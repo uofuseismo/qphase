@@ -4,6 +4,7 @@
 #include <QStandardPaths>
 #include "private/paths.hpp"
 #include "private/organization.hpp"
+#include "mainWindow.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -22,8 +23,8 @@ int main(int argc, char *argv[])
     std::string defaultUser(std::getenv("USER"));
 
     // Create the main application
-//    QNode::MainWindow mainWindow();//topics);
-//    mainWindow.show();
+    QPhase::QNode::MainWindow mainWindow;//topics);
+    mainWindow.show();
     auto error = QApplication::exec();
     if (error != 0){qCritical("Errors detected during execution");}
     return error;

@@ -59,8 +59,11 @@ target_include_directories(qphase_core
 ##########################################################################################
 #                                      Applications                                      #
 ##########################################################################################
-qt6_add_resources(QNODE_RESOURCES ${CMAKE_SOURCE_DIR}/resources/qnode.qrc)
-add_executable(qnode app/qnode.cpp ${QNODE_RESOURCES})
+qt6_add_resources(QNODE_RESOURCES
+                 ${CMAKE_SOURCE_DIR}/resources/qnode.qrc)
+add_executable(qnode
+               app/qnode/qnode.cpp
+               app/qnode/mainWindow.cpp ${QNODE_RESOURCES})
 set_target_properties(qnode PROPERTIES
                       CXX_STANDARD 17
                       CXX_STANDARD_REQUIRED YES
