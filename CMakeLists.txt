@@ -39,7 +39,8 @@ set(PRIVATE_HEADER_DIRECTORIES
 #                                        Libraries                                       #
 ##########################################################################################
 set(DB_SRC
-    src/database/internal/arrival.cpp)
+    src/database/internal/arrival.cpp
+    src/database/internal/origin.cpp)
 
 set(BUILD_SHARED_LIBS YES)
 add_library(qphase_core ${DB_SRC} src/version.cpp)

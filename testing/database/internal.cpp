@@ -1,6 +1,7 @@
 #include <string>
 #include <chrono>
 #include "qphase/database/internal/arrival.hpp"
+#include "qphase/database/internal/origin.hpp"
 #include <gtest/gtest.h>
 
 namespace
@@ -59,7 +60,33 @@ TEST(DatabaseInternal, Arrival)
 
 TEST(DatabaseInternal, Origin)
 {
+    const double time{110.12};
+    const double depth{10};
+    const double latitude{41};
+    const double longitude{-112 + 360};
+    const std::chrono::microseconds referenceTime{110120000};
+    auto reviewStatus = Origin::ReviewStatus::FINALIZED;
+    const int64_t id = 103;
 
+    Origin origin;
+    origin.setIdentifier(id);
+    origin.setLatitude(latitude);
+    origin.setLongitude(longitude);
+    origin.setDepth(depth);
+    origin.setTime(time);
+    origin.setReviewStatus(reviewStatus);
+
+    Origin oCopy(origin);
+    EXPECT_EQ(oCopy.getIdentifier(), id);
+    EXPECT_EQ(oCopy.getTime(), referenceTime);
+    EXPECT_NEAR(oCopy.getLongitude(), longitude - 360, 1.e-14);
+    EXPECT_NEAR(oCopy.getLatitude(), latitude, 1.e-14);
+    EXPECT_NEAR(oCopy.getDepth(), depth, 1.e-14);
+    EXPECT_EQ(oCopy.getReviewStatus(), reviewStatus);
+
+    origin.clear();
+    EXPECT_EQ(origin.getReviewStatus(), Origin::ReviewStatus::AUTOMATIC);
+    
 }
 
 }

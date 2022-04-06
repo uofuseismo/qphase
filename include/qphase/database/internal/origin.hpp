@@ -66,7 +66,7 @@ public:
     /// @brief Sets the event longitude.
     /// @param[in] longitude  The event longitude in degrees.  This is
     ///                       positive east.
-    void setLongtiude(double longitude) noexcept;
+    void setLongitude(double longitude) noexcept;
     /// @result The event longitude in degrees.  This will be in the range
     ///         [-180,180).
     /// @throws std::runtime_error if \c haveLongitude() is false.
@@ -82,6 +82,9 @@ public:
     [[nodiscard]] bool haveDepth() const noexcept;
 
     /// @brief Sets the event origin time.
+    /// @param[in] time  The event origin time in seconds (UTC) from the epoch.
+    void setTime(double time) noexcept;
+    /// @brief Sets the event origin time.
     /// @param[in] time  The event origin time in microseconds (UTC) from
     ///                  the epoch (Jan 1, 1970).
     void setTime(const std::chrono::microseconds &time) noexcept;
@@ -95,7 +98,7 @@ public:
     void setIdentifier(int64_t identifier) noexcept;
     /// @result The origin identifier.
     /// @throws std::runtime_error if \c haveIdentifier() is false.
-    [[nodiscard]] getIdentifier() const;
+    [[nodiscard]] int64_t getIdentifier() const;
     /// @result True indicates the origin identifier was set.
     [[nodiscard]] bool haveIdentifier() const noexcept;
     /// @}
