@@ -1,12 +1,14 @@
 #include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QListView>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QString>
 #include <QToolBar>
+#include <QSplitter>
 #include <QVBoxLayout>
 #include "mainWindow.hpp"
 #include <qphase/version.hpp>
@@ -36,13 +38,17 @@ MainWindow::MainWindow(QWidget *parent) :
     auto mainLayout = new QVBoxLayout();
     //mainLayout->addWidget();
  
-    auto eventAndTraceViewBox = new QHBoxLayout();
+    //auto eventAndTraceViewBox = new QHBoxLayout();
+    auto eventAndTraceViewSplitter = new QSplitter(Qt::Horizontal);
 
+    mEventListView = new QListView();
+    mEventListView->setMaximumWidth(280);
     mTraceView = new QGraphicsView();
 
     mainLayout->addWidget(mMainToolBar);
-    eventAndTraceViewBox->addWidget(mTraceView);
-    mainLayout->addLayout(eventAndTraceViewBox);
+    eventAndTraceViewSplitter->addWidget(mEventListView);
+    eventAndTraceViewSplitter->addWidget(mTraceView);
+    mainLayout->addWidget(eventAndTraceViewSplitter);
     mainLayout->addWidget(mStatusBar); 
 
     centralWidget->setLayout(mainLayout);
@@ -62,7 +68,9 @@ void MainWindow::createMainToolBar()
 void MainWindow::createStatusBar()
 {
     mStatusBar = new QStatusBar();
-    mStatusBar->showMessage(QString("Welcome to QNode"));
+    mStatusBar->setStyleSheet("background-color : rgb(255,255,255);");
+    mStatusBar->setFixedHeight(20);
+    mStatusBar->showMessage(tr("Welcome to QNode"));
 }
 
 /// Creates the menus

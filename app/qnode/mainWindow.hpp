@@ -10,8 +10,10 @@ class Topics;
 */
 QT_BEGIN_NAMESPACE
 class QStatusBar;
-class QGraphicsView;
 class QToolBar;
+
+class QGraphicsView;
+class QListView;
 QT_END_NAMESPACE
 namespace QPhase::QNode
 {
@@ -31,6 +33,7 @@ private slots:
 private:
 //    std::shared_ptr<QURTS::Topics> mTopics{nullptr};
     QGraphicsView *mTraceView{nullptr};
+    QListView *mEventListView{nullptr};
     QStatusBar *mStatusBar{nullptr};
     QToolBar *mMainToolBar{nullptr};
 };
