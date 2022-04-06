@@ -89,6 +89,18 @@ target_include_directories(unitTests
                            PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>)
 
 ##########################################################################################
+#                                      Installation                                      #
+##########################################################################################
+include(GNUInstallDirs)
+install(TARGETS qnode qphase_core
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/qphase
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+#install(DIRECTORY ${PUBLIC_HEADER_DIRECTORIES}/qphase
+#        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+##########################################################################################
 #                                     CPack Packaging                                    #
 ##########################################################################################
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
