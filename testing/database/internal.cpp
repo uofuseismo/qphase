@@ -2,6 +2,7 @@
 #include <chrono>
 #include "qphase/database/internal/arrival.hpp"
 #include "qphase/database/internal/origin.hpp"
+#include "qphase/database/internal/stationData.hpp"
 #include <gtest/gtest.h>
 
 namespace
@@ -86,7 +87,44 @@ TEST(DatabaseInternal, Origin)
 
     origin.clear();
     EXPECT_EQ(origin.getReviewStatus(), Origin::ReviewStatus::AUTOMATIC);
+}
+
+TEST(DatabaseInternal, StationData)
+{
+    const double latitude{40.77};
+    const double longitude{-111.85 + 360};
+    const double elevation{1449};
+    const std::string description{"University of Utah EMCB Bldg, SLC, UT, USA"};
+    const std::string network{"UU"};
+    const std::string station{"UUE"};
+    const std::chrono::microseconds onDate{1588291200000000};
+    const std::chrono::microseconds offDate{1651363200000000};
+    const std::chrono::microseconds loadDate{1651313200000000};
     
+    StationData stationData;
+    stationData.setNetwork(network);
+    stationData.setStation(station);
+    stationData.setLatitude(latitude);
+    stationData.setLongitude(longitude);
+    stationData.setElevation(elevation);
+    stationData.setDescription(description);
+    stationData.setOnOffDate(std::pair {onDate, offDate});
+    stationData.setLoadDate(loadDate);
+
+    StationData sCopy(stationData);
+    EXPECT_EQ(sCopy.getNetwork(), network);
+    EXPECT_EQ(sCopy.getStation(), station);
+    EXPECT_EQ(sCopy.getDescription(), description);
+    EXPECT_EQ(sCopy.getOnDate(), onDate);
+    EXPECT_EQ(sCopy.getOffDate(), offDate);
+    EXPECT_EQ(sCopy.getLoadDate(), loadDate);
+    EXPECT_NEAR(sCopy.getLatitude(), latitude, 1.e-10);
+    EXPECT_NEAR(sCopy.getLongitude(), longitude - 360, 1.e-10);
+    EXPECT_NEAR(sCopy.getElevation(), elevation, 1.e-10);
+
+    EXPECT_TRUE(sCopy == stationData);
+    stationData.clear();
+    EXPECT_TRUE(sCopy != stationData);
 }
 
 }

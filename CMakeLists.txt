@@ -40,7 +40,8 @@ set(PRIVATE_HEADER_DIRECTORIES
 ##########################################################################################
 set(DB_SRC
     src/database/internal/arrival.cpp
-    src/database/internal/origin.cpp)
+    src/database/internal/origin.cpp
+    src/database/internal/stationData.cpp)
 
 set(BUILD_SHARED_LIBS YES)
 add_library(qphase_core ${DB_SRC} src/version.cpp)
@@ -88,7 +89,9 @@ target_include_directories(unitTests
                            PRIVATE ${GTEST_INCLUDE_DIRS}
                                    ${PRIVATE_HEADER_DIRECTORIES}
                            PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>)
-
+# Add the tests
+add_test(NAME unitTests
+         COMMAND unitTests)
 ##########################################################################################
 #                                      Installation                                      #
 ##########################################################################################
