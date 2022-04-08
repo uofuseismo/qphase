@@ -62,6 +62,20 @@ MainWindow::~MainWindow() = default;
 void MainWindow::createMainToolBar()
 {
     mMainToolBar = new QToolBar();
+   
+    // Open icon
+    const auto openIcon
+        = QIcon::fromTheme("document-open", QIcon(":/images/open.png"));
+    auto openAction = new QAction(openIcon, tr("&Open..."));
+    openAction->setShortcuts(QKeySequence::Open);
+    openAction->setStatusTip(tr("Open waveforms"));
+    mMainToolBar->addAction(openAction);
+
+    // Map icon
+    const QIcon mapIcon(":/images/map_icon.png");
+    auto mainMapAction = new QAction(mapIcon, tr("Map"));
+    mainMapAction->setStatusTip("Map view of stations and events");
+    mMainToolBar->addAction(mainMapAction);
 }
 
 /// Creates the status bar
@@ -112,3 +126,4 @@ void MainWindow::createMenus()
     //---------------------------------Mac Nonsense---------------------------//
     setUnifiedTitleAndToolBarOnMac(true);
 }
+
