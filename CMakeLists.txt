@@ -27,6 +27,9 @@ find_package(SOCI REQUIRED)
 find_package(Boost COMPONENTS program_options date_time REQUIRED)
 find_package(GTest REQUIRED)
 
+set(FindQGeoView_DIR ${CMAKE_SOURCE_DIR}/cmake)
+find_package(FindQGeoView)
+
 include_directories(
     ${CMAKE_SOURCE_DIR}/include)
 set(PUBLIC_HEADER_DIRECTORIES
@@ -43,6 +46,18 @@ set(DB_SRC
     src/database/internal/origin.cpp
     src/database/internal/stationData.cpp)
 
+set(UI_SRC)
+#    src/widgets/map/background.cpp)
+
+if (${FindQGeoView_FOUND})
+    set(MAP_SRC
+        src/widgets/map/background.cpp
+        src/widgets/map/boundary.cpp 
+        src/widgets/map/station.cpp
+        include/qphase/widgets/map/QGVMapBox.hpp
+        src/widgets/map/QGVMapBox.cpp)
+endif()
+
 set(BUILD_SHARED_LIBS YES)
 add_library(qphase_core ${DB_SRC} src/version.cpp)
 set_target_properties(qphase_core PROPERTIES
@@ -58,6 +73,19 @@ target_include_directories(qphase_core
                            PUBLIC $<INSTALL_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>)
 
 
+add_library(qphase_widgets ${UI_SRC} ${MAP_SRC})
+set_target_properties(qphase_widgets PROPERTIES
+                      CXX_STANDARD 17
+                      CXX_STANDARD_REQUIRED YES
+                      CXX_EXTENSIONS NO)
+target_link_libraries(qphase_widgets
+                      PUBLIC qphase_core
+                      PRIVATE ${QGEOVIEW_LIBRARY} Qt6::Core Qt6::Widgets Qt6::Network)
+target_include_directories(qphase_widgets
+                           PUBLIC ${Qt6Widgets_INCLUDE_DIRS} ${QGEOVIEW_INCLUDE_DIR}
+                           PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>
+                           PUBLIC $<INSTALL_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>)
+
 ##########################################################################################
 #                                      Applications                                      #
 ##########################################################################################
@@ -71,7 +99,7 @@ set_target_properties(qnode PROPERTIES
                       CXX_STANDARD_REQUIRED YES
                       CXX_EXTENSIONS NO)
 target_link_libraries(qnode
-                      PRIVATE qphase_core Qt6::Core Qt6::Widgets Qt6::Network)
+                      PRIVATE qphase_core qphase_widgets Qt6::Core Qt6::Widgets Qt6::Network)
 ##########################################################################################
 #                                       Unit Tests                                       #
 ##########################################################################################
