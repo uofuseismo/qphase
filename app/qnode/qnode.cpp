@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(qnode);
 
     QApplication app(argc, argv);
-
+    QIcon::setThemeName("Yaru"); // TODO get this from CMake
     QCoreApplication::setOrganizationName(ORGANIZATION);
     QCoreApplication::setApplicationName("QNode");
     QCoreApplication::setOrganizationDomain("quake.utah.edu");
