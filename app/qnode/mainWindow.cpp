@@ -101,7 +101,8 @@ void MainWindow::createMenus()
     exitAction->setStatusTip(tr("Exit the application."));
     //-----------------------------------Help---------------------------------//
     auto helpMenu = menuBar()->addMenu(tr("&Help"));
-    auto aboutAction   = new QAction(tr("About QNode"), this);
+    QIcon applicationIcon(":/images/BlockU_redweb.png");
+    auto aboutAction   = new QAction(applicationIcon, tr("About QNode"), this);
     aboutAction->setStatusTip(tr("More about QNode"));
     connect(aboutAction,   &QAction::triggered,
             [=]()
@@ -112,7 +113,8 @@ void MainWindow::createMenus()
                      "<p>Copyright (C) University of Utah Seismograph "
                      "Stations, 2022."));
             });
-    auto aboutQtAction = new QAction(tr("About Qt"), this);
+    QIcon qtIcon(":/images/qt_extended_32x32.png");
+    auto aboutQtAction = new QAction(qtIcon, tr("About Qt"), this);
     aboutQtAction->setStatusTip(tr("More about Qt"));
     connect(aboutQtAction, &QAction::triggered,
             [=]()

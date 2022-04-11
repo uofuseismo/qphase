@@ -3,6 +3,7 @@
   <qresource>
      <file>images/map_icon.png</file>
      <file>images/BlockU_redweb.png</file>
+     <file>images/qt_extended_32x32.png</file>
   </qresource>
 </RCC>
 
