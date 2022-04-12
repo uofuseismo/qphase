@@ -215,10 +215,21 @@ QString Event::projTooltip(const QPointF &projPos) const
 
     if (pImpl->mHaveOriginTime)
     {
-//        std::stringstream ss;
-//        ss << pImpl->mOriginTime;
-//        result = result + "Origin Time: "
-//               + QString::fromStdString(ss.str()) + " (UTC)\n";
+        std::stringstream ss;
+        auto originTimeMilliSeconds
+            = static_cast<double> (pImpl->mOriginTime.count()*1.e-3);
+        auto originTimeUTC
+            = QDateTime::fromMSecsSinceEpoch(originTimeMilliSeconds,
+                                             Qt::UTC);
+        auto originTimeLocal
+            = QDateTime::fromMSecsSinceEpoch(originTimeMilliSeconds,
+                                             Qt::LocalTime); 
+        result = result
+               + "Origin Time (UTC): "
+               //+ originTimeUTC.toString("yyyy-MM-dd hh:mm:ss.z") + " (UTC)\n"
+               + originTimeUTC.toString(Qt::ISODate)
+               + "\nOrigin Time (Local): "
+               + originTimeLocal.toString(Qt::ISODate) + "\n";
     }
 
     if (pImpl->mHaveLatitudeAndLongitude && pImpl->mHaveDepth)
