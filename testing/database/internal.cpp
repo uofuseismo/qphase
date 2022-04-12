@@ -1,14 +1,24 @@
 #include <string>
 #include <chrono>
 #include "qphase/database/internal/arrival.hpp"
+#include "qphase/database/internal/magnitude.hpp"
 #include "qphase/database/internal/origin.hpp"
 #include "qphase/database/internal/stationData.hpp"
+#include "qphase/database/connection/sqlite3.hpp"
 #include <gtest/gtest.h>
 
 namespace
 {
 
 using namespace QPhase::Database::Internal;
+
+TEST(DatabaseConnection, SQLite3)
+{
+    QPhase::Database::Connection::SQLite3 sqlite3;
+    EXPECT_NO_THROW(sqlite3.setFileName("test.sqlite3"));
+    EXPECT_NO_THROW(sqlite3.connect());
+    EXPECT_TRUE(sqlite3.isConnected());
+}
 
 TEST(DatabaseInternal, Arrival)
 {
@@ -57,6 +67,27 @@ TEST(DatabaseInternal, Arrival)
     EXPECT_EQ(arrival.getPhase(), "P");
     arrival.setPhase(Arrival::Phase::S);
     EXPECT_EQ(arrival.getPhase(), "S");
+}
+
+TEST(DatabaseInternal, Magnitude)
+{
+    const int64_t identifier = 423;
+    const double value = 5.6;
+    const std::string type{"l"};
+
+    Magnitude magnitude;
+    magnitude.setIdentifier(identifier);
+    magnitude.setValue(value);
+    magnitude.setType(type);
+   
+    Magnitude magCopy(magnitude);
+    EXPECT_EQ(magCopy.getIdentifier(), identifier);
+    EXPECT_EQ(magCopy.getType(), type);
+    EXPECT_NEAR(magCopy.getValue(), value, 1.e-14);
+
+    EXPECT_TRUE(magnitude == magCopy);
+    magnitude.clear();
+    EXPECT_TRUE(magnitude != magCopy);
 }
 
 TEST(DatabaseInternal, Origin)
@@ -125,6 +156,11 @@ TEST(DatabaseInternal, StationData)
     EXPECT_TRUE(sCopy == stationData);
     stationData.clear();
     EXPECT_TRUE(sCopy != stationData);
+}
+
+TEST(DatabaseInternal, StationDataTable)
+{
+ 
 }
 
 }
