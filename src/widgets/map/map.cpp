@@ -7,6 +7,7 @@
 #include "qphase/widgets/map/event.hpp"
 #include "qphase/widgets/map/station.hpp"
 #include "qphase/widgets/map/map.hpp"
+#include "qphase/widgets/map/options.hpp"
 #include "qphase/database/internal/stationData.hpp"
 
 using namespace QPhase::Widgets::Map;
@@ -40,7 +41,6 @@ public:
     MapImpl() :
         mBackground(new Background())
     {
-/*
         // Map center
         mMapCenter = pairToGeoPos(mOptions.getCenter());
         // Boundaries
@@ -51,12 +51,9 @@ public:
         }
         /// Scale
         mScale = mOptions.getScale();
-*/
     }
-/*
 ///private:
     Options mOptions;
-*/
     Background *mBackground{nullptr};
     QNetworkAccessManager *mNetworkManager{nullptr};
     QNetworkDiskCache *mNetworkCache{nullptr};
@@ -76,9 +73,9 @@ Map::Map(QWidget *parent) :
 {
     // Need ability to `download' maps.  If possible read already downloaded
     // maps.
-//    auto mapCache = pImpl->mOptions.getTileCacheDirectory();
+    auto mapCache = pImpl->mOptions.getTileCacheDirectory();
     pImpl->mNetworkCache = new QNetworkDiskCache(this);
-//    pImpl->mNetworkCache->setCacheDirectory(mapCache.c_str());
+    pImpl->mNetworkCache->setCacheDirectory(mapCache.c_str());
     pImpl->mNetworkManager = new QNetworkAccessManager(this);
     pImpl->mNetworkManager->setCache(pImpl->mNetworkCache);
     QGV::setNetworkManager(pImpl->mNetworkManager);

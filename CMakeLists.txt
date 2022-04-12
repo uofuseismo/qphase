@@ -61,6 +61,7 @@ if (${FindQGeoView_FOUND})
         src/widgets/map/boundary.cpp 
         src/widgets/map/event.cpp
         src/widgets/map/map.cpp
+        src/widgets/map/options.cpp
         src/widgets/map/station.cpp
         include/qphase/widgets/map/QGVMapBox.hpp
         src/widgets/map/QGVMapBox.cpp)

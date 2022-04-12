@@ -14,11 +14,11 @@ class Event::EventImpl
 {
 public:
     EventImpl()
-    {   
+    {
         mPen.setWidth(0);
         mPen.setColor(Qt::black);
         mPen.setCosmetic(true);
-    }   
+    }
     QGV::GeoPos mGeoPosition;
     QRectF mProjRect;
     QString mIdentifier;

@@ -13,14 +13,17 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <filesystem>
-#include "mainWindow.hpp"
 #include <qphase/version.hpp>
+#include "mainWindow.hpp"
+#include "topics.hpp"
+#include "utilities.hpp"
 
 using namespace QPhase::QNode;
 
 /// C'tor
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
+    QMainWindow(parent),
+    mTopics(topics)
 {
     resize(1100, 600);
     setWindowIcon(QIcon(":images/BlockU_redweb.png"));
@@ -103,6 +106,16 @@ void MainWindow::createMainToolBar()
                         settings.setValue(defaultDirectory,
                                           QString {directory.c_str()});
                     }
+                    try
+                    {
+                        loadDatabase(fileName.toStdString());
+                        loadedFile = true;
+                    }
+                    catch (const std::exception &e)
+                    {
+                        qCritical() << e.what();
+                        loadedFile = false;
+                    }
                 }
                 if (loadedFile){qDebug() << "Loaded catalog";}
             });
@@ -113,6 +126,18 @@ void MainWindow::createMainToolBar()
     auto mainMapAction = new QAction(mapIcon, tr("Map"));
     mainMapAction->setToolTip("Map view of stations and events");
     mMainToolBar->addAction(mainMapAction);
+}
+
+/// Loads the database
+void MainWindow::loadDatabase(const std::string &fileName)
+{
+    constexpr bool readOnly = false;
+    if (mTopics->mInternalDatabaseConnection != nullptr)
+    {
+        qInfo() << "Closing previous database";
+    }
+    mTopics->mInternalDatabaseConnection
+        = createSQLite3Connection(fileName, readOnly);
 }
 
 /// Creates the status bar

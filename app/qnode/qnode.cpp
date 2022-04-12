@@ -5,9 +5,11 @@
 #include "private/paths.hpp"
 #include "private/organization.hpp"
 #include "mainWindow.hpp"
+#include "topics.hpp"
 
 int main(int argc, char *argv[])
 {
+    auto topics = std::make_shared<QPhase::QNode::Topics> ();
     Q_INIT_RESOURCE(qnode);
 
     QApplication app(argc, argv);
@@ -24,7 +26,7 @@ int main(int argc, char *argv[])
     std::string defaultUser(std::getenv("USER"));
 
     // Create the main application
-    QPhase::QNode::MainWindow mainWindow;//topics);
+    QPhase::QNode::MainWindow mainWindow(topics);
     mainWindow.show();
     auto error = QApplication::exec();
     if (error != 0){qCritical("Errors detected during execution");}

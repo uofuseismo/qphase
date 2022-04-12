@@ -87,7 +87,7 @@ void SQLite3::connect()
     }
     else
     {
-        connectionString = connectionString + "readonly=false";
+        connectionString = connectionString + " readonly=false";
     }
     try
     {
