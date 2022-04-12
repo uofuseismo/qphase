@@ -1,6 +1,7 @@
 #include <string>
 #include <chrono>
 #include "qphase/database/internal/arrival.hpp"
+#include "qphase/database/internal/event.hpp"
 #include "qphase/database/internal/magnitude.hpp"
 #include "qphase/database/internal/origin.hpp"
 #include "qphase/database/internal/stationData.hpp"
@@ -118,6 +119,54 @@ TEST(DatabaseInternal, Origin)
 
     origin.clear();
     EXPECT_EQ(origin.getReviewStatus(), Origin::ReviewStatus::AUTOMATIC);
+}
+
+TEST(DatabaseInternal, Event)
+{
+    const int64_t magIdentifier = 123;
+    const double value = 3.6;
+    const std::string magnitudeType{"d"};
+
+    Magnitude magnitude;
+    magnitude.setIdentifier(magIdentifier);
+    magnitude.setValue(value);
+    magnitude.setType(magnitudeType);
+
+    const double time{112.12};
+    const double depth{11};
+    const double latitude{41.1};
+    const double longitude{-112.5};
+    auto originReviewStatus = Origin::ReviewStatus::FINALIZED;
+    const int64_t originIdentifier = 103;
+
+    Origin origin;
+    origin.setIdentifier(originIdentifier);
+    origin.setLatitude(latitude);
+    origin.setLongitude(longitude);
+    origin.setDepth(depth);
+    origin.setTime(time);
+    origin.setReviewStatus(originReviewStatus);
+
+    Event event;
+    const auto reviewStatus = Event::ReviewStatus::INCOMPLETE;
+    const auto eventType = Event::Type::QUARRY_BLAST;
+    EXPECT_NO_THROW(event.setOrigin(origin));
+    EXPECT_NO_THROW(event.setMagnitude(magnitude));
+    event.setType(eventType);
+    event.setReviewStatus(reviewStatus);
+
+    Event eCopy(event);
+    EXPECT_EQ(eCopy.getOrigin(), origin);
+    EXPECT_EQ(eCopy.getMagnitude(), magnitude);
+    EXPECT_EQ(eCopy.getType(), eventType);
+    EXPECT_EQ(eCopy.getReviewStatus(), reviewStatus);
+
+    EXPECT_TRUE(eCopy == event);
+
+    eCopy.clear();
+    EXPECT_TRUE(eCopy != event);
+    EXPECT_EQ(eCopy.getReviewStatus(), Event::ReviewStatus::AUTOMATIC);
+    EXPECT_EQ(eCopy.getType(), Event::Type::UNKNOWN);
 }
 
 TEST(DatabaseInternal, StationData)

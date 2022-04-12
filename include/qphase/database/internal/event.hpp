@@ -3,6 +3,8 @@
 #include <memory>
 namespace QPhase::Database::Internal
 {
+class Origin;
+class Magnitude;
 /// @name Event "event.hpp" "qphase/database/internal/event.hpp"
 /// @brief Defines an event.
 /// @copyright Ben Baker (University of Utah) distributed under the MIT license.
@@ -41,6 +43,57 @@ public:
     Event(Event &&event) noexcept;
     /// @}
 
+    /// @name Properties
+    /// @{
+
+    /// @brief Sets the identifier.
+    /// @param[in] identifier  The event identifier.
+    void setIdentifier(int64_t identifier) noexcept;
+    /// @result The event identifier.
+    /// @throws std::invalid_argument if \c haveIdentifier() is false.
+    [[nodiscard]] int64_t getIdentifier() const;
+    /// @result True indicates the identifier was set.
+    [[nodiscard]] bool haveIdentifier() const noexcept;
+
+    /// @brief Sets the event's origin.
+    /// @param[in] origin  The event's origin.
+    /// @throws std::invalid_argument if the origin's latitude, longitude,
+    ///         depth, and time are not set.
+    void setOrigin(const Origin &origin);
+    /// @result The origin.
+    /// @throws std::runtime_error if \c haveOrigin() is false.
+    [[nodiscard]] Origin getOrigin() const;
+    /// @result True indicates the origin was set.
+    [[nodiscard]] bool haveOrigin() const noexcept;
+
+    /// @brief Sets the event's magnitude.
+    /// @param[in] magnitude  The event's magnitude.
+    /// @throws std::invalid_argument if the magnitude's value and type
+    ///         are not set.
+    void setMagnitude(const Magnitude &magnitude);
+    /// @result The magnitude.
+    /// @throws std::runtime_error if \c haveMagnitude() is false.
+    [[nodiscard]] Magnitude getMagnitude() const;
+    /// @result True indicates the magnitude was set.
+    [[nodiscard]] bool haveMagnitude() const noexcept;
+    /// @}
+
+    /// @name Optional Properties
+    /// @{
+
+    /// @brief Sets the event type.
+    /// @param[in] type  The event type.
+    void setType(Event::Type type) noexcept;
+    /// @result The event type.
+    [[nodiscard]] Event::Type getType() const noexcept;
+
+    /// @brief Sets the review status.
+    /// @param[in] status  The review status.
+    void setReviewStatus(Event::ReviewStatus status) noexcept;
+    /// @result The review status.
+    [[nodiscard]] Event::ReviewStatus getReviewStatus() const noexcept; 
+    /// @}
+
     /// @name Operators
     /// @{
 
@@ -67,5 +120,7 @@ private:
     class EventImpl;
     std::unique_ptr<EventImpl> pImpl;
 };
+[[nodiscard]] bool operator==(const Event &lhs, const Event &rhs);
+[[nodiscard]] bool operator!=(const Event &lhs, const Event &rhs);
 }
 #endif

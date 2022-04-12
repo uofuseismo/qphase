@@ -4,8 +4,14 @@
 #include <chrono>
 namespace QPhase::Database
 {
- class Connection::SQLite3;
- class Internal::StationData;
+ namespace Connection
+ {
+  class SQLite3;
+ }
+ namespace Internal
+ {
+  class Internal;
+ }
 }
 namespace QPhase::Database::Internal
 {
@@ -23,7 +29,7 @@ public:
     /// @}
 
     /// @brief Sets a connection to the internal database.
-    void setConnection(std::shared_ptr<QPhase::Database::Connection::SQLite3> &connection;
+    void setConnection(std::shared_ptr<QPhase::Database::Connection::SQLite3> &connection);
     /// @result True indicates the database is connected.
     [[nodiscard]] bool isConnected() const noexcept;
  

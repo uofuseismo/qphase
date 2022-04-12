@@ -125,5 +125,7 @@ private:
     class OriginImpl;
     std::unique_ptr<OriginImpl> pImpl;
 };
+[[nodiscard]] bool operator==(const Origin &lhs, const Origin &rhs);
+[[nodiscard]] bool operator!=(const Origin &lhs, const Origin &rhs);
 }
 #endif

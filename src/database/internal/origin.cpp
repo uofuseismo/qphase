@@ -213,3 +213,72 @@ Origin::ReviewStatus Origin::getReviewStatus() const noexcept
 {
     return pImpl->mReviewStatus;
 }
+
+///--------------------------------------------------------------------------///
+///                                Operators                                 ///
+///--------------------------------------------------------------------------///
+
+/*
+    double mLatitude = std::numeric_limits<double>::lowest();
+    double mLongitude = std::numeric_limits<double>::lowest();
+    double mDepth{0};
+    int64_t mIdentifier{0};
+    std::chrono::microseconds mTime{0};
+    Origin::ReviewStatus mReviewStatus = Origin::ReviewStatus::AUTOMATIC;
+*/
+
+bool QPhase::Database::Internal::operator==(
+    const Origin &lhs, const Origin &rhs)
+{
+    if (lhs.getReviewStatus() != rhs.getReviewStatus()){return false;}
+
+    if (lhs.haveIdentifier() != rhs.haveIdentifier()){return false;}
+    if (lhs.haveIdentifier())
+    {
+        if (lhs.getIdentifier() != rhs.getIdentifier()){return false;}
+    }
+
+    if (lhs.haveTime() != rhs.haveTime()){return false;}
+    if (lhs.haveTime())
+    {
+        if (lhs.getTime() != rhs.getTime()){return false;} 
+    }
+
+    if (lhs.haveLatitude() != rhs.haveLatitude()){return false;}
+    if (lhs.haveLatitude())
+    {   
+        if (std::abs(lhs.getLatitude() - rhs.getLatitude()) >
+            std::numeric_limits<double>::epsilon()*100)
+        {
+            return false;
+        }
+    }
+
+    if (lhs.haveLongitude() != rhs.haveLongitude()){return false;}
+    if (lhs.haveLongitude())
+    {
+        if (std::abs(lhs.getLongitude() - rhs.getLongitude()) >
+            std::numeric_limits<double>::epsilon()*1000)
+        {
+            return false;
+        }
+    }
+
+    if (lhs.haveDepth() != rhs.haveDepth()){return false;}
+    if (lhs.haveDepth())
+    {
+        if (std::abs(lhs.getDepth() - rhs.getDepth()) >
+            std::numeric_limits<double>::epsilon()*100)
+        {
+            return false;
+        }
+    }
+ 
+    return true;
+}
+
+bool QPhase::Database::Internal::operator!=(
+    const Origin &lhs, const Origin &rhs)
+ {
+    return !(lhs == rhs);
+}

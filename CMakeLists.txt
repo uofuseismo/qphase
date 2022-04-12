@@ -41,10 +41,16 @@ set(PRIVATE_HEADER_DIRECTORIES
 ##########################################################################################
 #                                        Libraries                                       #
 ##########################################################################################
+set(CORE_SRC
+    src/observerPattern/subject.cpp)
 set(DB_SRC
+    src/database/connection/sqlite3.cpp
     src/database/internal/arrival.cpp
+    src/database/internal/event.cpp
+    src/database/internal/magnitude.cpp
     src/database/internal/origin.cpp
-    src/database/internal/stationData.cpp)
+    src/database/internal/stationData.cpp
+    src/database/internal/stationDataTable.cpp)
 
 set(UI_SRC)
 #    src/widgets/map/background.cpp)
@@ -61,14 +67,14 @@ if (${FindQGeoView_FOUND})
 endif()
 
 set(BUILD_SHARED_LIBS YES)
-add_library(qphase_core ${DB_SRC} src/version.cpp)
+add_library(qphase_core ${CORE_SRC} ${DB_SRC} src/version.cpp)
 set_target_properties(qphase_core PROPERTIES
                       CXX_STANDARD 20
                       CXX_STANDARD_REQUIRED YES
                       CXX_EXTENSIONS NO)
 target_link_libraries(qphase_core
 #                      PUBLIC #${TIME_LIBRARY}
-                      PRIVATE Boost::date_time SOCI::soci_sqlite3)# SOCI::soci_postgresql)
+                      PRIVATE Boost::date_time SOCI::soci_core SOCI::soci_sqlite3)# SOCI::soci_postgresql)
 target_include_directories(qphase_core
                            PRIVATE SOCI::soci_sqlite3
                            PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>
