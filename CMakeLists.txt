@@ -51,6 +51,8 @@ set(DB_SRC
     src/database/internal/origin.cpp
     src/database/internal/stationData.cpp
     src/database/internal/stationDataTable.cpp)
+set(WS_SRC
+    src/webServices/comcat/event.cpp)
 
 set(UI_SRC)
 #    src/widgets/map/background.cpp)
@@ -68,7 +70,7 @@ if (${FindQGeoView_FOUND})
 endif()
 
 set(BUILD_SHARED_LIBS YES)
-add_library(qphase_core ${CORE_SRC} ${DB_SRC} src/version.cpp)
+add_library(qphase_core ${CORE_SRC} ${DB_SRC} ${WS_SRC} src/version.cpp)
 set_target_properties(qphase_core PROPERTIES
                       CXX_STANDARD 20
                       CXX_STANDARD_REQUIRED YES
@@ -114,7 +116,8 @@ target_link_libraries(qnode
 ##########################################################################################
 set(TEST_SRC
     testing/main.cpp
-    testing/database/internal.cpp)
+    testing/database/internal.cpp
+    testing/webServices/comcat.cpp)
 add_executable(unitTests ${TEST_SRC})
 set_target_properties(unitTests PROPERTIES
                       CXX_STANDARD 20
