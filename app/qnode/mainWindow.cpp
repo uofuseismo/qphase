@@ -1,7 +1,7 @@
 #include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QIcon>
-#include <QListView>
+#include <QTableView>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
@@ -17,6 +17,8 @@
 #include "mainWindow.hpp"
 #include "topics.hpp"
 #include "utilities.hpp"
+#include "eventTableModel.hpp"
+#include "eventTableView.hpp"
 
 using namespace QPhase::QNode;
 
@@ -47,12 +49,12 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     //auto eventAndTraceViewBox = new QHBoxLayout();
     auto eventAndTraceViewSplitter = new QSplitter(Qt::Horizontal);
 
-    mEventListView = new QListView();
-    mEventListView->setMaximumWidth(280);
+    auto mEventTableView = new EventTableView();
+
     mTraceView = new QGraphicsView();
 
     mainLayout->addWidget(mMainToolBar);
-    eventAndTraceViewSplitter->addWidget(mEventListView);
+    eventAndTraceViewSplitter->addWidget(mEventTableView);
     eventAndTraceViewSplitter->addWidget(mTraceView);
     mainLayout->addWidget(eventAndTraceViewSplitter);
     mainLayout->addWidget(mStatusBar); 

@@ -26,6 +26,7 @@ set(CMAKE_AUTOUIC ON)
 find_package(SOCI REQUIRED)
 find_package(Boost COMPONENTS program_options date_time REQUIRED)
 find_package(GTest REQUIRED)
+find_package(CURL)
 
 set(FindQGeoView_DIR ${CMAKE_SOURCE_DIR}/cmake)
 find_package(FindQGeoView)
@@ -53,6 +54,9 @@ set(DB_SRC
     src/database/internal/stationDataTable.cpp)
 set(WS_SRC
     src/webServices/comcat/event.cpp)
+if (${CURL_FOUND})
+
+endif()
 
 set(UI_SRC)
 #    src/widgets/map/background.cpp)
@@ -77,9 +81,10 @@ set_target_properties(qphase_core PROPERTIES
                       CXX_EXTENSIONS NO)
 target_link_libraries(qphase_core
 #                      PUBLIC #${TIME_LIBRARY}
-                      PRIVATE Boost::date_time SOCI::soci_core SOCI::soci_sqlite3)# SOCI::soci_postgresql)
+                      PRIVATE Boost::date_time SOCI::soci_core SOCI::soci_sqlite3
+                      PRIVATE ${CURL_LIBRARIES})# SOCI::soci_postgresql)
 target_include_directories(qphase_core
-                           PRIVATE SOCI::soci_sqlite3
+                           PRIVATE SOCI::soci_sqlite3 ${CURL_INCLUDE_DIRS}
                            PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>
                            PUBLIC $<INSTALL_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>)
 
@@ -104,6 +109,8 @@ qt6_add_resources(QNODE_RESOURCES
                  ${CMAKE_SOURCE_DIR}/resources/qnode.qrc)
 add_executable(qnode
                app/qnode/qnode.cpp
+               app/qnode/eventTableModel.cpp
+               app/qnode/eventTableView.cpp
                app/qnode/mainWindow.cpp ${QNODE_RESOURCES})
 set_target_properties(qnode PROPERTIES
                       CXX_STANDARD 17
