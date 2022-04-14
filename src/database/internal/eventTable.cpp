@@ -6,10 +6,58 @@
 #include "qphase/database/internal/eventTable.hpp"
 #include "qphase/database/internal/event.hpp"
 #include "qphase/database/internal/origin.hpp"
+#include "qphase/database/internal/arrival.hpp"
 #include "qphase/database/internal/magnitude.hpp"
 #include "qphase/database/connection/connection.hpp"
 
 using namespace QPhase::Database::Internal;
+
+namespace
+{
+[[nodiscard]] Event::Type stringToEventType(const std::string &eventType)
+{
+    auto temp = eventType;
+    std::transform(temp.begin(), temp.end(), temp.begin(), ::toupper);
+    if (temp == "LE")
+    {
+        return Event::Type::LOCAL_EARTHQUAKE;
+    }
+    else if (temp == "QB")
+    {
+        return Event::Type::QUARRY_BLAST;
+    }
+    else
+    {
+        std::cerr << "Unknown event type: " << temp << std::endl;
+    }
+    return Event::Type::UNKNOWN; 
+}
+[[nodiscard]] Event::ReviewStatus
+    stringToEventReviewStatus(const std::string &status)
+{
+    if (status == "a" || status == "A")
+    {
+        return Event::ReviewStatus::AUTOMATIC;
+    }
+    else if (status == "i" || status == "I")
+    {
+        return Event::ReviewStatus::INCOMPLETE;
+    }
+    else if (status == "f" || status == "F")
+    {
+        return Event::ReviewStatus::FINALIZED;
+    } 
+    else if (status == "c" || status == "C")
+    {
+        return Event::ReviewStatus::CANCELLED;
+    }
+    else
+    {
+        std::cerr << "Unknown review status: " << status << std::endl;
+    }
+    return Event::ReviewStatus::AUTOMATIC;
+}
+}
 
 template<> struct soci::type_conversion<Event>
 {
@@ -19,6 +67,9 @@ template<> struct soci::type_conversion<Event>
     {
         // Required by schema
         data.setIdentifier(v.get<int> ("evid"));
+        data.setType(stringToEventType(v.get<std::string> ("event_type")));
+        data.setReviewStatus(stringToEventReviewStatus(v.get<std::string>
+                             ("event_review_status")));
 
         Origin origin;
         origin.setIdentifier(v.get<int> ("orid"));
@@ -65,7 +116,7 @@ public:
         auto session = mConnection->getSession();
         soci::rowset<Event>
            rows(session->prepare
-                << "SELECT event.identifier as evid, "
+                << "SELECT event.identifier as evid, event.event_type as event_type, event.review_status as event_review_status, "
                 << " origin.identifier as orid, origin.latitude as latitude, origin.longitude as longitude, origin.depth, origin.time as origin_time, "
                 << " magnitude.identifier as magid, magnitude.magnitude as magnitude, magnitude.magnitude_type as magnitude_type "
                 << "FROM "

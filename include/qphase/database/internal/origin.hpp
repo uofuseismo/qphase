@@ -127,5 +127,6 @@ private:
 };
 [[nodiscard]] bool operator==(const Origin &lhs, const Origin &rhs);
 [[nodiscard]] bool operator!=(const Origin &lhs, const Origin &rhs);
+//std::ostream& operator<<(std::ostream &os, const Origin &origin);
 }
 #endif

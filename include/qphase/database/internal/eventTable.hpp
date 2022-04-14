@@ -33,10 +33,11 @@ public:
     /// @result True indicates the database is connected.
     [[nodiscard]] bool isConnected() const noexcept;
 
-    /// @brief Queries all stations from the database.
+    /// @brief Queries all events from the database.
     /// @throws std::runtime_error if \c isConnected() is false.
     void queryAll();
 
+    /// @result The queried events.
     [[nodiscard]] std::vector<Event> getEvents() const noexcept;
 
     /// @name Destructors

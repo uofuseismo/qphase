@@ -99,7 +99,7 @@ QVariant EventTableModel::data(
                     = static_cast<qint64> (std::round(originTimeMicroSeconds));
                 QDateTime originTime;
                 originTime.setMSecsSinceEpoch(mSecsSinceEpoch);
-                return QVariant(originTime);
+                return QVariant(originTime.toString(Qt::ISODate));
             }
         }
         return QVariant();

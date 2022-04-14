@@ -10,7 +10,7 @@ class EventTableView::EventTableViewImpl
 {
 public:
     //EventTableModel *mTableModel{nullptr}; 
-    std::array<int, 3> mTableWidths{95, 160, 95};
+    std::array<int, 3> mTableWidths{90, 170, 85};
     int mTableWidth = std::accumulate(mTableWidths.begin(),
                                       mTableWidths.end(), 0);// + 3;
 };
@@ -20,8 +20,8 @@ EventTableView::EventTableView(QWidget *parent) :
     QTableView(parent),
     pImpl(std::make_unique<EventTableViewImpl> ())
 {
-    //pImpl->mTableModel = new EventTableModel();
-    //setModel(pImpl->mTableModel);
+    auto tempModel = new EventTableModel();
+    setModel(tempModel);
  
     setStyleSheet("QTableView::item:selected{background-color: rgb(204,0,0);}");
     this->verticalScrollBar()->setFixedWidth(13);
@@ -38,12 +38,13 @@ EventTableView::EventTableView(QWidget *parent) :
 //    setMaximumWidth(pImpl->mTableWidth);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    setFixedWidth(pImpl->mTableWidth
+                + this->verticalScrollBar()->width() + 5);
+
     setColumnWidth(0, pImpl->mTableWidths.at(0));
     setColumnWidth(1, pImpl->mTableWidths.at(1));
     setColumnWidth(2, pImpl->mTableWidths.at(2));
-
-    setFixedWidth(pImpl->mTableWidth
-                - this->verticalScrollBar()->width() - 21);
 }
 
 /*

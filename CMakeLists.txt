@@ -49,6 +49,7 @@ set(CORE_SRC
 set(DB_SRC
     src/database/connection/sqlite3.cpp
     src/database/internal/arrival.cpp
+    src/database/internal/arrivalTable.cpp
     src/database/internal/event.cpp
     src/database/internal/eventTable.cpp
     src/database/internal/magnitude.cpp
