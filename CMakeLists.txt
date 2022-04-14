@@ -29,7 +29,9 @@ find_package(GTest REQUIRED)
 find_package(CURL)
 
 set(FindQGeoView_DIR ${CMAKE_SOURCE_DIR}/cmake)
+set(FindSFF_DIR ${CMAKE_SOURCE_DIR}/cmake)
 find_package(FindQGeoView)
+find_package(FindSFF)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/include)
