@@ -2,18 +2,28 @@
 #define QNODE_MAINWINDOW_HPP
 #include <memory>
 #include <QMainWindow>
-namespace QPhase::QNode
+namespace QPhase
 {
-class Topics;
+ namespace QNode
+ {
+  class Topics;
+ }
+ namespace Widgets::TableViews
+ {
+  class EventTableView;
+  class EventTableModel;
+ }
 }
+
 QT_BEGIN_NAMESPACE
 class QStatusBar;
 class QToolBar;
 
 class QGraphicsView;
 //class QListView;
-class QTableView;
+//class QTableView;
 QT_END_NAMESPACE
+
 namespace QPhase::QNode
 {
 class MainWindow : public QMainWindow
@@ -24,6 +34,8 @@ public:
                         QWidget *parent = nullptr); //std::shared_ptr<Topics> &topics,
 //                        QWidget *parent = nullptr);
     virtual ~MainWindow();
+public slots:
+    void refreshEventList();
 private:
     void createMenus();
     void createMainToolBar();
@@ -33,8 +45,9 @@ private slots:
     //void aboutQt();
 private:
     std::shared_ptr<QPhase::QNode::Topics> mTopics{nullptr};
+    QPhase::Widgets::TableViews::EventTableModel *mEventTableModel{nullptr};
+    QPhase::Widgets::TableViews::EventTableView *mEventTableView{nullptr}; 
     QGraphicsView *mTraceView{nullptr};
-    QTableView *mEventTableView{nullptr};
     QStatusBar *mStatusBar{nullptr};
     QToolBar *mMainToolBar{nullptr};
 };

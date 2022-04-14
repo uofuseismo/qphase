@@ -48,6 +48,7 @@ set(DB_SRC
     src/database/connection/sqlite3.cpp
     src/database/internal/arrival.cpp
     src/database/internal/event.cpp
+    src/database/internal/eventTable.cpp
     src/database/internal/magnitude.cpp
     src/database/internal/origin.cpp
     src/database/internal/stationData.cpp
@@ -58,8 +59,9 @@ if (${CURL_FOUND})
 
 endif()
 
-set(UI_SRC)
-#    src/widgets/map/background.cpp)
+set(UI_SRC
+    src/widgets/tableViews/eventTableModel.cpp
+    src/widgets/tableViews/eventTableView.cpp)
 
 if (${FindQGeoView_FOUND})
     set(MAP_SRC
@@ -109,8 +111,6 @@ qt6_add_resources(QNODE_RESOURCES
                  ${CMAKE_SOURCE_DIR}/resources/qnode.qrc)
 add_executable(qnode
                app/qnode/qnode.cpp
-               app/qnode/eventTableModel.cpp
-               app/qnode/eventTableView.cpp
                app/qnode/mainWindow.cpp ${QNODE_RESOURCES})
 set_target_properties(qnode PROPERTIES
                       CXX_STANDARD 17

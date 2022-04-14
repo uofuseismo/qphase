@@ -17,8 +17,10 @@
 #include "mainWindow.hpp"
 #include "topics.hpp"
 #include "utilities.hpp"
-#include "eventTableModel.hpp"
-#include "eventTableView.hpp"
+#include "qphase/database/internal/eventTable.hpp"
+#include "qphase/database/internal/event.hpp"
+#include "qphase/widgets/tableViews/eventTableView.hpp"
+#include "qphase/widgets/tableViews/eventTableModel.hpp"
 
 using namespace QPhase::QNode;
 
@@ -27,7 +29,7 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     QMainWindow(parent),
     mTopics(topics)
 {
-    resize(1100, 600);
+    resize(1200, 600);
     setWindowIcon(QIcon(":images/BlockU_redweb.png"));
     setWindowTitle(tr("QNode"));
     // Create the menus, main toolbar, graphics view, etc.
@@ -46,10 +48,12 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     auto mainLayout = new QVBoxLayout();
     //mainLayout->addWidget();
  
-    //auto eventAndTraceViewBox = new QHBoxLayout();
     auto eventAndTraceViewSplitter = new QSplitter(Qt::Horizontal);
 
-    auto mEventTableView = new EventTableView();
+    mEventTableModel = new QPhase::Widgets::TableViews::EventTableModel ();
+    mEventTableView
+        = new QPhase::Widgets::TableViews::EventTableView();
+    mEventTableView->setModel(mEventTableModel);
 
     mTraceView = new QGraphicsView();
 
@@ -140,6 +144,26 @@ void MainWindow::loadDatabase(const std::string &fileName)
     }
     mTopics->mInternalDatabaseConnection
         = createSQLite3Connection(fileName, readOnly);
+    QPhase::Database::Internal::EventTable eventTable;
+    eventTable.setConnection(mTopics->mInternalDatabaseConnection);
+    eventTable.queryAll();
+    auto eventTableModel = new QPhase::Widgets::TableViews::EventTableModel();
+    eventTableModel->populateData(eventTable.getEvents());
+    mEventTableModel = std::move(eventTableModel);
+    refreshEventList();
+}
+
+/// Refreshes the event list
+void MainWindow::refreshEventList()
+{
+    if (mEventTableView != nullptr)
+    {
+        mEventTableView->setModel(mEventTableModel);
+    }
+    else
+    {
+        qWarning() << "Event table model view is NULL";
+    }
 }
 
 /// Creates the status bar

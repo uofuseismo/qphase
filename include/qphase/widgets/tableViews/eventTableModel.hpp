@@ -1,13 +1,12 @@
-#ifndef QPHASE_WIDGETS_ABSTRACTTABLEMODEL_EVENTTABLEMODEL_HPP
-#define QPHASE_WIDGETS_ABSTRACTTABLEMODEL_EVENTTABLEMODEL_HPP
+#ifndef QPHASE_WIDGETS_TABLEVIEWS_EVENTTABLEMODEL_HPP
+#define QPHASE_WIDGETS_TABLEVIEWS_EVENTTABLEMODEL_HPP
 #include <QAbstractTableModel>
 namespace QPhase::Database::Internal
 {
 class Event;
 }
 
-// namespace QPhase::Widgets::AbstractTableModel::EventTableModel
-namespace QPhase::QNode
+namespace QPhase::Widgets::TableViews
 {
 class EventTableModel : public QAbstractTableModel
 {
@@ -16,7 +15,9 @@ public:
     /// @brief Constructor.
     EventTableModel(QObject *parent = nullptr);
 
-    //void populateData(const std::vector<QPhase::Database::Internal::Event> &events);
+    /// @brief Sets the events.
+    void populateData(std::vector<QPhase::Database::Internal::Event> &&events) noexcept;
+    void populateData(const std::vector<QPhase::Database::Internal::Event> &events);
     /// @result The number of rows under the given parent.
     [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     /// @result The number of columns under the given parent.

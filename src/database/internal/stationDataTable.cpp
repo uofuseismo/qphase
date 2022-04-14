@@ -5,6 +5,7 @@
 #include <soci/soci.h>
 #include "qphase/database/internal/stationDataTable.hpp"
 #include "qphase/database/internal/stationData.hpp"
+#include "qphase/database/connection/connection.hpp"
 #include "qphase/database/connection/sqlite3.hpp"
 
 using namespace QPhase::Database::Internal;
@@ -77,8 +78,16 @@ public:
         }
         return false;
     }
+    /// Set connection
+    void setConnection(
+        std::shared_ptr<QPhase::Database::Connection::IConnection> &connection)
+    {
+        std::scoped_lock lock(mMutex);
+        mConnection = connection;
+    }
     mutable std::mutex mMutex;
-    std::shared_ptr<QPhase::Database::Connection::SQLite3> mConnection{nullptr};
+    std::shared_ptr<QPhase::Database::Connection::IConnection>
+        mConnection{nullptr};
     std::vector<StationData> mStationData;
 };
 
@@ -92,7 +101,19 @@ StationDataTable::StationDataTable() :
 StationDataTable::~StationDataTable() = default;
 
 /// Set the connection
-
+void StationDataTable::setConnection(
+    std::shared_ptr<QPhase::Database::Connection::IConnection> &connection)
+{
+    if (connection == nullptr)
+    {
+        throw std::invalid_argument("Connection is NULL");
+    }
+    if (!connection->isConnected())
+    {
+        throw std::invalid_argument("Database connection not set");
+    }
+    pImpl->setConnection(connection);
+}
 
 /// Connected?
 bool StationDataTable::isConnected() const noexcept
