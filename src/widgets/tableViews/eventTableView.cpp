@@ -24,7 +24,7 @@ EventTableView::EventTableView(QWidget *parent) :
     //setModel(pImpl->mTableModel);
  
     setStyleSheet("QTableView::item:selected{background-color: rgb(204,0,0);}");
-    this->verticalScrollBar()->setFixedWidth(12);
+    this->verticalScrollBar()->setFixedWidth(13);
 
     setSelectionBehavior(QAbstractItemView::SelectRows);
 /*
@@ -34,15 +34,16 @@ EventTableView::EventTableView(QWidget *parent) :
     mEventModel->populateData(events);
     mTableView->setModel(mEventModel);
 */
-    setMinimumWidth(pImpl->mTableWidth);
-    setMaximumWidth(pImpl->mTableWidth);
+//    setMinimumWidth(pImpl->mTableWidth);
+//    setMaximumWidth(pImpl->mTableWidth);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setColumnWidth(0, pImpl->mTableWidths.at(0));
     setColumnWidth(1, pImpl->mTableWidths.at(1));
     setColumnWidth(2, pImpl->mTableWidths.at(2));
 
-    setFixedWidth(pImpl->mTableWidth + this->verticalScrollBar()->width() + 2);
+    setFixedWidth(pImpl->mTableWidth
+                - this->verticalScrollBar()->width() - 21);
 }
 
 /*
