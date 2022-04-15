@@ -40,11 +40,10 @@ template<> struct soci::type_conversion<StationData>
         data.setLatitude(v.get<double> ("latitude"));
         data.setLongitude(v.get<double> ("longitude"));
         data.setElevation(v.get<double> ("elevation"));
-        auto onDate  = std::chrono::microseconds { v.get<int64_t> ("ondate") };
-        auto offDate = std::chrono::microseconds { v.get<int64_t> ("offdate") };
-        data.setOnOffDate(std::pair(onDate, offDate));
-        //auto loadDate = fromTM(v.get<std::tm> ("lddate"));
-        //data.setLoadDate(loadDate);
+        auto onDate  = static_cast<int64_t> (v.get<double> ("ondate"));
+        auto offDate = static_cast<int64_t> (v.get<double> ("offdate"));
+        data.setOnOffDate(std::pair(std::chrono::microseconds {onDate},
+                                    std::chrono::microseconds {offDate} ));
         // Optional
         std::string description;
         try
@@ -85,6 +84,27 @@ public:
         std::scoped_lock lock(mMutex);
         mConnection = connection;
     }
+    /// Query
+    void queryAll()
+    {
+        std::scoped_lock lock(mMutex);
+        auto session = mConnection->getSession();
+        soci::rowset<StationData>
+           rows(session->prepare
+                << "SELECT network, station, latitude, longitude, elevation, ondate, offdate, description FROM station_data");
+        std::vector<StationData> stations;
+        for (auto &it : rows)
+        {
+            stations.push_back(it);
+        }
+        mStationData = stations;
+    }
+    /// Get stations
+    [[nodiscard]] std::vector<StationData> getStationData() const
+    {
+        std::scoped_lock lock(mMutex);
+        return mStationData;
+    }
     mutable std::mutex mMutex;
     std::shared_ptr<QPhase::Database::Connection::IConnection>
         mConnection{nullptr};
@@ -119,4 +139,17 @@ void StationDataTable::setConnection(
 bool StationDataTable::isConnected() const noexcept
 {
     return pImpl->isConnected();
+}
+
+/// Query all
+void StationDataTable::queryAll()
+{
+    if (!isConnected()){throw std::runtime_error("Connection not set");}
+    pImpl->queryAll();
+}
+
+/// Get the stations
+std::vector<StationData> StationDataTable::getStations() const noexcept
+{
+    return pImpl->getStationData();
 }

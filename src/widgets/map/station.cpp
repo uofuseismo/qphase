@@ -8,6 +8,7 @@
 #include <QString>
 #include <QVector>
 #include "qphase/widgets/map/station.hpp"
+#include "qphase/database/internal/stationData.hpp"
 
 using namespace QPhase::Widgets::Map;
 
@@ -43,6 +44,35 @@ Station::Station() :
 {
     setFlags(QGV::ItemFlag::IgnoreScale);
     setSelectable(true);
+}
+
+/// Constructor from stationdata
+Station::Station(const QPhase::Database::Internal::StationData &stationData) :
+    pImpl(std::make_unique<StationImpl> ())
+{
+    Station station;
+    // Most important thing is the locations (these will throw)
+    station.setLatitudeLongitude(
+        std::pair {stationData.getLatitude(), stationData.getLongitude() });
+    // Can probably work around this
+    if (stationData.haveNetwork())
+    {
+        station.setNetwork(stationData.getNetwork());
+    }
+    if (stationData.haveStation())
+    {
+        station.setName(stationData.getStation());
+    }
+    if (stationData.haveElevation())
+    {
+        station.setElevation(stationData.getElevation());
+    }
+    auto description = stationData.getDescription();
+    if (!description.empty())
+    {
+        station.setDescription(description);
+    }
+    *this = station;
 }
 
 /// Copy c'tor

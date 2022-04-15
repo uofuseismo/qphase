@@ -8,10 +8,17 @@ namespace QPhase
  {
   class Topics;
  }
- namespace Widgets::TableViews
+ namespace Widgets
  {
-  class EventTableView;
-  class EventTableModel;
+  namespace TableViews
+  {
+   class EventTableView;
+   class EventTableModel;
+  }
+  namespace Map
+  {
+   class MainWindow;
+  }
  }
 }
 
@@ -49,6 +56,7 @@ private:
     std::shared_ptr<QPhase::QNode::Topics> mTopics{nullptr};
     QPhase::Widgets::TableViews::EventTableModel *mEventTableModel{nullptr};
     QPhase::Widgets::TableViews::EventTableView *mEventTableView{nullptr}; 
+    QPhase::Widgets::Map::MainWindow *mMap{nullptr};
     QGraphicsView *mTraceView{nullptr};
     QStatusBar *mStatusBar{nullptr};
     QToolBar *mMainToolBar{nullptr};

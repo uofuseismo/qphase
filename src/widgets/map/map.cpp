@@ -1,3 +1,4 @@
+#include <QAction>
 #include <QGeoView/QGVMap.h>
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
@@ -71,6 +72,9 @@ Map::Map(QWidget *parent) :
     QGVMap(parent),
     pImpl(std::make_unique<MapImpl> ()) 
 {
+    setProjection(QGV::Projection::EPSG3857); // WGS84 under the hood
+    cameraTo(QGVCameraActions(this).moveTo(pImpl->mMapCenter));
+    cameraTo(QGVCameraActions(this).scaleTo(pImpl->mScale));
     // Need ability to `download' maps.  If possible read already downloaded
     // maps.
     auto mapCache = pImpl->mOptions.getTileCacheDirectory();
@@ -83,6 +87,12 @@ Map::Map(QWidget *parent) :
     pImpl->mBackground = new Background();
     pImpl->mBackground->initialize(this);
     pImpl->mBackground->selectLayer(pImpl->mBackgroundLayer);
+    // Draw the map
+    draw();
+    // Setup mouse actions
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    auto tileAction = new QAction("Select tiles", this);
+    addAction(tileAction);
 }
 
 /// Destructor

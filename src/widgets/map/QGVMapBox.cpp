@@ -1,3 +1,5 @@
+#include <iostream>
+#include <QString>
 #include "private/haveMap.hpp"
 #include "qphase/widgets/map/QGVMapBox.hpp"
 
@@ -20,7 +22,17 @@ QGVLayerMapBox::QGVLayerMapBox(QGV::TilesType type,
     mType(type),
     mLocale(locale)
 {
-    std::string token{std::getenv("QPHASE_MAPBOX_TOKEN")};
+    // Try to get the token from the environment
+    std::string token;
+    try
+    {
+        token = std::string {std::getenv("QPHASE_MAPBOX_TOKEN")};
+    }
+    catch (const std::exception &e)
+    {
+        //qDebug() << "QPHASE_MAPBOX_TOKEN environment variable not set.";
+    }
+    // Otherwise use the install token
     if (token.empty())
     {
         token = QPHASE_MAPBOX_TOKEN;

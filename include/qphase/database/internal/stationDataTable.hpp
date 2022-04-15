@@ -35,6 +35,8 @@ public:
     /// @brief Queries all stations from the database.
     /// @throws std::runtime_error if \c isConnected() is false.
     void queryAll();
+    /// @result The queried stations.
+    [[nodiscard]] std::vector<StationData> getStations() const noexcept;
 
     /// @name Destructors
     /// @{

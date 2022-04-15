@@ -15,7 +15,7 @@ class Background::BackgroundImpl
 public:
     BackgroundImpl()
     {
-        const QString customURI = "http://c.tile.opentopomap.org/${z}/${x}/${y}.png";
+        const QString customURI{"http://c.tile.opentopomap.org/${z}/${x}/${y}.png"};
         mLayers.push_back({Background::Layer::OSM,
                            new QGVLayerOSM(customURI)});
         mLayers.push_back({Background::Layer::BING_SATELLITE,

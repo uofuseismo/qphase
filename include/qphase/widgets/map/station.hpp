@@ -2,6 +2,12 @@
 #define QURTS_MAP_STATION_HPP
 #include <memory>
 #include <QGeoView/QGVDrawItem.h>
+
+namespace QPhase::Database::Internal
+{
+class StationData;
+}
+
 QT_BEGIN_NAMESPACE
 class QPainterPath;
 class QPainter;
@@ -25,6 +31,9 @@ public:
 
     /// @brief Constructor.
     Station();
+    /// @brief Creates a station from the internal station data.
+    /// @param[in] station  The station data from the database.
+    explicit Station(const QPhase::Database::Internal::StationData &station);
     /// @brief Copy constructor.
     /// @param[in] station  The station class from which to initialize this
     ///                     class.

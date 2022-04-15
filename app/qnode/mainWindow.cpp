@@ -23,8 +23,16 @@
 #include "qphase/database/internal/event.hpp"
 #include "qphase/database/internal/eventTable.hpp"
 #include "qphase/database/internal/origin.hpp"
+#include "qphase/database/internal/stationData.hpp"
+#include "qphase/database/internal/stationDataTable.hpp"
 #include "qphase/widgets/tableViews/eventTableView.hpp"
 #include "qphase/widgets/tableViews/eventTableModel.hpp"
+#include "private/haveMap.hpp"
+#if QPHASE_HAVE_QGVIEW == 1
+#include "qphase/widgets/map/mainWindow.hpp"
+#include "qphase/widgets/map/map.hpp"
+#include "qphase/widgets/map/station.hpp"
+#endif
 
 using namespace QPhase::QNode;
 
@@ -67,6 +75,10 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     eventAndTraceViewSplitter->addWidget(mTraceView);
     mainLayout->addWidget(eventAndTraceViewSplitter);
     mainLayout->addWidget(mStatusBar); 
+
+#if QPHASE_HAVE_QGVIEW == 1
+    mMap = new QPhase::Widgets::Map::MainWindow (this);
+#endif
 
     createSlots();
 
@@ -114,6 +126,7 @@ void MainWindow::createSlots()
                     qCritical() << "Could not find event";
                 }
             });
+
 }
 
 /// Creates the main toolbar
@@ -173,11 +186,26 @@ void MainWindow::createMainToolBar()
             });
     mMainToolBar->addAction(openAction);
 
+#ifdef QPHASE_HAVE_QGVIEW
     // Map icon
     const QIcon mapIcon(":/images/map_icon.png");
     auto mainMapAction = new QAction(mapIcon, tr("Map"));
     mainMapAction->setToolTip("Map view of stations and events");
     mMainToolBar->addAction(mainMapAction);
+    connect(mainMapAction, &QAction::triggered,
+            [=]()
+            {
+                if (!mMap)
+                {
+                    mMap = new QPhase::Widgets::Map::MainWindow (this);
+                    mMap->show();
+                }
+                else
+                {
+                    mMap->show();
+                }
+            });
+#endif
 }
 
 /// Loads the database
@@ -197,6 +225,28 @@ void MainWindow::loadDatabase(const std::string &fileName)
     eventTableModel->populateData(eventTable.getEvents());
     mEventTableModel = std::move(eventTableModel);
     refreshEventList();
+
+    if (mMap)
+    {
+        QPhase::Database::Internal::StationDataTable stationTable;
+        stationTable.setConnection(mTopics->mInternalDatabaseConnection);
+        stationTable.queryAll();
+        auto stations = stationTable.getStations();
+        std::vector<QPhase::Widgets::Map::Station> mapStations;
+        for (const auto &station : stations)
+        {
+            try
+            {
+                QPhase::Widgets::Map::Station mapStation(station);
+                mapStations.push_back(mapStation);
+            }
+            catch (const std::exception &e)
+            {
+                qWarning() << e.what();
+            }
+        }
+        mMap->getMapPointer()->updateStations(mapStations);
+    }
 }
 
 /// Refreshes the event list

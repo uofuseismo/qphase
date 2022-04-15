@@ -88,6 +88,8 @@ if (${FindQGeoView_FOUND})
         src/widgets/map/boundary.cpp 
         src/widgets/map/event.cpp
         src/widgets/map/map.cpp
+        include/qphase/widgets/map/mainWindow.hpp
+        src/widgets/map/mainWindow.cpp
         src/widgets/map/options.cpp
         src/widgets/map/station.cpp)
     if (${USE_MAPBOX})
