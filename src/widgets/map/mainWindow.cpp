@@ -57,7 +57,9 @@ void MainWindow::createMenus()
 #endif
     backgroundMenu->addAction(bingSatelliteAction);
     backgroundMenu->addAction(osmTopoAction);
+#if QPHASE_HAVE_MAPBOX == 1
     backgroundMenu->addAction(mapBoxSatelliteStreetsAction);
+#endif
     connect(bingSatelliteAction, &QAction::triggered,
             this, [this]()
             {
