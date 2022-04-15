@@ -247,3 +247,61 @@ bool QPhase::Database::Internal::operator!=(
  {
     return !(lhs == rhs);
 }
+
+std::ostream& QPhase::Database::Internal::operator<<(std::ostream &os,
+                                                     const Origin &origin)
+{
+    std::string result{"Origin:"};
+    if (origin.haveIdentifier())
+    {
+        result = result + "\n   Identifier: "
+               + std::to_string(origin.getIdentifier());
+    }
+
+    if (origin.haveLatitude())
+    {
+        result = result + "\n   Latitude: "
+               + std::to_string(origin.getLatitude());
+    }
+
+    if (origin.haveLongitude())
+    {
+        result = result + "\n   Longitude: "
+               + std::to_string(origin.getLongitude());
+    }
+
+    if (origin.haveDepth())
+    {
+        result = result + "\n   Depth: "
+               + std::to_string(origin.getDepth());
+    }
+
+    if (origin.haveTime())
+    {
+        result = result + "\n   Time: " 
+               + std::to_string(origin.getTime().count());
+    }
+
+    if (origin.getReviewStatus() == Origin::ReviewStatus::AUTOMATIC)
+    {
+        result = result + "\n   Review Status: Automatic";
+    }
+    else if (origin.getReviewStatus() == Origin::ReviewStatus::INCOMPLETE)
+    {
+        result = result + "\n   Review Status: Incomplete";
+    }
+    else if (origin.getReviewStatus() == Origin::ReviewStatus::FINALIZED)
+    {
+        result = result + "\n   Review Status: Finalized";
+    }
+    else if (origin.getReviewStatus() == Origin::ReviewStatus::CANCELLED)
+    {
+        result = result + "\n   Review Status: Cancelled";
+    }
+    else
+    {
+        result = result + "\n   Review Status: Unknown";
+    }
+    return os << result;
+}
+

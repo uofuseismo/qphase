@@ -2,6 +2,7 @@
 #define QPHASE_DATABASE_INTERNAL_ARRIVAL_HPP
 #include <memory>
 #include <chrono>
+#include <ostream>
 namespace QPhase::Database::Internal
 {
 /// @name Arrival "arrival.hpp" "qphase/database/internal/arrival.hpp"
@@ -163,5 +164,6 @@ private:
 [[nodiscard]] bool operator==(const Arrival &lhs, const Arrival &rhs);
 /// @result True indicates the arrivals are not equal.
 [[nodiscard]] bool operator!=(const Arrival &lhs, const Arrival &rhs);
+[[nodiscard]] std::ostream& operator<<(std::ostream &os, const Arrival &arrival);
 }
 #endif

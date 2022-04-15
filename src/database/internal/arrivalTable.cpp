@@ -1,3 +1,4 @@
+#include <iostream>
 #include <mutex>
 #include <vector>
 #include <string>
@@ -8,6 +9,62 @@
 
 using namespace QPhase::Database::Internal;
 
+namespace
+{
+
+Arrival::CreationMode stringToCreationMode(const std::string &status)
+{
+    if (status == "a" || status == "A")
+    {
+        return Arrival::CreationMode::AUTOMATIC;
+    }
+    else if (status == "h" || status == "H" ||
+             status == "m" || status == "M")
+    {
+        return Arrival::CreationMode::MANUAL;
+    }
+    else
+    {
+        std::cerr << "Unknown creation mode: " << status << std::endl;
+    }
+    return Arrival::CreationMode::AUTOMATIC;
+}
+
+Arrival::FirstMotion intToFirstMotion(const int fm)
+{
+    if (fm == 0)
+    {
+        return Arrival::FirstMotion::UNKNOWN;
+    }
+    else if (fm == 1)
+    {
+        return Arrival::FirstMotion::UP;
+    }
+    else if (fm ==-1)
+    {
+        return Arrival::FirstMotion::DOWN;
+    }
+    else
+    {
+        std::cerr << "Unknown first motion: " << fm << std::endl;
+    }
+    return Arrival::FirstMotion::UNKNOWN;
+}
+
+}
+/*
+ identifier INTEGER PRIMARY KEY NOT NULL,
+ origin INTEGER NOT NULL,
+ network VARCHAR(32) NOT NULL,
+ station VARCHAR(32) NOT NULL,
+ channel VARCHAR(32) NOT NULL,
+ location_code VARCHAR(32) NOT NULL DEFAULT '01',
+ time DOUBLE NOT NULL,
+ phase VARCHAR(8) NOT NULL,
+ first_motion INTEGER DEFAULT 0,
+ review_status VARCHAR(1) DEFAULT 'A',
+*/
+
 template<> struct soci::type_conversion<Arrival>
 {
     [[maybe_unused]] typedef values base_type;
@@ -16,33 +73,19 @@ template<> struct soci::type_conversion<Arrival>
     {
         // Required by schema
         data.setIdentifier(v.get<int> ("arid"));
-        //data.setOrigin(v.get<int> ("orid"));
+        //data.setOrigin(v.get<int> ("origin"));
 
         data.setNetwork(v.get<std::string> ("network"));
         data.setStation(v.get<std::string> ("station"));
         data.setChannel(v.get<std::string> ("channel"));
         data.setLocationCode(v.get<std::string> ("location_code"));
-/*
-        data.setType(stringToEventType(v.get<std::string> ("event_type")));
-        data.setReviewStatus(stringToEventReviewStatus(v.get<std::string>
-                             ("event_review_status")));
-
-        Origin origin;
-        origin.setIdentifier(v.get<int> ("orid"));
-        origin.setLatitude(v.get<double> ("latitude"));
-        origin.setLongitude(v.get<double> ("longitude"));
-        origin.setDepth(v.get<double> ("depth"));
-        double originTime = v.get<double> ("origin_time");
-        origin.setTime(originTime*1.e-6);
-
-        Magnitude magnitude;
-        magnitude.setIdentifier(v.get<int> ("magid"));
-        magnitude.setValue(v.get<double> ("magnitude"));
-        magnitude.setType("M" + v.get<std::string> ("magnitude_type"));
-
-        data.setOrigin(origin);
-        data.setMagnitude(magnitude);
-*/
+ 
+        data.setTime(v.get<double> ("time")*1.e-6);
+        data.setPhase(v.get<std::string> ("phase"));
+        data.setFirstMotion(intToFirstMotion(v.get<int> ("first_motion")));
+        data.setCreationMode(
+            stringToCreationMode(v.get<std::string> ("creation_mode")));
+std::cout << data << std::endl;
     }
 };
 
@@ -64,6 +107,26 @@ public:
             return mConnection->isConnected();
         }
         return false;
+    }
+    /// Query based on an origin
+    void queryOrigin(const int64_t originIdentifier)
+    {
+        std::scoped_lock lock(mMutex);
+        auto session = mConnection->getSession();
+        soci::rowset<Arrival>
+           rows(session->prepare
+                << "SELECT "
+                << "  identifier as arid, network, station, channel, "
+                << "  location_code, time, first_motion, phase, "
+                << "  review_status as creation_mode"
+                << " FROM arrival "
+                << "   WHERE origin = " << originIdentifier);
+        std::vector<Arrival> arrivals;
+        for (const auto &it : rows)
+        {
+            arrivals.push_back(it);
+        }
+        mArrivals = arrivals;
     }
     /// Set connection
     void setConnection(
@@ -93,3 +156,24 @@ bool ArrivalTable::isConnected() const noexcept
     return pImpl->isConnected();
 }
 
+/// Set the connection
+void ArrivalTable::setConnection(
+    std::shared_ptr<QPhase::Database::Connection::IConnection> &connection)
+{
+    if (connection == nullptr)
+    {
+        throw std::invalid_argument("Connection is NULL");
+    }
+    if (!connection->isConnected())
+    {
+        throw std::invalid_argument("Database connection not set");
+    }
+    pImpl->setConnection(connection);
+}
+
+/// Query for arrivals corresponding to an event
+void ArrivalTable::query(const int64_t originIdentifier)
+{
+    if (!isConnected()){throw std::runtime_error("No connection");}
+    pImpl->queryOrigin(originIdentifier);
+}

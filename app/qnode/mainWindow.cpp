@@ -14,11 +14,15 @@
 #include <QVBoxLayout>
 #include <filesystem>
 #include <qphase/version.hpp>
+
 #include "mainWindow.hpp"
 #include "topics.hpp"
 #include "utilities.hpp"
-#include "qphase/database/internal/eventTable.hpp"
+#include "qphase/database/internal/arrival.hpp"
+#include "qphase/database/internal/arrivalTable.hpp"
 #include "qphase/database/internal/event.hpp"
+#include "qphase/database/internal/eventTable.hpp"
+#include "qphase/database/internal/origin.hpp"
 #include "qphase/widgets/tableViews/eventTableView.hpp"
 #include "qphase/widgets/tableViews/eventTableModel.hpp"
 
@@ -78,7 +82,6 @@ void MainWindow::createSlots()
     connect(mEventTableView, &QTableView::doubleClicked,
             this, [=]()
             {
-                qDebug() << "Double clicked";
                 auto selectedEvents = mEventTableView->getSelectedEvents();
                 if (!selectedEvents.empty())
                 {
@@ -90,6 +93,21 @@ void MainWindow::createSlots()
                     message = message + QString::number(
                                          selectedEvents.at(0).getIdentifier()); 
                     mStatusBar->showMessage(message);
+                    if (mTopics->mInternalDatabaseConnection != nullptr)
+                    {
+                        QPhase::Database::Internal::ArrivalTable arrivalTable;
+                        try
+                        {
+                            arrivalTable.setConnection(
+                               mTopics->mInternalDatabaseConnection);
+                            arrivalTable.query(
+                               selectedEvents.at(0).getOrigin().getIdentifier());
+                        }
+                        catch (const std::exception &e)
+                        {
+                            qCritical() << e.what();
+                        }
+                    }
                 }
                 else
                 {

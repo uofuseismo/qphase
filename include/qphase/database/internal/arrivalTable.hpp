@@ -37,7 +37,7 @@ public:
     /// @param[in] originIdentifier  The origin identifier to which these
     ///                              arrivals are associated.
     /// @throws std::runtime_error if \c isConnected() is false.
-    void query(int originIdentifier);
+    void query(int64_t originIdentifier);
 
     [[nodiscard]] std::vector<Arrival> getArrivals() const noexcept;
 

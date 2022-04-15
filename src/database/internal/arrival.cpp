@@ -327,3 +327,70 @@ bool QPhase::Database::Internal::operator!=(const Arrival &lhs,
 {
     return !(lhs == rhs);
 }
+
+std::ostream& QPhase::Database::Internal::operator<<(std::ostream &os,
+                                                     const Arrival &arrival)
+{
+    std::string result{"Arrival:"};
+    if (arrival.haveIdentifier())
+    {   
+        result = result + "\n   Identifier: "
+               + std::to_string(arrival.getIdentifier());
+    }
+
+    if (arrival.haveNetwork())
+    {
+        result = result + "\n   Network: " + arrival.getNetwork();
+    }
+
+    if (arrival.haveStation())
+    {
+        result = result + "\n   Station: " + arrival.getStation();
+    }
+
+    if (arrival.haveChannel())
+    {
+        result = result + "\n   Channel: " + arrival.getChannel();
+    }
+
+    //if (arrival.haveLocationCode())
+    //{
+        result = result + "\n   Location Code: " + arrival.getLocationCode();
+    //}
+
+    if (arrival.haveTime())
+    {
+        result = result + "\n   Time: "
+               + std::to_string(arrival.getTime().count());
+    }
+
+    if (arrival.havePhase())
+    {
+        result = result + "\n   Phase: " + arrival.getPhase();
+    }
+
+    if (arrival.getFirstMotion() == Arrival::FirstMotion::UNKNOWN)
+    {
+        result = result + "\n   First Motion: Unknown";
+    }
+    else if (arrival.getFirstMotion() == Arrival::FirstMotion::UP)
+    {
+        result = result + "\n   First Motion: Up";
+    }
+    else if (arrival.getFirstMotion() == Arrival::FirstMotion::DOWN)
+    {
+        result = result + "\n   First Motion: Down";
+    }
+
+    if (arrival.getCreationMode() == Arrival::CreationMode::AUTOMATIC)
+    {
+        result = result + "\n   Review Status: Automatic";
+    }
+    else if (arrival.getCreationMode() == Arrival::CreationMode::MANUAL)
+    {
+        result = result + "\n   Review Status: Manual";
+    } 
+
+    return os << result;
+}
+
