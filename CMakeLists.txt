@@ -8,7 +8,10 @@ set(ORGANIZATION "UUSS" CACHE STRING "Name of your organization.")
 set(HOME_PATH $ENV{HOME})
 set(DATA_PATH   ${HOME_PATH}/.local/share/${ORGANIZATION}/qphase CACHE STRING "Default data path.")
 set(CACHE_PATH  ${HOME_PATH}/.cache/${ORGANIZATION}/qphase CACHE STRING "Default cache path.")
-set(CONFIG_PATH ${HOME_PATH}/.config/${ORGANIZATION} CACHE STRING "Deafult config path.")
+set(CONFIG_PATH ${HOME_PATH}/.config/${ORGANIZATION} CACHE STRING "Default config path.")
+
+option(USE_MAPBOX "Enable MapBox mapping for maps" OFF)
+set(MAPBOX_TOKEN "" CACHE STRING "MapBox token for MapBox maps")
 
 configure_file(${CMAKE_SOURCE_DIR}/include/private/version.hpp.in
                ${CMAKE_SOURCE_DIR}/include/qphase/version.hpp)
@@ -40,6 +43,19 @@ set(PUBLIC_HEADER_DIRECTORIES
 set(PRIVATE_HEADER_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/private)
 
+if (${FindQGeoView_FOUND})
+   set(QPHASE_HAVE_QGVIEW 1)
+   if (${USE_MAPBOX})
+      set(QPHASE_HAVE_MAPBOX 1)
+   else()
+      set(QPHASE_HAVE_MAPBOX 0)
+   endif()
+else()
+   set(QPHASE_HAVE_QGVIEW 0)
+   set(QPHASE_HAVE_MAPBOX 0)
+endif()
+configure_file(${CMAKE_SOURCE_DIR}/include/private/haveMap.hpp.in
+               ${CMAKE_SOURCE_DIR}/include/private/haveMap.hpp)
 
 ##########################################################################################
 #                                        Libraries                                       #
@@ -73,9 +89,11 @@ if (${FindQGeoView_FOUND})
         src/widgets/map/event.cpp
         src/widgets/map/map.cpp
         src/widgets/map/options.cpp
-        src/widgets/map/station.cpp
-        include/qphase/widgets/map/QGVMapBox.hpp
-        src/widgets/map/QGVMapBox.cpp)
+        src/widgets/map/station.cpp)
+    if (${USE_MAPBOX})
+        set(MAP_SRC ${MAP_SRC} src/widgets/map/QGVMapBox.cpp
+                               include/qphase/widgets/map/QGVMapBox.hpp)
+    endif()
 endif()
 
 set(BUILD_SHARED_LIBS YES)

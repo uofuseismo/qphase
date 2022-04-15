@@ -85,7 +85,6 @@ template<> struct soci::type_conversion<Arrival>
         data.setFirstMotion(intToFirstMotion(v.get<int> ("first_motion")));
         data.setCreationMode(
             stringToCreationMode(v.get<std::string> ("creation_mode")));
-std::cout << data << std::endl;
     }
 };
 
@@ -134,7 +133,13 @@ public:
     {   
         std::scoped_lock lock(mMutex);
         mConnection = connection;
-    }   
+    }
+    /// Get arrivals
+    [[nodiscard]] std::vector<Arrival> getArrivals() const
+    {
+        std::scoped_lock lock(mMutex);
+        return mArrivals;
+    }
     mutable std::mutex mMutex;
     std::shared_ptr<QPhase::Database::Connection::IConnection>
         mConnection{nullptr};
@@ -176,4 +181,10 @@ void ArrivalTable::query(const int64_t originIdentifier)
 {
     if (!isConnected()){throw std::runtime_error("No connection");}
     pImpl->queryOrigin(originIdentifier);
+}
+
+/// Gets the arrivals
+std::vector<Arrival> ArrivalTable::getArrivals() const noexcept
+{
+    return pImpl->getArrivals();
 }

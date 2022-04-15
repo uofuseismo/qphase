@@ -1,3 +1,4 @@
+#include "private/haveMap.hpp"
 #include "qphase/widgets/map/QGVMapBox.hpp"
 
 namespace
@@ -19,7 +20,11 @@ QGVLayerMapBox::QGVLayerMapBox(QGV::TilesType type,
     mType(type),
     mLocale(locale)
 {
-    auto token = std::getenv("QURTS_MAPBOX_TOKEN");
+    std::string token{std::getenv("QPHASE_MAPBOX_TOKEN")};
+    if (token.empty())
+    {
+        token = QPHASE_MAPBOX_TOKEN;
+    }
     mAccessToken = QString::fromStdString(token);
     createName();
 }

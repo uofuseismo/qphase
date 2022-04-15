@@ -2,8 +2,11 @@
 #include <QGeoView/QGVLayerBing.h>
 #include <QGeoView/QGVLayerOSM.h>
 #include <QGeoView/QGVWidgetText.h>
+#include "private/haveMap.hpp"
 #include "qphase/widgets/map/background.hpp"
-#include "qphase/widgets/map/QGVMapBox.hpp"
+#if QPHASE_HAVE_MAPBOX == 1
+  #include "qphase/widgets/map/QGVMapBox.hpp"
+#endif
 
 using namespace QPhase::Widgets::Map;
 
@@ -17,8 +20,10 @@ public:
                            new QGVLayerOSM(customURI)});
         mLayers.push_back({Background::Layer::BING_SATELLITE,
                            new QGVLayerBing(QGV::TilesType::Satellite)});
+#if QPHASE_HAVE_MAPBOX == 1
         mLayers.push_back({Background::Layer::MAPBOX_SATELLITE_STREETS,
                            new QGVLayerMapBox(QGV::TilesType::Satellite)});
+#endif
     }
     QList<QPair<Background::Layer, QGVLayer *>> mLayers;
     QGVMap *mGeoMapPointer = nullptr;
