@@ -29,7 +29,7 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     QMainWindow(parent),
     mTopics(topics)
 {
-    resize(1200, 600);
+    resize(1250, 600);
     setWindowIcon(QIcon(":images/BlockU_redweb.png"));
     setWindowTitle(tr("QNode"));
     // Create the menus, main toolbar, graphics view, etc.
@@ -54,6 +54,7 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     mEventTableView
         = new QPhase::Widgets::TableViews::EventTableView();
     mEventTableView->setModel(mEventTableModel);
+    mEventTableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     mTraceView = new QGraphicsView();
 
@@ -63,12 +64,39 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     mainLayout->addWidget(eventAndTraceViewSplitter);
     mainLayout->addWidget(mStatusBar); 
 
+    createSlots();
+
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
 }
 
 /// Destructor
 MainWindow::~MainWindow() = default;
+
+void MainWindow::createSlots()
+{
+    connect(mEventTableView, &QTableView::doubleClicked,
+            this, [=]()
+            {
+                qDebug() << "Double clicked";
+                auto selectedEvents = mEventTableView->getSelectedEvents();
+                if (!selectedEvents.empty())
+                {
+                    if (selectedEvents.size() > 1)
+                    {
+                        qWarning() << "Multiple selections.  Processing first";
+                    }
+                    QString message{"Processing event: "};
+                    message = message + QString::number(
+                                         selectedEvents.at(0).getIdentifier()); 
+                    mStatusBar->showMessage(message);
+                }
+                else
+                {
+                    qCritical() << "Could not find event";
+                }
+            });
+}
 
 /// Creates the main toolbar
 void MainWindow::createMainToolBar()

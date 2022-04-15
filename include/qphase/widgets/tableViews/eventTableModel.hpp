@@ -22,6 +22,10 @@ public:
     [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     /// @result The number of columns under the given parent.
     [[nodiscard]] int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    /// @result The event corresponding to the given event identifier.
+    /// @throws std::invalid_argument if no events match the specified
+    ///         event identifier.
+    [[nodiscard]] QPhase::Database::Internal::Event getEvent(int64_t eventIdentifier) const;
     /// @result The data stored under the given role for the item referred
     ///         to by the index.
     [[nodiscard]] QVariant data(const QModelIndex &index,

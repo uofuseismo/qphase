@@ -1,10 +1,18 @@
 #ifndef QPHASE_WIDGETS_TABLEVIEWS_EVENTTABLEVIEW_HPP
 #define QPHASE_WIDGETS_TABLEVIEWS_EVENTTABLEVIEW_HPP
 #include <memory>
+#include <vector>
 #include <QTableView>
-namespace QPhase::Widgets::TableViews
+namespace QPhase
 {
-//class EventTableModel;
+ namespace Database::Internal
+ {
+  class Event;
+ }
+ namespace Widgets::TableViews
+ {
+  //class EventTableModel;
+ }
 }
 
 namespace QPhase::Widgets::TableViews
@@ -36,6 +44,7 @@ public:
 
     //void setModel(QAbstractTableModel *model);
     //EventTableModel *getEventTableModelPointer();
+    [[nodiscard]] std::vector<QPhase::Database::Internal::Event> getSelectedEvents() const;
 
     EventTableView(const EventTableView &) = delete;
     EventTableView(EventTableView &&) noexcept = delete;

@@ -3,6 +3,7 @@
 #include <QScrollBar>
 #include "qphase/widgets/tableViews/eventTableView.hpp"
 #include "qphase/widgets/tableViews/eventTableModel.hpp"
+#include "qphase/database/internal/event.hpp"
 
 using namespace QPhase::Widgets::TableViews;
 
@@ -57,6 +58,33 @@ void EventTableView::setModel(QAbstractTableModel *model)
 
 /// Destructor
 EventTableView::~EventTableView() = default;
+
+/// Get the selections
+std::vector<QPhase::Database::Internal::Event> EventTableView::getSelectedEvents() const
+{
+    std::vector<QPhase::Database::Internal::Event> result;
+    auto selections = this->selectionModel();
+    if (selections->hasSelection())
+    {
+        auto eventModel = reinterpret_cast<EventTableModel *> (this->model());
+        auto rows = selections->selectedRows();
+        result.reserve(rows.size());
+        for (const auto &row : rows)
+        {
+            auto data = eventModel->data(row);
+            auto eventIdentifier = static_cast<int64_t> (data.toLongLong());
+            try
+            {
+                result.push_back(eventModel->getEvent(eventIdentifier));
+            }
+            catch (const std::exception &e)
+            {
+                qCritical() << e.what();
+            }
+        }
+    }
+    return result;
+}
 
 /// Pointer to the table model
 /*

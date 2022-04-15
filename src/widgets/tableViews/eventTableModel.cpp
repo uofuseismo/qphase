@@ -45,6 +45,22 @@ void EventTableModel::populateData(
     pImpl->mEvents = events;
 }
 
+/// Get the event corresponding to the identifier
+QPhase::Database::Internal::Event
+    EventTableModel::getEvent(const int64_t eventIdentifier) const
+{
+    for (const auto &event : pImpl->mEvents)
+    {
+        if (event.haveIdentifier())
+        {
+            if (event.getIdentifier() == eventIdentifier){return event;}
+        }
+    }
+    throw std::invalid_argument("Event "
+                              + std::to_string(eventIdentifier)
+                              + " does not exist");
+}
+
 /// Table rows
 int EventTableModel::rowCount(const QModelIndex &) const
 {

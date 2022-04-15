@@ -36,10 +36,12 @@ public:
     virtual ~MainWindow();
 public slots:
     void refreshEventList();
+    //void eventTableViewDoubleClicked();
 private:
     void createMenus();
     void createMainToolBar();
     void createStatusBar();
+    void createSlots();
     void loadDatabase(const std::string &fileName);
 private slots:
     //void aboutQt();
