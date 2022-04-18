@@ -34,7 +34,7 @@ public:
     TraceScene& operator=(TraceScene &&) noexcept = delete;
 protected:
     /// @brief Handles zoom and horizontal scroll events
-    //void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+    void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 private:
     class TraceSceneImpl;
     std::unique_ptr<TraceSceneImpl> pImpl;    

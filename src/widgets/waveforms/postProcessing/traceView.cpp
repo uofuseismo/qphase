@@ -1,3 +1,4 @@
+#include <chrono>
 #include <QDebug>
 #include <QGraphicsView>
 #include <QResizeEvent>
@@ -5,15 +6,19 @@
 #include "qphase/widgets/waveforms/postProcessing/traceView.hpp"
 #include "qphase/widgets/waveforms/postProcessing/traceScene.hpp"
 
+#define DEFAULT_TRACE_HEIGHT 150
+
 using namespace QPhase::Widgets::Waveforms::PostProcessing;
 
 class TraceView::TraceViewImpl
 {
 public:
     TraceScene *mScene{nullptr};
+    std::chrono::microseconds mPlotEarliestTime{0};
+    std::chrono::microseconds mPlotLatestTime{0};
     int mMinimumWidth{600};
     int mMinimumHeight{200};
-    int mTraceHeight{150};
+    int mTraceHeight{DEFAULT_TRACE_HEIGHT};
     int mTraceWidth{400};
 };
 
@@ -26,7 +31,7 @@ TraceView::TraceView(QWidget *parent) :
 
     auto boundingRect
         = this->mapToScene(this->viewport()->geometry()).boundingRect();
-    int traceHeight = 150;
+    int traceHeight = DEFAULT_TRACE_HEIGHT;
     int traceWidth  = boundingRect.width();
     
     pImpl->mScene = new TraceScene(traceWidth, traceHeight);
