@@ -1,4 +1,3 @@
-#include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QTableView>
@@ -27,6 +26,7 @@
 #include "qphase/database/internal/stationDataTable.hpp"
 #include "qphase/widgets/tableViews/eventTableView.hpp"
 #include "qphase/widgets/tableViews/eventTableModel.hpp"
+#include "qphase/widgets/waveforms/postProcessing/traceView.hpp"
 #include "private/haveMap.hpp"
 #if QPHASE_HAVE_QGVIEW == 1
 #include "qphase/widgets/map/mainWindow.hpp"
@@ -68,7 +68,7 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     mEventTableView->setModel(mEventTableModel);
     mEventTableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    mTraceView = new QGraphicsView();
+    mTraceView = new QPhase::Widgets::Waveforms::PostProcessing::TraceView();
 
     mainLayout->addWidget(mMainToolBar);
     eventAndTraceViewSplitter->addWidget(mEventTableView);
@@ -89,8 +89,11 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
 /// Destructor
 MainWindow::~MainWindow() = default;
 
+/// Hook up slots
 void MainWindow::createSlots()
 {
+    // When an entry in the event table view is double clicked this will query
+    // the database, load waveforms, and redraw the map
     connect(mEventTableView, &QTableView::doubleClicked,
             this, [=]()
             {

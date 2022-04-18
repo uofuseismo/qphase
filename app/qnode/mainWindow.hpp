@@ -19,6 +19,10 @@ namespace QPhase
   {
    class MainWindow;
   }
+  namespace Waveforms::PostProcessing
+  {
+   class TraceView;
+  }
  }
 }
 
@@ -57,7 +61,7 @@ private:
     QPhase::Widgets::TableViews::EventTableModel *mEventTableModel{nullptr};
     QPhase::Widgets::TableViews::EventTableView *mEventTableView{nullptr}; 
     QPhase::Widgets::Map::MainWindow *mMap{nullptr};
-    QGraphicsView *mTraceView{nullptr};
+    QPhase::Widgets::Waveforms::PostProcessing::TraceView *mTraceView{nullptr};
     QStatusBar *mStatusBar{nullptr};
     QToolBar *mMainToolBar{nullptr};
 };
