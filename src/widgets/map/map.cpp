@@ -1,5 +1,7 @@
 #include <QAction>
+#include <QContextMenuEvent>
 #include <QGeoView/QGVMap.h>
+#include <QMenu>
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
 #include "qphase/widgets/map/map.hpp"
@@ -10,6 +12,8 @@
 #include "qphase/widgets/map/map.hpp"
 #include "qphase/widgets/map/options.hpp"
 #include "qphase/database/internal/stationData.hpp"
+#include "private/haveMap.hpp"
+
 
 using namespace QPhase::Widgets::Map;
 
@@ -89,10 +93,39 @@ Map::Map(QWidget *parent) :
     pImpl->mBackground->selectLayer(pImpl->mBackgroundLayer);
     // Draw the map
     draw();
+
     // Setup mouse actions
     setContextMenuPolicy(Qt::CustomContextMenu);
-    auto tileAction = new QAction("Select tiles", this);
-    addAction(tileAction);
+    auto osmTopoAction = new QAction("OSM Topography Layer", this);
+    connect(osmTopoAction, &QAction::triggered,
+            this, [this]()
+            {
+                qDebug("Switching to OSM Topography...");
+                this->selectBackground(Background::Layer::OSM);
+            });
+    addAction(osmTopoAction);
+
+    auto bingSatelliteAction = new QAction("Bing Satellite Layer", this);
+    connect(bingSatelliteAction, &QAction::triggered,
+            this, [this]()
+            {
+                qDebug("Switching to Bing Satellite...");
+                this->selectBackground(Background::Layer::BING_SATELLITE);
+            });
+    addAction(bingSatelliteAction);
+
+#if QPHASE_HAVE_MAPBOX
+    auto mapBoxSatelliteStreetsAction
+        = new QAction("MapBox Satellite-Streets Layer", this);
+    connect(mapBoxSatelliteStreetsAction, &QAction::triggered,
+            this, [this]()
+            {
+                qDebug("Switching to MapBox SatelliteStreets...");
+                this->selectBackground(
+                    Background::Layer::MAPBOX_SATELLITE_STREETS);
+            });
+    addAction(mapBoxSatelliteStreetsAction);
+#endif
 }
 
 /// Destructor

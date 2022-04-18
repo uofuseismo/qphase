@@ -6,6 +6,7 @@
 
 QT_BEGIN_NAMESPACE
 class QWidget;
+class QContextMenuEvent;
 QT_END_NAMESPACE
 
 namespace QPhase::Database::Internal
@@ -27,6 +28,7 @@ class Map : public QGVMap
 {
     //Q_OBJECT
 public:
+    /// @brief Constructor with a given parent.
     explicit Map(QWidget *parent = nullptr);
     /// @brief Selects the map's background.
     /// @param[in] layer  The background layer.
