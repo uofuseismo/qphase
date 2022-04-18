@@ -12,11 +12,13 @@ The following prerequisites are required
    4. [Boost](boost.org) v.1.70 or greater.
    5. [SFF](https://github.com/uofuseismo/sff) for loading seismic files of various formats.
    6. [SOCI](http://soci.sourceforge.net/) with, at least, [SQLite3](https://www.sqlite.org/index.html) support.
+   7. [GTest](https://github.com/google/googletest) v.1.11 or greater.
 
 The following prerequisites are optional
 
    1. [QGeoView](https://github.com/AmonRaNet/QGeoView) for mapping.
    2. A [MapBox](https://www.mapbox.com/) API token.
+   3. [libCURL](https://curl.se/libcurl/) for accessing certain webservices.
 
 # Configuring
 
