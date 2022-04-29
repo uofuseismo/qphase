@@ -90,7 +90,10 @@ void Arrival::setIdentifier(const int64_t id) noexcept
 
 int64_t Arrival::getIdentifier() const
 {
-    if (!haveIdentifier()){throw std::runtime_error("Identifier not set");}
+    if (!haveIdentifier())
+    {
+        throw std::runtime_error("Arrival identifier not set");
+    }
     return pImpl->mIdentifier;
 }
 

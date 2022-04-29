@@ -103,7 +103,10 @@ void Magnitude::setIdentifier(const int64_t identifier) noexcept
 
 int64_t Magnitude::getIdentifier() const
 {
-    if (!haveIdentifier()){throw std::runtime_error("Identifier not set");}
+    if (!haveIdentifier())
+    {
+        throw std::runtime_error("Magnitude identifier not set");
+    }
     return pImpl->mIdentifier;
 }
 

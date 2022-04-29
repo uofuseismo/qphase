@@ -46,7 +46,7 @@ Station::Station() :
     setSelectable(true);
 }
 
-/// Constructor from stationdata
+/// Constructor from stationData
 Station::Station(const QPhase::Database::Internal::StationData &stationData) :
     pImpl(std::make_unique<StationImpl> ())
 {

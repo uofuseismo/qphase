@@ -2,6 +2,12 @@
 #define QPHASE_WIDGETS_MAP_EVENT_HPP
 #include <memory>
 #include <QGeoView/QGVDrawItem.h>
+
+namespace QPhase::Database::Internal
+{
+class Event;
+}
+
 QT_BEGIN_NAMESPACE
 class QPainterPath;
 class QPainter;
@@ -28,6 +34,9 @@ public:
     /// @brief Copy constructor.
     /// @param[in] event  The event class from which to initialize this class. 
     Event(const Event &event);
+    /// @brief Constructs an event from a database event.
+    /// @throws std::invalid_argument if \c event.haveOrigin() is false.
+    Event(const QPhase::Database::Internal::Event &event);
     /// @brief Move c'tor
     /// @param[in,out] event  The event class from which to initialize this
     ///                       class.  On exit, event's behavior is undefined.

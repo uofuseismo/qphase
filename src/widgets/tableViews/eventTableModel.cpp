@@ -113,8 +113,8 @@ QVariant EventTableModel::data(
                 auto originTimeMicroSeconds = origin.getTime().count()*1.e-3;
                 auto mSecsSinceEpoch
                     = static_cast<qint64> (std::round(originTimeMicroSeconds));
-                QDateTime originTime;
-                originTime.setMSecsSinceEpoch(mSecsSinceEpoch);
+                auto originTime
+                    = QDateTime::fromMSecsSinceEpoch(mSecsSinceEpoch, Qt::UTC);
                 return QVariant(originTime.toString(Qt::ISODate));
             }
         }

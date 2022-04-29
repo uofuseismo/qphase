@@ -7,6 +7,9 @@
 #include <QString>
 #include <chrono>
 #include "qphase/widgets/map/event.hpp"
+#include "qphase/database/internal/event.hpp"
+#include "qphase/database/internal/origin.hpp"
+#include "qphase/database/internal/magnitude.hpp"
 
 using namespace QPhase::Widgets::Map;
 
@@ -69,6 +72,35 @@ Event& Event::operator=(const Event &event)
     if (&event == this){return *this;}
     pImpl = std::make_unique<EventImpl> (*event.pImpl);
     return *this;
+}
+
+/// Constructor from event
+Event::Event(const QPhase::Database::Internal::Event &eventData) :
+    pImpl(std::make_unique<EventImpl> ()) 
+{
+    Event event;
+    // Most important thing is the locations (these will throw)
+    auto origin = eventData.getOrigin();
+    event.setLatitudeLongitude(std::pair{origin.getLatitude(),
+                                         origin.getLongitude()});
+    if (origin.haveTime()){event.setOriginTime(origin.getTime());}
+    if (origin.haveDepth()){event.setDepth(origin.getDepth());}
+    // Some auxiliary stuff
+    if (eventData.haveMagnitude())
+    {
+        auto magnitude = eventData.getMagnitude();
+        std::string type = "?";
+        if (magnitude.haveValue())
+        {
+            if (magnitude.haveType()){type = magnitude.getType();}
+            event.setMagnitude(magnitude.getValue(), type);
+        }
+    }
+    if (eventData.haveIdentifier())
+    {
+        event.setIdentifier(eventData.getIdentifier());
+    }
+    *this = event;
 }
 
 /// Move assignment
@@ -158,6 +190,7 @@ void Event::setMagnitude(const double magnitude,
     {
         pImpl->mMagnitudeType = QString::fromStdString(magnitudeType);
     }
+    pImpl->mHaveMagnitude = true;
 }
 
 /// Sets the event type
@@ -169,7 +202,13 @@ void Event::setType(const std::string &eventType)
 /// Sets the origin time
 void Event::setOriginTime(const double time) noexcept
 {
-//    pImpl->mOriginTime = Time::UTC(time);
+    std::chrono::microseconds
+        tMicroSeconds{static_cast<int64_t> (std::round(time*1.e6))};
+}
+
+void Event::setOriginTime(const std::chrono::microseconds &time) noexcept
+{
+    pImpl->mOriginTime = time;
     pImpl->mHaveOriginTime = true;
 }
 
@@ -256,7 +295,7 @@ QString Event::projTooltip(const QPointF &projPos) const
 
     if (pImpl->mHaveMagnitude)
     {
-        result = result + "Magnitude: " + QString::number(pImpl->mMagnitude);
+        result = result + "\nMagnitude: " + QString::number(pImpl->mMagnitude);
         if (!pImpl->mMagnitudeType.isEmpty())
         {
             result = result + " " + pImpl->mMagnitudeType;

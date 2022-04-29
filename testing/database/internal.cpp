@@ -13,6 +13,7 @@ namespace
 
 using namespace QPhase::Database::Internal;
 
+/*
 TEST(DatabaseConnection, SQLite3)
 {
     QPhase::Database::Connection::SQLite3 sqlite3;
@@ -20,6 +21,7 @@ TEST(DatabaseConnection, SQLite3)
     EXPECT_NO_THROW(sqlite3.connect());
     EXPECT_TRUE(sqlite3.isConnected());
 }
+*/
 
 TEST(DatabaseInternal, Arrival)
 {

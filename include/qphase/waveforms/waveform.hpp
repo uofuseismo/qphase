@@ -1,6 +1,5 @@
 #ifndef QPHASE_WAVEFORMS_WAVEFORM_HPP
 #define QPHASE_WAVEFORMS_WAVEFORM_HPP
-#include <memory>
 #include <chrono>
 namespace QPhase::Waveforms
 {

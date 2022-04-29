@@ -123,7 +123,7 @@ double Origin::getDepth() const
 
 bool Origin::haveDepth() const noexcept
 {
-    return pImpl->mDepth;
+    return pImpl->mHaveDepth;
 }
 
 /// Time
@@ -159,13 +159,16 @@ void Origin::setIdentifier(const int64_t id) noexcept
 
 int64_t Origin::getIdentifier() const
 {
-    if (!haveIdentifier()){throw std::runtime_error("Identifier not set");}
+    if (!haveIdentifier())
+    {
+        throw std::runtime_error("Origin identifier not set");
+    }
     return pImpl->mIdentifier;
 }
 
 bool Origin::haveIdentifier() const noexcept
 {
-    return pImpl->mIdentifier;
+    return pImpl->mHaveIdentifier;
 }
 
 /// Review status

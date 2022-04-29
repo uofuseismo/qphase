@@ -32,6 +32,7 @@
 #include "qphase/widgets/map/mainWindow.hpp"
 #include "qphase/widgets/map/map.hpp"
 #include "qphase/widgets/map/station.hpp"
+#include "qphase/widgets/map/event.hpp"
 #endif
 
 using namespace QPhase::QNode;
@@ -117,6 +118,14 @@ void MainWindow::createSlots()
                                mTopics->mInternalDatabaseConnection);
                             arrivalTable.query(
                                selectedEvents.at(0).getOrigin().getIdentifier());
+#if QPHASE_HAVE_QGVIEW == 1
+                            if (mMap)
+                            {
+                                QPhase::Widgets::Map::Event mapEvent(selectedEvents.at(0));
+                                mMap->getMapPointer()->updateEvents(
+                                    std::vector<QPhase::Widgets::Map::Event> {mapEvent});
+                            }
+#endif
                         }
                         catch (const std::exception &e)
                         {
