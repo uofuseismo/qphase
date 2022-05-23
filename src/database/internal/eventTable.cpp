@@ -65,6 +65,7 @@ template<> struct soci::type_conversion<Event>
     [[maybe_unused]] static void
     from_base(const values &v, indicator , Event &data)
     {
+        data.clear();
         // Required by schema
         data.setIdentifier(v.get<int> ("evid"));
         data.setType(stringToEventType(v.get<std::string> ("event_type")));

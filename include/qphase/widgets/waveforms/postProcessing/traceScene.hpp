@@ -27,6 +27,17 @@ public:
     void populateScene();
     /// @brief Resizes the current trace scene.
     void resize(const QSize &newSize);
+    /// @brief Sets the time limits.
+    /// @param[in] plotLimits  plotLimits.first is the start time (UTC) in
+    ///                        microseconds since the epoch of the plot while
+    ///                        plotLimits.second is the end time (UTC) in
+    ///                        microseconds since the epoch of the plot.
+    void setAbsoluteTimeLimits(const std::pair<std::chrono::microseconds,
+                                               std::chrono::microseconds> &plotLimits);
+    /// @brief Sets the time about which to plot relative.
+    /// @param[in] time  The time in UTC seconds since the epoch.  
+    ///                  This will represent the "zero" time.
+    void setRelativeTimeLimits(const std::chrono::microseconds &time);
 
     TraceScene(const TraceScene &) = delete;
     TraceScene(TraceScene &&) noexcept = delete;

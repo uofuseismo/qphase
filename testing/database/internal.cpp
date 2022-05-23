@@ -1,10 +1,13 @@
+#include <cstdlib>
 #include <string>
+#include <fstream>
 #include <chrono>
 #include "qphase/database/internal/arrival.hpp"
 #include "qphase/database/internal/event.hpp"
 #include "qphase/database/internal/magnitude.hpp"
 #include "qphase/database/internal/origin.hpp"
 #include "qphase/database/internal/stationData.hpp"
+#include "qphase/database/internal/waveform.hpp"
 #include "qphase/database/connection/sqlite3.hpp"
 #include <gtest/gtest.h>
 
@@ -212,6 +215,52 @@ TEST(DatabaseInternal, StationData)
 TEST(DatabaseInternal, StationDataTable)
 {
  
+}
+
+TEST(DatabaseInternal, Waveform)
+{
+    const std::string fileName{"dbaseInternalTestWaveformFile.txt"};
+    std::ofstream outfl{fileName};
+    outfl.close();
+    Waveform waveform;
+    const std::string network{"UU"};
+    const std::string station{"CRLU"};
+    const std::string channel{"EHZ"};
+    const std::string locationCode{"01"};
+    const double t0 = 100;
+    const double t1 = 105;
+    const std::chrono::microseconds it0{static_cast<int64_t> (t0*1000000)};
+    const std::chrono::microseconds it1{static_cast<int64_t> (t1*1.e6)};
+    int64_t evid = 10358;
+    int64_t id = 2323;
+
+    waveform.setNetwork(network);
+    waveform.setStation(station);
+    waveform.setChannel("ehz");
+    waveform.setLocationCode(locationCode);
+    waveform.setStartAndEndTime(std::pair<double, double> {t0, t1});
+    waveform.setEventIdentifier(evid);
+    waveform.setIdentifier(id);
+    EXPECT_NO_THROW(waveform.setFileName(fileName));
+
+    Waveform wCopy(waveform);
+    EXPECT_EQ(wCopy.getNetwork(), network);
+    EXPECT_EQ(wCopy.getStation(), station);
+    EXPECT_EQ(wCopy.getChannel(), channel);
+    EXPECT_EQ(wCopy.getLocationCode(), locationCode);
+    EXPECT_EQ(wCopy.getStartTime(), it0);
+    EXPECT_EQ(wCopy.getEndTime(), it1);
+    EXPECT_EQ(wCopy.getEventIdentifier(), evid);
+    EXPECT_EQ(wCopy.getIdentifier(), id);
+    EXPECT_EQ(wCopy.getFileName(), fileName);
+
+    EXPECT_TRUE(waveform == wCopy);
+    wCopy.setIdentifier(id + 1);
+    EXPECT_TRUE(waveform != wCopy);
+    waveform.clear();
+    EXPECT_TRUE(waveform != wCopy);
+
+    std::remove(fileName.c_str());
 }
 
 }

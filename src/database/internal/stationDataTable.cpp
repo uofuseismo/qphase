@@ -33,7 +33,8 @@ template<> struct soci::type_conversion<StationData>
     [[maybe_unused]] typedef values base_type;
     [[maybe_unused]] static void
     from_base(const values &v, indicator , StationData &data)
-    {   
+    {
+        data.clear();
         // Required by schema
         data.setNetwork(v.get<std::string> ("network"));
         data.setStation(v.get<std::string> ("station"));

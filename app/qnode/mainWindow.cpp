@@ -1,3 +1,4 @@
+#include <iostream>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QTableView>
@@ -24,9 +25,13 @@
 #include "qphase/database/internal/origin.hpp"
 #include "qphase/database/internal/stationData.hpp"
 #include "qphase/database/internal/stationDataTable.hpp"
+#include "qphase/database/internal/waveform.hpp"
+#include "qphase/database/internal/waveformTable.hpp"
 #include "qphase/widgets/tableViews/eventTableView.hpp"
 #include "qphase/widgets/tableViews/eventTableModel.hpp"
 #include "qphase/widgets/waveforms/postProcessing/traceView.hpp"
+#include "qphase/waveforms/waveform.hpp"
+#include "qphase/waveforms/segment.hpp"
 #include "private/haveMap.hpp"
 #if QPHASE_HAVE_QGVIEW == 1
 #include "qphase/widgets/map/mainWindow.hpp"
@@ -103,14 +108,21 @@ void MainWindow::createSlots()
                 {
                     if (selectedEvents.size() > 1)
                     {
-                        qWarning() << "Multiple selections.  Processing first";
+                        qWarning() << "Multiple selections.  Processing first.";
                     }
                     QString message{"Processing event: "};
-                    message = message + QString::number(
-                                         selectedEvents.at(0).getIdentifier()); 
+                    auto eventIdentifier = selectedEvents.at(0).getIdentifier();
+                    auto originTime = selectedEvents.at(0).getOrigin().getTime();
+                    auto plotTime0 = originTime
+                                   - std::chrono::microseconds {30*1000000};
+                    auto plotTime1 = originTime
+                                   + std::chrono::microseconds {5*60*1000000};
+                    message = message + QString::number(eventIdentifier);
                     mStatusBar->showMessage(message);
                     if (mTopics->mInternalDatabaseConnection != nullptr)
                     {
+                        // Arrivals
+                        std::vector<Database::Internal::Arrival> arrivals;
                         QPhase::Database::Internal::ArrivalTable arrivalTable;
                         try
                         {
@@ -118,12 +130,22 @@ void MainWindow::createSlots()
                                mTopics->mInternalDatabaseConnection);
                             arrivalTable.query(
                                selectedEvents.at(0).getOrigin().getIdentifier());
+                            arrivals = arrivalTable.getArrivals();
 #if QPHASE_HAVE_QGVIEW == 1
-                            if (mMap)
+                            try
                             {
-                                QPhase::Widgets::Map::Event mapEvent(selectedEvents.at(0));
-                                mMap->getMapPointer()->updateEvents(
-                                    std::vector<QPhase::Widgets::Map::Event> {mapEvent});
+                                if (mMap)
+                                {
+                                    QPhase::Widgets::Map::Event
+                                        mapEvent(selectedEvents.at(0));
+                                    mMap->getMapPointer()->updateEvents(
+                                        std::vector<QPhase::Widgets::Map::Event>
+                                                   {mapEvent});
+                                }
+                            }
+                            catch (const std::exception &e)
+                            {
+                                qCritical() << "Failed to make map: " << e.what();
                             }
 #endif
                         }
@@ -131,9 +153,46 @@ void MainWindow::createSlots()
                         {
                             qCritical() << e.what();
                         }
-                    }
+                        // Waveforms
+                        std::vector<Database::Internal::Waveform> waveformsInTable;
+                        QPhase::Database::Internal::WaveformTable waveformTable;
+                        try
+                        {
+                            waveformTable.setConnection(
+                               mTopics->mInternalDatabaseConnection);
+                            waveformTable.query(eventIdentifier);
+                            waveformsInTable = waveformTable.getWaveforms();
+                        }
+                        catch (const std::exception &e)
+                        {
+                            qCritical() << e.what();
+                        }
+                        // Read in the waveforms
+                        for (const auto &w : waveformsInTable)
+                        {
+                            qDebug() << "Loading: "
+                                     << QString::fromStdString(w.getFileName());
+                            QPhase::Waveforms::Waveform<double> wave;
+                            try
+                            {
+                                wave.load(w.getFileName(), plotTime0, plotTime1);
+/*
+for (const auto &was : wave)
+{
+qDebug() << was.getNumberOfSamples();
+}
+*/
+                            }
+                            catch (const std::exception &e)
+                            {
+                                qCritical() << e.what();
+                            }
+                        }
+                    } // End check on database connection
+                    // Start doing plotting
+                    mTraceView->setTimeLimits(std::pair(plotTime0, plotTime1));
                 }
-                else
+                else // No events
                 {
                     qCritical() << "Could not find event";
                 }

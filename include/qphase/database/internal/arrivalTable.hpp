@@ -39,6 +39,7 @@ public:
     /// @throws std::runtime_error if \c isConnected() is false.
     void query(int64_t originIdentifier);
 
+    /// @result The arrivals that have been queried.
     [[nodiscard]] std::vector<Arrival> getArrivals() const noexcept;
 
     /// @name Destructors

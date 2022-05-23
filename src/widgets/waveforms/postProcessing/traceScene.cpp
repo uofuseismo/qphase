@@ -121,6 +121,25 @@ void TraceScene::resize(const QSize &newSize)
     populateScene(); // replot
 }
 
+/// Time limits
+void TraceScene::setAbsoluteTimeLimits(
+    const std::pair<std::chrono::microseconds, std::chrono::microseconds>
+    &timeLimits)
+{
+    if (timeLimits.first >= timeLimits.second)
+    {   
+        throw std::invalid_argument("timeLimits.first >= timeLimits.second");
+    }
+    pImpl->mPlotEarliestTime = timeLimits.first;
+    pImpl->mPlotLatestTime = timeLimits.second;
+    for (auto &item : items())
+    {
+        //auto traceItem = reinterpret_cast<TraceItem *> (item);
+        //traceItem->setXAxisLimits(axisLimits);
+    }
+}
+
+
 /// Populate scene 
 void TraceScene::populateScene()
 {

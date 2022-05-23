@@ -71,6 +71,7 @@ template<> struct soci::type_conversion<Arrival>
     [[maybe_unused]] static void
     from_base(const values &v, indicator, Arrival &data)
     {
+        data.clear();
         // Required by schema
         data.setIdentifier(v.get<int> ("arid"));
         //data.setOrigin(v.get<int> ("origin"));

@@ -20,6 +20,7 @@ public:
     int mMinimumHeight{200};
     int mTraceHeight{DEFAULT_TRACE_HEIGHT};
     int mTraceWidth{400};
+    TraceView::TimeConvention mTimeConvention{TraceView::TimeConvention::Absolute};
 };
 
 /// C'tor
@@ -59,3 +60,23 @@ void TraceView::resizeEvent(QResizeEvent *event)
     QGraphicsView::resizeEvent(event);
 }
 
+/// Time limits
+void TraceView::setTimeLimits(const std::pair<std::chrono::microseconds,
+                                              std::chrono::microseconds>
+                               &timeLimits)
+{
+    if (pImpl->mScene == nullptr)
+    {
+        qCritical() << __func__ << "Scene is NULL";
+        return;
+    }
+    try
+    {
+        pImpl->mTimeConvention = TraceView::TimeConvention::Absolute;
+        pImpl->mScene->setAbsoluteTimeLimits(timeLimits);
+    }
+    catch (const std::exception &e)
+    {
+        qCritical() << __func__ << "Failed to set time limits: " << e.what();
+    }
+}

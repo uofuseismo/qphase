@@ -61,7 +61,11 @@ configure_file(${CMAKE_SOURCE_DIR}/include/private/haveMap.hpp.in
 #                                        Libraries                                       #
 ##########################################################################################
 set(CORE_SRC
-    src/observerPattern/subject.cpp)
+    src/observerPattern/subject.cpp
+    src/waveforms/multiChannelStation.cpp
+    src/waveforms/segment.cpp
+    src/waveforms/waveform.cpp
+    src/waveforms/sac.cpp)
 set(DB_SRC
     src/database/connection/sqlite3.cpp
     src/database/internal/arrival.cpp
@@ -71,7 +75,9 @@ set(DB_SRC
     src/database/internal/magnitude.cpp
     src/database/internal/origin.cpp
     src/database/internal/stationData.cpp
-    src/database/internal/stationDataTable.cpp)
+    src/database/internal/stationDataTable.cpp
+    src/database/internal/waveform.cpp
+    src/database/internal/waveformTable.cpp)
 set(WS_SRC
     src/webServices/comcat/event.cpp)
 if (${CURL_FOUND})
@@ -110,9 +116,10 @@ set_target_properties(qphase_core PROPERTIES
 target_link_libraries(qphase_core
 #                      PUBLIC #${TIME_LIBRARY}
                       PRIVATE Boost::date_time SOCI::soci_core SOCI::soci_sqlite3
+                      PRIVATE ${SFF_LIBRARY}
                       PRIVATE ${CURL_LIBRARIES})# SOCI::soci_postgresql)
 target_include_directories(qphase_core
-                           PRIVATE SOCI::soci_sqlite3 ${CURL_INCLUDE_DIRS}
+                           PRIVATE SOCI::soci_sqlite3 ${CURL_INCLUDE_DIRS} ${SFF_INCLUDE_DIR}
                            PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>
                            PUBLIC $<INSTALL_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>)
 
