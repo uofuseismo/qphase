@@ -62,7 +62,7 @@ configure_file(${CMAKE_SOURCE_DIR}/include/private/haveMap.hpp.in
 ##########################################################################################
 set(CORE_SRC
     src/observerPattern/subject.cpp
-    src/waveforms/multiChannelStation.cpp
+    #src/waveforms/multiChannelStation.cpp
     src/waveforms/segment.cpp
     src/waveforms/waveform.cpp
     src/waveforms/sac.cpp)
