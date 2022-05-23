@@ -65,7 +65,8 @@ set(CORE_SRC
     #src/waveforms/multiChannelStation.cpp
     src/waveforms/segment.cpp
     src/waveforms/waveform.cpp
-    src/waveforms/sac.cpp)
+    #src/waveforms/sac.cpp
+    )
 set(DB_SRC
     src/database/connection/sqlite3.cpp
     src/database/internal/arrival.cpp
