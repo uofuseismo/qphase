@@ -6,6 +6,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QString>
 #include "qphase/widgets/waveforms/postProcessing/traceScene.hpp"
+#include "qphase/widgets/waveforms/postProcessing/traceItem.hpp"
 #include "qphase/waveforms/waveform.hpp"
 
 using namespace QPhase::Widgets::Waveforms::PostProcessing;
@@ -14,7 +15,7 @@ namespace
 {
 struct Waveform
 {
-    std::shared_ptr<QPhase::Waveforms::IWaveform> mWaveform{nullptr};
+    std::shared_ptr<QPhase::Waveforms::Waveform<double>> mWaveform{nullptr};
     bool mVisible{true}; 
 };
 
@@ -24,6 +25,7 @@ std::pair<std::chrono::microseconds, std::chrono::microseconds>
                   const bool lVisible = true)
 {
     std::pair<std::chrono::microseconds, std::chrono::microseconds> result;
+/*
     if (lVisible)
     {
         for (const auto &waveform : waveforms)
@@ -48,6 +50,7 @@ std::pair<std::chrono::microseconds, std::chrono::microseconds>
         }
     }
     return result; 
+*/
 }
  
 }
@@ -92,6 +95,7 @@ public:
     int mTraceWidth{400};
     int mTraceHeight{150};
     int mMaxTracesPerScene = 11;
+    TimeConvention mTimeConvention{TimeConvention::Absolute};
     bool mNormalZoom{true}; // Wheel forward zooms in
     bool mNormalTimeAdvance{true}; // Wheel in goes back in time
 };
@@ -132,6 +136,7 @@ void TraceScene::setAbsoluteTimeLimits(
     }
     pImpl->mPlotEarliestTime = timeLimits.first;
     pImpl->mPlotLatestTime = timeLimits.second;
+    pImpl->mTimeConvention = TimeConvention::Absolute;
     for (auto &item : items())
     {
         //auto traceItem = reinterpret_cast<TraceItem *> (item);
@@ -149,13 +154,26 @@ void TraceScene::populateScene()
                                 {
                                    return w.mVisible;
                                 });
+auto nTraces = static_cast<int> (pImpl->mWaveforms.size());
     if (!haveData)
     {
+        qDebug() << "No data in trace scene.  Setting default background...";
         addSimpleText(pImpl->mBackgroundName, pImpl->mBackgroundFont);
     }
     else
     {
-
+        qDebug() << "Creating new trace scene...";
+        // Get axis limits
+        auto axisLimits = std::pair(pImpl->mPlotEarliestTime,
+                                    pImpl->mPlotLatestTime);
+        if (pImpl->mTimeConvention == TimeConvention::Relative)
+        {
+            qCritical() << "Not done";
+        } 
+        int traceWidth = pImpl->mTraceWidth;
+        int traceHeight = pImpl->mTraceHeight;
+        setSceneRect(0, 0, traceWidth, traceHeight*nTraces);
+        clear();
     }
 }
 

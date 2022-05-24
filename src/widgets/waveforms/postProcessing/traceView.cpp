@@ -5,6 +5,7 @@
 #include <QScrollBar>
 #include "qphase/widgets/waveforms/postProcessing/traceView.hpp"
 #include "qphase/widgets/waveforms/postProcessing/traceScene.hpp"
+#include "qphase/widgets/waveforms/postProcessing/traceItem.hpp"
 
 #define DEFAULT_TRACE_HEIGHT 150
 
@@ -20,7 +21,7 @@ public:
     int mMinimumHeight{200};
     int mTraceHeight{DEFAULT_TRACE_HEIGHT};
     int mTraceWidth{400};
-    TraceView::TimeConvention mTimeConvention{TraceView::TimeConvention::Absolute};
+    TimeConvention mTimeConvention{TimeConvention::Absolute};
 };
 
 /// C'tor
@@ -72,7 +73,7 @@ void TraceView::setTimeLimits(const std::pair<std::chrono::microseconds,
     }
     try
     {
-        pImpl->mTimeConvention = TraceView::TimeConvention::Absolute;
+        pImpl->mTimeConvention = TimeConvention::Absolute;
         pImpl->mScene->setAbsoluteTimeLimits(timeLimits);
     }
     catch (const std::exception &e)
@@ -80,3 +81,10 @@ void TraceView::setTimeLimits(const std::pair<std::chrono::microseconds,
         qCritical() << __func__ << "Failed to set time limits: " << e.what();
     }
 }
+
+/// Force a redraw
+void TraceView::redrawScene()
+{
+    pImpl->mScene->update();
+}
+

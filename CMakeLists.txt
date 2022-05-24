@@ -88,6 +88,7 @@ endif()
 set(UI_SRC
     src/widgets/tableViews/eventTableModel.cpp
     src/widgets/tableViews/eventTableView.cpp
+    src/widgets/waveforms/postProcessing/traceItem.cpp
     src/widgets/waveforms/postProcessing/traceScene.cpp
     include/qphase/widgets/waveforms/postProcessing/traceView.hpp
     src/widgets/waveforms/postProcessing/traceView.cpp)

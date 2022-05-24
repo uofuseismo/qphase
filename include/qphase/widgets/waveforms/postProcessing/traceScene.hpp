@@ -2,6 +2,7 @@
 #define QPHASE_WIDGETS_WAVEFORMS_POSTPROCESSING_TRACESCENE_HPP
 #include <QGraphicsScene>
 #include <memory>
+#include "qphase/widgets/waveforms/postProcessing/enums.hpp"
 QT_BEGIN_NAMESPACE
  class QGraphicsSceneWheelEvent;
  class QSize;
