@@ -63,6 +63,7 @@ configure_file(${CMAKE_SOURCE_DIR}/include/private/haveMap.hpp.in
 set(CORE_SRC
     src/observerPattern/subject.cpp
     #src/waveforms/multiChannelStation.cpp
+    src/waveforms/channel.cpp
     src/waveforms/segment.cpp
     src/waveforms/waveform.cpp
     #src/waveforms/sac.cpp
@@ -159,6 +160,7 @@ target_link_libraries(qnode
 set(TEST_SRC
     testing/main.cpp
     testing/database/internal.cpp
+    testing/waveforms/waveform.cpp
     testing/webServices/comcat.cpp)
 add_executable(unitTests ${TEST_SRC})
 set_target_properties(unitTests PROPERTIES

@@ -19,7 +19,8 @@ public:
             {
                 auto dtMuS = static_cast<int64_t> (std::round( 1000000
                                                               /mSamplingRate ));
-                mEndTime = std::chrono::microseconds {(nSamples - 1)*dtMuS};
+                mEndTime = mStartTime
+                         + std::chrono::microseconds {(nSamples - 1)*dtMuS};
             }
         } 
     }
@@ -67,6 +68,13 @@ Segment<T>& Segment<T>::operator=(Segment<T> &&segment) noexcept
     if (&segment == this){return *this;}
     pImpl = std::move(segment.pImpl);
     return *this;
+}
+
+/// Clear
+template<class T>
+void Segment<T>::clear() noexcept
+{
+    pImpl = std::make_unique<SegmentImpl> ();
 }
 
 /// Destructor
