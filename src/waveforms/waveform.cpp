@@ -11,6 +11,30 @@
 
 using namespace QPhase::Waveforms;
 
+namespace
+{
+template<class T>
+void checkSegment(const Segment<T> &segment)
+{
+    if (!segment.haveSamplingRate())
+    {   
+        throw std::invalid_argument("Segment does not have sampling rate");
+    }
+}
+template<class T>
+void checkSegments(const std::vector<Segment<T>> &segments)
+{
+    // Check there are segments
+    if (segments.empty()){throw std::invalid_argument("segments is empty");}
+    // Check segments
+    for (const auto &s : segments)
+    {   
+        checkSegment(s);
+    } 
+}
+
+}
+
 template<class T>
 class Waveform<T>::WaveformImpl
 {
@@ -216,22 +240,47 @@ void Waveform<T>::load(const std::string &fileName,
 template<class T>
 void Waveform<T>::setSegments(Segment<T> &&segment)
 {
-    if (!segment.haveSamplingRate())
-    {   
-        throw std::invalid_argument("Segment does not have sampling rate");
-    }   
+    checkSegment(segment);
     pImpl->mSegments.clear();
     pImpl->mSegments.push_back(std::move(segment));
     pImpl->update();
 }
 
+/// Segments
+template<class T>
+void Waveform<T>::setSegments(const std::vector<Segment<T>> &segments)
+{
+    checkSegments(segments);
+    pImpl->mSegments = segments;
+    pImpl->update();
+}
+
+/*
+template<class T>
+void Waveform<T>::setSegments(std::vector<Segment<T>> &&segments)
+{
+    // Check there are segments
+    auto nSegments = static_cast<int> (segments.size());
+    if (nSegments < 1){throw std::invalid_argument("Segments is empty");}
+    // Check segments
+    int nCopy = 0;
+    for (const auto &s : segments)
+    {   
+        if (!s.haveSamplingRate())
+        {   
+            throw std::invalid_argument("Segment does not have sampling rate");
+        }   
+    }   
+    if (nCopy == 0){throw std::invalid_argument("No data in any segments");}
+    pImpl->mSegments = std::move(segments);
+    pImpl->update();
+}
+*/
+
 template<class T>
 void Waveform<T>::setSegments(const Segment<T> &segment)
 {
-    if (!segment.haveSamplingRate())
-    {
-        throw std::invalid_argument("Segment does not have sampling rate");
-    }
+    checkSegment(segment);
     pImpl->mSegments.clear();
     pImpl->mSegments.push_back(segment);
     pImpl->update();  

@@ -89,11 +89,23 @@ public:
     [[nodiscard]] std::chrono::microseconds getLatestTime() const;
 
     /// @brief Sets the waveform segments.
+    /// @param[in] segments  The waveform segments.  Each segment must have
+    ///                      a valid sampling rate.  Empty segments will not
+    ///                      be copied.
     void setSegments(const std::vector<Segment<T>> &segments);
-    /// @brief Sets the waveform segments.  In this case, there's only one.
-    /// @throws std::invalid_argument if the segments do not have a valid
+    void setSegments(std::vector<Segment<T>> &&segments);
+    /// @brief Sets the waveform segments.  In this case, there is only
+    ///        one segment.
+    /// @param[in] segment  The waveform segment.
+    /// @throws std::invalid_argument if the segment does not have a valid
     ///         sampling rate.
     void setSegments(const Segment<T> &segment);
+    /// @brief Sets the waveform segments.  In this case, there is only
+    ///        one segment.
+    /// @param[in,out] segment  On input, this contains the waveform segment.
+    ///                         On exit, segment's behavior is undefined.
+    /// @throws std::invalid_argument if the segment does not have a valid
+    ///         sampling rate.
     void setSegments(Segment<T> &&segment);
     /// @result The waveform segments.
     [[nodiscard]] std::vector<Segment<T>> getSegments() const noexcept;

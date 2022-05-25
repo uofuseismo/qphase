@@ -10,8 +10,10 @@ template<class T>
 class MultiChannelStation<T>::MultiChannelStationImpl
 {
 public:
-    std::map<Waveform<T>> mChannels;
-    std::vector<int> mOrdering;
+    std::vector<Waveform<T>> mChannels;
+    //std::vector<int> mOrdering;
+    std::string mNetworkCode;
+    std::string mStationCode;
 };
 
 /// C'tor

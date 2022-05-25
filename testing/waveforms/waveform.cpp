@@ -6,12 +6,37 @@
 #include <limits>
 #include "qphase/waveforms/waveform.hpp"
 #include "qphase/waveforms/segment.hpp"
+#include "qphase/waveforms/channel.hpp"
 #include <gtest/gtest.h>
 
 namespace
 {
 
 using namespace QPhase::Waveforms;
+
+template<typename T>
+bool operator==(const Segment<T> &lhs, const Segment<T> &rhs)
+{
+    if (lhs.getStartTime() != rhs.getStartTime()){return false;}
+    if (lhs.getEndTime()   != rhs.getEndTime()){return false;}
+    if (lhs.getSamplingPeriodInMicroSeconds() !=
+       rhs.getSamplingPeriodInMicroSeconds())
+    {
+       return false;
+    }
+    if (lhs.getNumberOfSamples() != rhs.getNumberOfSamples()){return false;}
+    auto t1 = lhs.getData();
+    auto t2 = rhs.getData();
+    if (t1.size() != t2.size()){return false;}
+    for (int i = 0; i < static_cast<int> (t1.size()); ++i)
+    {
+        if (static_cast<double> (std::abs(t1[i] - t2[i])) > 1.e-14)
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 using MyTypes = ::testing::Types<double, float>;
 
@@ -72,6 +97,145 @@ TYPED_TEST(SegmentTest, Segment)
     // Clear it
     segmentCopy.clear();
     EXPECT_EQ(segmentCopy.getNumberOfSamples(), 0);
+}
+
+//----------------------------------------------------------------------------//
+
+template<class T>
+class WaveformTest : public testing::Test
+{
+public:
+    std::vector<double> timeSeries1{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    std::vector<double> timeSeries2{10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+    double startTime = 1628803598;
+    std::chrono::microseconds startTimeMuS1{1628803598000000};
+    std::chrono::microseconds endTimeMuS1{1628803598000000 + 225000};
+    std::chrono::microseconds startTimeMus2{1628803598000000 + 250000};
+    std::chrono::microseconds endTimeMuS2{1628803598000000 + + 250000 + 200000};
+    double samplingRate1 = 40;
+    double samplingRate2 = 50;
+    std::chrono::microseconds samplingPeriodMuS1{25000};
+    std::chrono::microseconds samplignPeriodMuS2{20000};
+    double tol = std::numeric_limits<double>::epsilon();
+    std::vector<Segment<T>> segments;
+    std::vector<Segment<T>> reverseSegments;
+protected:
+    WaveformTest() :
+        waveform(std::make_unique<Waveform<T>> ()) 
+    {   
+        Segment<T> segment1;
+        segment1.setStartTime(startTime);
+        segment1.setSamplingRate(samplingRate1);
+        segment1.setData(timeSeries1);
+       
+        Segment<T> segment2;
+        segment2.setStartTime(startTime + timeSeries1.size()/samplingRate1);
+        segment2.setSamplingRate(samplingRate2);
+        segment2.setData(timeSeries2);
+
+        segments.push_back(segment1);
+        segments.push_back(segment2);
+
+        reverseSegments.push_back(segment2);
+        reverseSegments.push_back(segment1);
+    }   
+    ~WaveformTest() override = default;
+    std::unique_ptr<Waveform<T>> waveform;
+};
+
+TYPED_TEST_SUITE(WaveformTest, MyTypes);
+
+TYPED_TEST(WaveformTest, Waveform)
+{
+    auto segments = this->segments;
+    auto reverseSegments = this->reverseSegments;
+    EXPECT_NO_THROW(this->waveform->setSegments(segments.at(0)));
+
+    auto waveformCopy = *this->waveform;
+    EXPECT_EQ(waveformCopy.getNumberOfSegments(), 1);
+    auto segmentsBack = waveformCopy.getSegments();
+    EXPECT_TRUE(segments[0] == segmentsBack[0]);
+    EXPECT_EQ(segments[0].getStartTime(), waveformCopy.getEarliestTime());
+    EXPECT_EQ(segments[0].getEndTime(),   waveformCopy.getLatestTime());
+
+    waveformCopy.clear();
+
+    for (int job = 0; job < 2; ++job)
+    {
+        if (job == 0)
+        {
+            waveformCopy.setSegments(segments);
+        }
+        else
+        {
+            waveformCopy.setSegments(reverseSegments);
+        }
+        EXPECT_EQ(waveformCopy.getNumberOfSegments(), 2);
+        EXPECT_EQ(waveformCopy.getCumulativeNumberOfSamples(), 21);
+        EXPECT_EQ(segments[0].getStartTime(), waveformCopy.getEarliestTime());
+        EXPECT_EQ(segments[1].getEndTime(),   waveformCopy.getLatestTime());
+        segmentsBack = waveformCopy.getSegments();
+        int is = 0;
+        for (const auto &s : waveformCopy)
+        {
+            EXPECT_TRUE(segments[is] == s);
+            is = is + 1;
+        } 
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+
+template<class T>
+class ChannelTest : public testing::Test
+{
+public:
+    std::string networkCode{"UU"};
+    std::string stationName{" fork4 "};
+    std::string stationNameRef{"FORK4"};
+    std::string channelCode{"HHZ"};
+    std::string locationCode{"01"};
+    double azimuth{0};
+    double dip{-90};
+protected:
+    ChannelTest() :
+        channel(std::make_unique<Channel<T>> ()) 
+    {   
+    }   
+    ~ChannelTest() override = default;
+    std::unique_ptr<Channel<T>> channel;
+
+};
+
+TYPED_TEST_SUITE(ChannelTest, MyTypes);
+
+TYPED_TEST(ChannelTest, Channel)
+{
+    auto network = this->networkCode;
+    auto station = this->stationName;
+    auto stationRef = this->stationNameRef;
+    auto channel = this->channelCode;
+    auto locationCode = this->locationCode;
+    auto dip = this->dip;
+    auto azimuth = this->azimuth;
+    // Set stuff
+    EXPECT_NO_THROW(this->channel->setNetworkCode(network));
+    EXPECT_NO_THROW(this->channel->setStationName(station));
+    EXPECT_NO_THROW(this->channel->setChannelCode(channel));
+    EXPECT_NO_THROW(this->channel->setLocationCode(locationCode));
+    EXPECT_NO_THROW(this->channel->setDip(dip));
+    EXPECT_NO_THROW(this->channel->setAzimuth(azimuth));
+    // Copy and verify
+    auto channelCopy = *this->channel;
+    // Verify 
+    EXPECT_EQ(channelCopy.getNetworkCode(),  network);
+    EXPECT_EQ(channelCopy.getStationName(),  stationRef);
+    EXPECT_EQ(channelCopy.getChannelCode(),  channel);
+    EXPECT_EQ(channelCopy.getLocationCode(), locationCode);
+    EXPECT_NEAR(channelCopy.getDip(),     dip,     1.e-14);
+    EXPECT_NEAR(channelCopy.getAzimuth(), azimuth, 1.e-14);
+
 }
 
 }

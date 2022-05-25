@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <algorithm>
 #include "qphase/waveforms/channel.hpp"
@@ -10,7 +11,8 @@ namespace
 [[nodiscard]] std::string removeBlanksAndCapitalize(const std::string &s)
 {
     auto result = s;
-    std::remove_if(result.begin(), result.end(), ::isspace);
+    result.erase(std::remove_if(result.begin(), result.end(), ::isspace),
+                 result.end());
     std::transform(result.begin(), result.end(), result.begin(), ::toupper);
     return result;
 }
