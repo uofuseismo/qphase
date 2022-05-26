@@ -3,7 +3,7 @@
 #include "qphase/waveforms/enums.hpp"
 #include <chrono>
 #include <memory>
-namespace QPhase::Waveforms::SimpleResponse
+namespace QPhase::Waveforms
 {
 /// @class SimpleResponse "simpleResponse.hpp" "qphase/waveforms/simpleResponse.hpp"
 /// @brief A simple response is a loose-approximation to the full response.

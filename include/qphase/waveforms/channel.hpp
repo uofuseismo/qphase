@@ -4,6 +4,7 @@
 namespace QPhase::Waveforms
 {
 template<class T> class Waveform;
+class SimpleResponse;
 }
 namespace QPhase::Waveforms
 {
@@ -56,23 +57,25 @@ public:
     /// @name Waveform Name
     /// @{
 
+    /// TODO DELETE
     /// @brief Sets the station's network code.
     /// @param[in] network  The network code - e.g., UU.
-    void setNetworkCode(const std::string &network);
+    [[deprecated]] void setNetworkCode(const std::string &network);
     /// @result The network code.    
     /// @throws std::runtime_error if \c haveNetworkCode() is false.
-    [[nodiscard]] std::string getNetworkCode() const;
+    [[deprecated]] [[nodiscard]] std::string getNetworkCode() const;
     /// @result True indicates the network code was set.
-    [[nodiscard]] bool haveNetworkCode() const noexcept;
+    [[deprecated]] [[nodiscard]] bool haveNetworkCode() const noexcept;
 
+    /// TODO DELETE
     /// @brief Sets the station's name.
     /// @param[in] station  The station's name - e.g., CTU.
-    void setStationName(const std::string &station);
+    [[deprecated]] void setStationName(const std::string &station);
     /// @result The station name.
     /// @throws std::runtime_error if \c haveStation() is false.
-    [[nodiscard]] std::string getStationName() const;
+    [[deprecated]] [[nodiscard]] std::string getStationName() const;
     /// @result True indicates the station name was set.
-    [[nodiscard]] bool haveStationName() const noexcept;
+    [[deprecated]] [[nodiscard]] bool haveStationName() const noexcept;
 
     /// @brief Sets the channel code.
     /// @param[in] channel  The channel code - e.g., HHZ.
@@ -83,11 +86,12 @@ public:
     /// @result True indicates the channel code was set.
     [[nodiscard]] bool haveChannelCode() const noexcept;
 
+    /// TODO DELETE
     /// @brief Sets the location code.
     /// @param[in] locationCode  The location code - e.g., 01.
-    void setLocationCode(const std::string &locationCode);
+    [[deprecated]] void setLocationCode(const std::string &locationCode);
     /// @result The location code.  By default this is empty.
-    [[nodiscard]] std::string getLocationCode() const noexcept;
+    [[deprecated]] [[nodiscard]] std::string getLocationCode() const noexcept;
     /// @}
 
     /// @name Orientation
@@ -114,6 +118,25 @@ public:
     [[nodiscard]] double getAzimuth() const;
     /// @result True indicates the channel's azimuth was set.
     [[nodiscard]] bool haveAzimuth() const noexcept;
+    /// @}
+
+    /// @name Simple Response (Optional)
+    /// @{
+
+    /// @brief Sets a simple response.  This is useful for quick-and-dirty
+    ///        `deconvolutions' which amount to multiplying the trace by
+    ///        a scalar.  This is appropriate for when the energy of signal of
+    ///        interest is primarily captured by the flat passband of the 
+    ///        instrument. 
+    /// @param[in] response  The simple response.
+    /// @throws std::invalid_argument if the scalar constant, input, or output
+    ///         uses are not set.
+    void setSimpleResponse(const SimpleResponse &response);
+    /// @result The simple response.
+    /// @throws std::runtime_error if \c haveSimpleResponse() is false.
+    [[nodiscard]] SimpleResponse getSimpleResponse() const;
+    /// @result True indicates the simple response was set.
+    [[nodiscard]] bool haveSimpleResponse() const noexcept;
     /// @}
 
     /// @name Destructors

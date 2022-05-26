@@ -65,6 +65,7 @@ set(CORE_SRC
     #src/waveforms/multiChannelStation.cpp
     src/waveforms/channel.cpp
     src/waveforms/segment.cpp
+    src/waveforms/simpleResponse.cpp
     src/waveforms/singleChannelSensor.cpp
     src/waveforms/waveform.cpp
     #src/waveforms/sac.cpp

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "qphase/waveforms/channel.hpp"
 #include "qphase/waveforms/waveform.hpp"
+#include "qphase/waveforms/simpleResponse.hpp"
 
 using namespace QPhase::Waveforms;
 
@@ -23,6 +24,7 @@ class Channel<T>::ChannelImpl
 {
 public:
     Waveform<T> mWaveform;
+    SimpleResponse mSimpleResponse;
     std::string mNetworkCode;
     std::string mStationName;
     std::string mChannelCode;
@@ -244,6 +246,45 @@ template<class T>
 bool Channel<T>::haveWaveform() const noexcept
 {
     return pImpl->mHaveWaveform;
+}
+
+/// Simple response
+template<class T>
+void Channel<T>::setSimpleResponse(const SimpleResponse &response)
+{
+    if (!response.haveInputUnits())
+    {
+        throw std::invalid_argument("Input units not set");
+    }
+    if (!response.haveOutputUnits())
+    {
+        throw std::invalid_argument("Output units not set");
+    }
+    if (!response.haveScalar())
+    {
+        throw std::invalid_argument("Scalar not set");
+    }
+    if (!response.haveStartAndEndTime())
+    {
+        throw std::invalid_argument("Start and end times not set");
+    }  
+    pImpl->mSimpleResponse = response;
+}
+
+template<class T>
+SimpleResponse Channel<T>::getSimpleResponse() const
+{
+    if (!haveSimpleResponse())
+    {
+        throw std::runtime_error("Simple response not set");
+    }
+    return pImpl->mSimpleResponse;
+}
+
+template<class T>
+bool Channel<T>::haveSimpleResponse() const noexcept
+{
+    return pImpl->mSimpleResponse.haveScalar();
 }
 
 ///--------------------------------------------------------------------------///
