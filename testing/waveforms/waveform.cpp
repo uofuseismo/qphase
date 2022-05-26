@@ -15,6 +15,29 @@ namespace
 
 using namespace QPhase::Waveforms;
 
+TEST(SimpleResponse, SimpleResponse)
+{
+    SimpleResponse response;
+    double scalar{10};
+    std::chrono::microseconds start{0};
+    std::chrono::microseconds end{10};
+    Units input = Units::Velocity;
+    Units output = Units::Counts;
+    response.setScalar(scalar);
+    response.setInputUnits(input);
+    response.setOutputUnits(output);
+    response.setStartAndEndTime(std::pair{start, end});
+ 
+    auto responseCopy = response;
+    EXPECT_NEAR(responseCopy.getScalar(), scalar, 1.e-14);
+    EXPECT_EQ(responseCopy.getInputUnits(), input);
+    EXPECT_EQ(responseCopy.getOutputUnits(), output);
+    EXPECT_EQ(responseCopy.getStartTime(), start);
+    EXPECT_EQ(responseCopy.getEndTime(), end);
+}
+
+//----------------------------------------------------------------------------//
+
 template<typename T>
 bool operator==(const Segment<T> &lhs, const Segment<T> &rhs)
 {
@@ -192,18 +215,30 @@ template<class T>
 class ChannelTest : public testing::Test
 {
 public:
-    std::string networkCode{"UU"};
-    std::string stationName{" fork4 "};
-    std::string stationNameRef{"FORK4"};
+    SimpleResponse simpleResponse;
+    Waveform<T> waveform;
+    double samplingRate{100};
+    std::vector<double> timeSeries{1, 2};
     std::string channelCode{"HHZ"};
-    std::string locationCode{"01"};
     double azimuth{0};
     double dip{-90};
 protected:
     ChannelTest() :
         channel(std::make_unique<Channel<T>> ()) 
-    {   
-    }   
+    {
+        Segment<T> segment;
+        segment.setStartTime(std::chrono::microseconds{45});
+        segment.setSamplingRate(samplingRate);
+        segment.setData(timeSeries);
+        waveform.setSegments(segment);
+
+        std::chrono::microseconds start{40};
+        std::chrono::microseconds end{50};
+        simpleResponse.setScalar(1);
+        simpleResponse.setInputUnits(Units::Velocity);
+        simpleResponse.setOutputUnits(Units::Counts);
+        simpleResponse.setStartAndEndTime(std::pair(start, end));
+    }
     ~ChannelTest() override = default;
     std::unique_ptr<Channel<T>> channel;
 
@@ -213,31 +248,33 @@ TYPED_TEST_SUITE(ChannelTest, MyTypes);
 
 TYPED_TEST(ChannelTest, Channel)
 {
-    //auto network = this->networkCode;
-    //auto station = this->stationName;
-    //auto stationRef = this->stationNameRef;
     auto channel = this->channelCode;
-    //auto locationCode = this->locationCode;
     auto dip = this->dip;
     auto azimuth = this->azimuth;
+    auto simpleResponse = this->simpleResponse;
+    auto waveform = this->waveform;
     // Set stuff
-    //EXPECT_NO_THROW(this->channel->setNetworkCode(network));
-    //EXPECT_NO_THROW(this->channel->setStationName(station));
     EXPECT_NO_THROW(this->channel->setChannelCode(channel));
-    //EXPECT_NO_THROW(this->channel->setLocationCode(locationCode));
     EXPECT_NO_THROW(this->channel->setDip(dip));
     EXPECT_NO_THROW(this->channel->setAzimuth(azimuth));
+    EXPECT_NO_THROW(this->channel->setWaveform(waveform));
     EXPECT_FALSE(this->channel->haveSimpleResponse());
+    EXPECT_NO_THROW(this->channel->setSimpleResponse(simpleResponse));
     // Copy and verify
     auto channelCopy = *this->channel;
     // Verify 
-    //EXPECT_EQ(channelCopy.getNetworkCode(),  network);
-    //EXPECT_EQ(channelCopy.getStationName(),  stationRef);
     EXPECT_EQ(channelCopy.getChannelCode(),  channel);
-    //EXPECT_EQ(channelCopy.getLocationCode(), locationCode);
     EXPECT_NEAR(channelCopy.getDip(),     dip,     1.e-14);
     EXPECT_NEAR(channelCopy.getAzimuth(), azimuth, 1.e-14);
 
+    EXPECT_NEAR(channelCopy.getSimpleResponse().getScalar(),
+                simpleResponse.getScalar(), 1.e-14);
+    EXPECT_EQ(channelCopy.getSimpleResponse().getInputUnits(),
+              simpleResponse.getInputUnits());
+    EXPECT_EQ(channelCopy.getSimpleResponse().getOutputUnits(),
+              simpleResponse.getOutputUnits());
+    EXPECT_EQ(channelCopy.getWaveform().getNumberOfSegments(),
+              waveform.getNumberOfSegments());
 }
 
 }

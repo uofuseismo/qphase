@@ -15,6 +15,7 @@ namespace QPhase::Waveforms
 template<class T>
 class Waveform
 {
+private:
     using SegmentsType = std::vector<Segment<T>>;
 public:
     using iterator = typename SegmentsType::iterator;
@@ -93,6 +94,9 @@ public:
     ///                      a valid sampling rate.  Empty segments will not
     ///                      be copied.
     void setSegments(const std::vector<Segment<T>> &segments);
+    /// @param[in,out] segments  The waveform segments.  Each segment must have
+    ///                          a valid sampling rate.  On exit, the behavior 
+    ///                          of segments is undefined. 
     void setSegments(std::vector<Segment<T>> &&segments);
     /// @brief Sets the waveform segments.  In this case, there is only
     ///        one segment.

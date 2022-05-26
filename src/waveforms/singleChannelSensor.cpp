@@ -11,11 +11,11 @@ template<typename T>
 void checkChannel(const Channel<T> &channel)
 {
     if (!channel.haveWaveform())
-    {   
+    {
         throw std::runtime_error("Waveform not set on channel");
     }
     if (!channel.haveChannelCode())
-    {   
+    {
         throw std::runtime_error("Channel code not set");
     }
     auto channelCode = channel.getChannelCode();
@@ -30,14 +30,6 @@ void checkChannel(const Channel<T> &channel)
     {
         throw std::invalid_argument("Channel code = " + channelCode
                                   + " appears to not be vertical");
-    }
-    if (!channel.haveNetworkCode())
-    {
-        throw std::runtime_error("Network code not set");
-    }
-    if (!channel.haveStationName())
-    {
-        throw std::runtime_error("Station name not set");
     }
 }
 
