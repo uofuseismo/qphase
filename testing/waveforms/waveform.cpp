@@ -7,6 +7,7 @@
 #include "qphase/waveforms/waveform.hpp"
 #include "qphase/waveforms/segment.hpp"
 #include "qphase/waveforms/channel.hpp"
+#include "qphase/waveforms/simpleResponse.hpp"
 #include <gtest/gtest.h>
 
 namespace
@@ -212,27 +213,28 @@ TYPED_TEST_SUITE(ChannelTest, MyTypes);
 
 TYPED_TEST(ChannelTest, Channel)
 {
-    auto network = this->networkCode;
-    auto station = this->stationName;
-    auto stationRef = this->stationNameRef;
+    //auto network = this->networkCode;
+    //auto station = this->stationName;
+    //auto stationRef = this->stationNameRef;
     auto channel = this->channelCode;
-    auto locationCode = this->locationCode;
+    //auto locationCode = this->locationCode;
     auto dip = this->dip;
     auto azimuth = this->azimuth;
     // Set stuff
-    EXPECT_NO_THROW(this->channel->setNetworkCode(network));
-    EXPECT_NO_THROW(this->channel->setStationName(station));
+    //EXPECT_NO_THROW(this->channel->setNetworkCode(network));
+    //EXPECT_NO_THROW(this->channel->setStationName(station));
     EXPECT_NO_THROW(this->channel->setChannelCode(channel));
-    EXPECT_NO_THROW(this->channel->setLocationCode(locationCode));
+    //EXPECT_NO_THROW(this->channel->setLocationCode(locationCode));
     EXPECT_NO_THROW(this->channel->setDip(dip));
     EXPECT_NO_THROW(this->channel->setAzimuth(azimuth));
+    EXPECT_FALSE(this->channel->haveSimpleResponse());
     // Copy and verify
     auto channelCopy = *this->channel;
     // Verify 
-    EXPECT_EQ(channelCopy.getNetworkCode(),  network);
-    EXPECT_EQ(channelCopy.getStationName(),  stationRef);
+    //EXPECT_EQ(channelCopy.getNetworkCode(),  network);
+    //EXPECT_EQ(channelCopy.getStationName(),  stationRef);
     EXPECT_EQ(channelCopy.getChannelCode(),  channel);
-    EXPECT_EQ(channelCopy.getLocationCode(), locationCode);
+    //EXPECT_EQ(channelCopy.getLocationCode(), locationCode);
     EXPECT_NEAR(channelCopy.getDip(),     dip,     1.e-14);
     EXPECT_NEAR(channelCopy.getAzimuth(), azimuth, 1.e-14);
 
