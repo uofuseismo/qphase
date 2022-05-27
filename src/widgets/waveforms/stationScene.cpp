@@ -9,6 +9,7 @@
 //#include "qphase/widgets/waveforms/stationItem.hpp"
 #include "qphase/widgets/waveforms/channelItem.hpp"
 #include "qphase/waveforms/station.hpp"
+#include "qphase/waveforms/channel.hpp"
 
 using namespace QPhase::Widgets::Waveforms;
 
@@ -20,10 +21,7 @@ public:
         mTraceWidth(std::max(200, traceWidth)),
         mTraceHeight(std::max(20, traceHeight))
     {
-        mBackgroundFont.setStyleHint(QFont::Monospace);
-        mBackgroundFont.setPointSize(22);
-        mBackgroundFont.setWeight(QFont::Light);
-        mBackgroundFont.setItalic(false);
+        //mBackgroundFont.setStyleHint(QFont::System);
     }
 
     /// Recomputes the trace height given the current plot size
@@ -43,11 +41,11 @@ public:
             = static_cast<int> (std::floor(availableHeight/denominator));
     }
 ///private:
-    //std::shared_ptr<QPhase::Waveforms::Station<T>> mStations;
+    std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> mStations;
     QSize mCurrentSize;
     QColor mBackgroundColor{Qt::white};
-    QString mBackgroundName{tr("Trace Viewer")};
-    QFont mBackgroundFont;
+    QString mBackgroundName{tr("Station Viewer")};
+    QFont mBackgroundFont{"Helvetica", 22, QFont::Light, false};
     std::chrono::microseconds mPlotEarliestTime{0};
     std::chrono::microseconds mPlotLatestTime{0};
     double mZoomFactor{1.1};
@@ -63,8 +61,8 @@ public:
 
 /// C'tor
 StationScene::StationScene(const int traceWidth,
-                       const int traceHeight,
-                       QObject *parent) :
+                           const int traceHeight,
+                           QObject *parent) :
     QGraphicsScene(parent),
     pImpl(std::make_unique<StationSceneImpl> (traceWidth, traceHeight))
 {
@@ -116,8 +114,12 @@ bool haveData = false;
                                 {
                                    return w.mVisible;
                                 });
-auto nTraces = static_cast<int> (pImpl->mWaveforms.size());
 */
+    int nStations = 0;
+    if (pImpl->mStations)
+    {
+        nStations = static_cast<int> (pImpl->mStations->size());
+    }
     if (!haveData)
     {
         qDebug() << "No data in trace scene.  Setting default background...";
@@ -223,3 +225,6 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
     event->ignore();
     if (handled){event->accept();}
 }
+
+//template class QPhase::Widgets::Waveforms::StationScene<double>;
+//template class QPhase::Widgets::Waveforms::StationScene<float>;

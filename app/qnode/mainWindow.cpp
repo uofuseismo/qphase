@@ -30,6 +30,7 @@
 #include "qphase/database/internal/waveformTable.hpp"
 #include "qphase/widgets/tableViews/eventTableView.hpp"
 #include "qphase/widgets/tableViews/eventTableModel.hpp"
+#include "qphase/widgets/waveforms/stationView.hpp"
 #include "qphase/widgets/waveforms/postProcessing/traceView.hpp"
 #include "qphase/waveforms/station.hpp"
 #include "private/haveMap.hpp"
@@ -94,11 +95,11 @@ MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
     mEventTableView->setModel(mEventTableModel);
     mEventTableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    mTraceView = new QPhase::Widgets::Waveforms::PostProcessing::TraceView();
+    mStationView = new QPhase::Widgets::Waveforms::StationView();//PostProcessing::TraceView();
 
     mainLayout->addWidget(mMainToolBar);
     eventAndTraceViewSplitter->addWidget(mEventTableView);
-    eventAndTraceViewSplitter->addWidget(mTraceView);
+    eventAndTraceViewSplitter->addWidget(mStationView); //TraceView);
     mainLayout->addWidget(eventAndTraceViewSplitter);
     mainLayout->addWidget(mStatusBar); 
 
@@ -193,13 +194,16 @@ void MainWindow::createSlots()
                         {
                             sacFileNames.push_back(w.getFileName());
                         }
-                        auto stations = loadSACFiles<double>(sacFileNames,
+                        auto stations
+                           = std::make_shared<std::vector<QPhase::Waveforms::Station<double>>>
+                                     (loadSACFiles<double>(sacFileNames,
                                                              plotTime0,
-                                                             plotTime1);
-                        qDebug() << "Read" << stations.size() << "stations";
+                                                             plotTime1));
+                        qDebug() << "Read" << stations->size() << "stations";
+                        mStationView->setStations(stations);
                     } // End check on database connection
                     // Start doing plotting
-                    mTraceView->setTimeLimits(std::pair(plotTime0, plotTime1));
+                    mStationView->setTimeLimits(std::pair(plotTime0, plotTime1));
                 }
                 else // No events
                 {

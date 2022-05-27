@@ -1,10 +1,12 @@
 #include <chrono>
+#include <vector>
 #include <QDebug>
 #include <QGraphicsView>
 #include <QResizeEvent>
 #include <QScrollBar>
 #include "qphase/widgets/waveforms/stationView.hpp"
 #include "qphase/widgets/waveforms/stationScene.hpp"
+#include "qphase/waveforms/station.hpp"
 
 #define DEFAULT_TRACE_HEIGHT 150
 
@@ -14,6 +16,7 @@ class StationView::StationViewImpl
 {
 public:
     StationScene *mScene{nullptr};
+    std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> mStations;
     std::chrono::microseconds mPlotEarliestTime{0};
     std::chrono::microseconds mPlotLatestTime{0};
     int mMinimumWidth{600};
@@ -87,3 +90,29 @@ void StationView::redrawScene()
     pImpl->mScene->update();
 }
 
+/// Sets the stations
+void StationView::setStations(
+    std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations)
+{
+    if (stations == nullptr){throw std::invalid_argument("Stations is NULL");}
+    if (stations->empty())
+    {
+        throw std::invalid_argument("No stations");
+    }
+    pImpl->mStations = stations;
+}
+
+/*
+template<>
+void StationView::setStations<float>(
+    std::shared_ptr<std::vector<QPhase::Waveforms::Station<float>>> &stations)
+{
+    if (stations == nullptr){throw std::invalid_argument("Stations is NULL");}
+    if (stations->empty())
+    {
+        throw std::invalid_argument("No stations");
+    }
+    pImpl->mDoubleStations = nullptr;
+    pImpl->mFloatStations = stations;
+}
+*/

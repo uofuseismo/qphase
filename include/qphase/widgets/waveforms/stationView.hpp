@@ -7,9 +7,13 @@
 QT_BEGIN_NAMESPACE
  class QResizeEvent;
 QT_END_NAMESPACE
+namespace QPhase::Waveforms
+{
+ template<class T> class Station;
+}
 namespace QPhase::Widgets::Waveforms
 {
- class StationScene;
+ //template<class T> class StationScene;
  class StationItem;
 }
 namespace QPhase::Widgets::Waveforms
@@ -31,6 +35,8 @@ public:
     ///                        while plotLimits.second is the end time of the
     ///                        plot.  
     void setTimeLimits(const std::pair<std::chrono::microseconds, std::chrono::microseconds> &plotLimits);
+    /// @brief Sets the stations to plot.
+    void setStations(std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations);
 
     /// @brief Forces the scene to be redrawn.
     void redrawScene();

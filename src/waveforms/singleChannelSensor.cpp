@@ -1,3 +1,4 @@
+#include <string>
 #include "qphase/waveforms/singleChannelSensor.hpp"
 #include "qphase/waveforms/channel.hpp"
 #include "private/shiftLongitude.hpp"
@@ -150,7 +151,8 @@ void SingleChannelSensor<T>::setLatitude(const double latitude)
 {
     if (latitude < -90 || latitude > 90)
     {
-        throw std::invalid_argument("Latitude must be in range [-90,90]");
+        throw std::invalid_argument("Latitude = " + std::to_string(latitude)
+                                  + " must be in range [-90,90]");
     }
     pImpl->mLatitude = latitude;
     pImpl->mHaveLatitude = true;

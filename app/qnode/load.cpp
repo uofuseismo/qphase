@@ -259,7 +259,7 @@ std::vector<QPhase::Waveforms::Station<T>>
                 }
                 if (workSpace[iVertical].haveLongitude)
                 {
-                    sensor.setLatitude(workSpace[iVertical].longitude);
+                    sensor.setLongitude(workSpace[iVertical].longitude);
                 }
                 auto vertical = waveformHelperToChannel<T>(
                     std::move(workSpace[iVertical]));
@@ -293,7 +293,7 @@ std::vector<QPhase::Waveforms::Station<T>>
                 }
                 if (workSpace[i].haveLongitude)
                 {
-                    sensor.setLatitude(workSpace[i].longitude);
+                    sensor.setLongitude(workSpace[i].longitude);
                 }
                 auto channel
                     = waveformHelperToChannel<T>(std::move(workSpace[i]));
