@@ -17,6 +17,7 @@
 
 #include "mainWindow.hpp"
 #include "topics.hpp"
+#include "load.hpp"
 #include "utilities.hpp"
 #include "qphase/database/internal/arrival.hpp"
 #include "qphase/database/internal/arrivalTable.hpp"
@@ -30,8 +31,7 @@
 #include "qphase/widgets/tableViews/eventTableView.hpp"
 #include "qphase/widgets/tableViews/eventTableModel.hpp"
 #include "qphase/widgets/waveforms/postProcessing/traceView.hpp"
-#include "qphase/waveforms/waveform.hpp"
-#include "qphase/waveforms/segment.hpp"
+#include "qphase/waveforms/station.hpp"
 #include "private/haveMap.hpp"
 #if QPHASE_HAVE_QGVIEW == 1
 #include "qphase/widgets/map/mainWindow.hpp"
@@ -41,6 +41,26 @@
 #endif
 
 using namespace QPhase::QNode;
+
+namespace
+{
+/*
+#include <sff/sac/waveform.hpp>
+std::vector<QPhase::Waveforms::Station<double>> load(
+    const std::vector<std::string> &fileNames,
+    const std::pair<std::chrono::microseconds,
+                    std::chrono::microseconds> &times)
+{
+    std::vector<QPhase::Waveforms::Station<double>> stations;
+    for (const auto &fileName : fileNames)
+    {
+        SFF::SAC::Waveform sac;
+        sac.read(fileName);
+    }
+    return stations;
+}
+*/
+}
 
 /// C'tor
 MainWindow::MainWindow(std::shared_ptr<Topics> &topics, QWidget *parent) :
@@ -168,26 +188,15 @@ void MainWindow::createSlots()
                             qCritical() << e.what();
                         }
                         // Read in the waveforms
+                        std::vector<std::string> sacFileNames;
                         for (const auto &w : waveformsInTable)
                         {
-                            qDebug() << "Loading: "
-                                     << QString::fromStdString(w.getFileName());
-                            QPhase::Waveforms::Waveform<double> wave;
-                            try
-                            {
-                                wave.load(w.getFileName(), plotTime0, plotTime1);
-/*
-for (const auto &was : wave)
-{
-qDebug() << was.getNumberOfSamples();
-}
-*/
-                            }
-                            catch (const std::exception &e)
-                            {
-                                qCritical() << e.what();
-                            }
+                            sacFileNames.push_back(w.getFileName());
                         }
+                        auto stations = loadSACFiles<double>(sacFileNames,
+                                                             plotTime0,
+                                                             plotTime1);
+                        qDebug() << "Read" << stations.size() << "stations";
                     } // End check on database connection
                     // Start doing plotting
                     mTraceView->setTimeLimits(std::pair(plotTime0, plotTime1));

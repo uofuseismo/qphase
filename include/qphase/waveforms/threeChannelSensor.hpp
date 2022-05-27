@@ -138,6 +138,16 @@ public:
     [[nodiscard]] bool haveElevation() const noexcept;
     /// @}
 
+    /// @name Location Code
+    /// @{
+
+    /// @brief Sets the location code.
+    /// @param[in] locationCode  The location code - e.g., 01.
+    void setLocationCode(const std::string &locationCode);
+    /// @result The location code.  By default this is empty.
+    [[nodiscard]] std::string getLocationCode() const noexcept;
+    /// @}
+
     /// @name Destructors
     /// @{
 

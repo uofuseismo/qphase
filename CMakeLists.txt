@@ -67,6 +67,8 @@ set(CORE_SRC
     src/waveforms/segment.cpp
     src/waveforms/simpleResponse.cpp
     src/waveforms/singleChannelSensor.cpp
+    src/waveforms/station.cpp
+    src/waveforms/threeChannelSensor.cpp
     src/waveforms/waveform.cpp
     #src/waveforms/sac.cpp
     )
@@ -91,6 +93,9 @@ endif()
 set(UI_SRC
     src/widgets/tableViews/eventTableModel.cpp
     src/widgets/tableViews/eventTableView.cpp
+    src/widgets/waveforms/stationScene.cpp
+    src/widgets/waveforms/stationView.cpp
+    include/qphase/widgets/waveforms/stationView.hpp
     src/widgets/waveforms/postProcessing/traceItem.cpp
     src/widgets/waveforms/postProcessing/traceScene.cpp
     include/qphase/widgets/waveforms/postProcessing/traceView.hpp
@@ -148,14 +153,16 @@ target_include_directories(qphase_widgets
 qt6_add_resources(QNODE_RESOURCES
                  ${CMAKE_SOURCE_DIR}/resources/qnode.qrc)
 add_executable(qnode
+               app/qnode/load.cpp
                app/qnode/qnode.cpp
                app/qnode/mainWindow.cpp ${QNODE_RESOURCES})
 set_target_properties(qnode PROPERTIES
                       CXX_STANDARD 17
                       CXX_STANDARD_REQUIRED YES
                       CXX_EXTENSIONS NO)
+target_include_directories(qnode PRIVATE ${SFF_INCLUDE_DIR})
 target_link_libraries(qnode
-                      PRIVATE qphase_core qphase_widgets Qt6::Core Qt6::Widgets Qt6::Network)
+                      PRIVATE qphase_core qphase_widgets Qt6::Core Qt6::Widgets Qt6::Network ${SFF_LIBRARY})
 ##########################################################################################
 #                                       Unit Tests                                       #
 ##########################################################################################

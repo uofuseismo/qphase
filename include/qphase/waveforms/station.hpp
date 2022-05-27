@@ -50,8 +50,10 @@ public:
 
     /// @brief Adds a single-channel sensor.
     void add(const SingleChannelSensor<T> &sensor);
+    void add(SingleChannelSensor<T> &&sensor);
     /// @brief Adds a three-channel sensor.
     void add(const ThreeChannelSensor<T> &sensor); 
+    void add(ThreeChannelSensor<T> &&sensor);
 
     /// @brief Gets the three-channel sensors.
     
@@ -69,6 +71,15 @@ public:
 
     /// @name Station Name
     /// @{
+
+    /// @brief Sets the station's network code.
+    /// @param[in] networkCode The station network code - e.g., UU.
+    void setNetworkCode(const std::string &networkCode);
+    /// @result The network code.
+    /// @throws std::runtime_error if \c haveNetworkCode() is false.
+    [[nodiscard]] std::string getNetworkCode() const;
+    /// @result True indicates the network code was set.
+    [[nodiscard]] bool haveNetworkCode() const noexcept;
 
     /// @brief Sets the station name.
     /// @param[in] name  The station name - e.g., BRTU.

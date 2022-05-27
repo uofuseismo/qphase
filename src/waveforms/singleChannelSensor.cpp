@@ -40,6 +40,7 @@ class SingleChannelSensor<T>::SingleChannelSensorImpl
 {
 public:
     Channel<T> mVerticalChannel;
+    std::string mLocationCode;
     double mLatitude;
     double mLongitude;
     double mElevation;
@@ -212,6 +213,19 @@ template<class T>
 bool SingleChannelSensor<T>::haveElevation() const noexcept
 {
     return pImpl->mHaveElevation;
+}
+
+/// Location code
+template<class T>
+void SingleChannelSensor<T>::setLocationCode(const std::string &locationCode)
+{
+    pImpl->mLocationCode = locationCode;
+}
+
+template<class T>
+std::string SingleChannelSensor<T>::getLocationCode() const noexcept
+{
+    return pImpl->mLocationCode;
 }
 
 /// Reset class

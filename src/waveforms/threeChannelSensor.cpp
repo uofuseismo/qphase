@@ -31,8 +31,9 @@ void checkVerticalChannel(const Channel<T> &channel)
     checkChannel(channel);
     auto channelCode = channel.getChannelCode();
     if (channelCode[2] == 'N' ||
+        channelCode[2] == 'R' ||
+        channelCode[2] == 'Q' ||
         channelCode[2] == 'E' ||
-        channelCode[2] == 'R' ||  
         channelCode[2] == 'T')
     {   
         throw std::invalid_argument("Channel code = " + channelCode
@@ -46,6 +47,7 @@ void checkNorthChannel(const Channel<T> &channel)
     checkChannel(channel);
     auto channelCode = channel.getChannelCode();
     if (channelCode[2] == 'Z' ||
+        channelCode[2] == 'L' ||
         channelCode[2] == 'E' ||
         channelCode[2] == 'T')
     {   
@@ -60,8 +62,10 @@ void checkEastChannel(const Channel<T> &channel)
     checkChannel(channel);
     auto channelCode = channel.getChannelCode();
     if (channelCode[2] == 'Z' ||
+        channelCode[2] == 'L' ||
         channelCode[2] == 'N' ||
-        channelCode[2] == 'R')
+        channelCode[2] == 'R' ||
+        channelCode[2] == 'Q')
     {   
         throw std::invalid_argument("Channel code = " + channelCode
                                   + " appears to not be east");
@@ -77,6 +81,7 @@ public:
     Channel<T> mVerticalChannel;
     Channel<T> mNorthChannel;
     Channel<T> mEastChannel;
+    std::string mLocationCode;
     double mLatitude;
     double mLongitude;
     double mElevation;
@@ -353,6 +358,19 @@ template<class T>
 bool ThreeChannelSensor<T>::haveElevation() const noexcept
 {
     return pImpl->mHaveElevation;
+}
+
+/// Location code
+template<class T>
+void ThreeChannelSensor<T>::setLocationCode(const std::string &locationCode)
+{
+    pImpl->mLocationCode = locationCode;
+}
+
+template<class T>
+std::string ThreeChannelSensor<T>::getLocationCode() const noexcept
+{
+    return pImpl->mLocationCode;
 }
 
 /// Reset class
