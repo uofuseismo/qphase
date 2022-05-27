@@ -226,5 +226,16 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
     if (handled){event->accept();}
 }
 
+/// Sets the stations
+void StationScene::setStations(
+    std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations)
+{
+    if (stations == nullptr){throw std::invalid_argument("Stations is NULL");}
+    if (stations->empty())
+    {
+        throw std::invalid_argument("No stations");
+    }
+    pImpl->mStations = stations;
+}
 //template class QPhase::Widgets::Waveforms::StationScene<double>;
 //template class QPhase::Widgets::Waveforms::StationScene<float>;

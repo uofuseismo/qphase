@@ -100,6 +100,8 @@ void StationView::setStations(
         throw std::invalid_argument("No stations");
     }
     pImpl->mStations = stations;
+    pImpl->mScene->setStations(stations);
+    redrawScene();
 }
 
 /*

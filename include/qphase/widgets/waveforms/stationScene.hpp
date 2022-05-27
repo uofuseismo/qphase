@@ -7,6 +7,10 @@ QT_BEGIN_NAMESPACE
  class QGraphicsSceneWheelEvent;
  class QSize;
 QT_END_NAMESPACE
+namespace QPhase::Waveforms
+{
+ template<class T> class Station;
+}
 namespace QPhase::Widgets::Waveforms
 {
 /// @class StationScene "stationScene.hpp" "qphase/widgets/postProcessing/stationScene.hpp"
@@ -37,6 +41,8 @@ public:
     /// @param[in] time  The time in UTC seconds since the epoch.  
     ///                  This will represent the "zero" time.
     void setRelativeTimeLimits(const std::chrono::microseconds &time);
+    /// @brief Sets the stations to plot.
+    void setStations(std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations);
 
     StationScene(const StationScene &) = delete;
     StationScene(StationScene &&) noexcept = delete;
