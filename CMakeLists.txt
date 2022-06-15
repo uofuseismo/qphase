@@ -93,6 +93,7 @@ endif()
 set(UI_SRC
     src/widgets/tableViews/eventTableModel.cpp
     src/widgets/tableViews/eventTableView.cpp
+    src/widgets/waveforms/stationItem.cpp
     src/widgets/waveforms/stationScene.cpp
     src/widgets/waveforms/stationView.cpp
     include/qphase/widgets/waveforms/stationView.hpp

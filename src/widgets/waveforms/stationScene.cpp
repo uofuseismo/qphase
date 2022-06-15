@@ -6,7 +6,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QString>
 #include "qphase/widgets/waveforms/stationScene.hpp"
-//#include "qphase/widgets/waveforms/stationItem.hpp"
+#include "qphase/widgets/waveforms/stationItem.hpp"
 #include "qphase/widgets/waveforms/channelItem.hpp"
 #include "qphase/waveforms/station.hpp"
 #include "qphase/waveforms/channel.hpp"
@@ -106,41 +106,48 @@ void StationScene::setAbsoluteTimeLimits(
 /// Populate scene 
 void StationScene::populateScene()
 {
-bool haveData = false;
-/*
-    bool haveData = std::any_of(pImpl->mWaveforms.begin(),
-                                pImpl->mWaveforms.end(),
-                                [](const Waveform &w) 
-                                {
-                                   return w.mVisible;
-                                });
-*/
     int nStations = 0;
     if (pImpl->mStations)
     {
         nStations = static_cast<int> (pImpl->mStations->size());
     }
-    if (!haveData)
+    if (nStations == 0)
     {
         qDebug() << "No data in trace scene.  Setting default background...";
         addSimpleText(pImpl->mBackgroundName, pImpl->mBackgroundFont);
     }
     else
     {
-        qDebug() << "Creating new trace scene...";
-/*
+        int nTraces = 0;
+        for (const auto &station : *pImpl->mStations)
+        {
+            nTraces = nTraces + station.getNumberOfChannels();
+        }
+        qDebug() << "Creating new trace scene with " << nTraces << " traces...";
         // Get axis limits
         auto axisLimits = std::pair(pImpl->mPlotEarliestTime,
                                     pImpl->mPlotLatestTime);
         if (pImpl->mTimeConvention == TimeConvention::Relative)
         {
             qCritical() << "Not done";
-        } 
+        }
         int traceWidth = pImpl->mTraceWidth;
         int traceHeight = pImpl->mTraceHeight;
         setSceneRect(0, 0, traceWidth, traceHeight*nTraces);
         clear();
-*/
+        int nTotalChannels = 0;
+        for (const auto &station : *pImpl->mStations) 
+        {
+            auto nChannels = station.getNumberOfChannels();
+            QRectF stationPlotArea{0, 0,
+                                   static_cast<qreal> (traceWidth),
+                                   static_cast<qreal> (traceHeight*nChannels)};
+            auto stationItem = new StationItem(station, stationPlotArea);
+            stationItem->setPos(0, 1 + nTotalChannels*traceHeight);
+            nTotalChannels = nTotalChannels
+                           + stationItem->getNumberOfChannels();
+            addItem(stationItem);
+        }
     }
 }
 
@@ -151,6 +158,7 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
     bool updatePlot = false;
     bool handled = false;
     bool haveData = false;
+    if (pImpl->mStations){haveData = !pImpl->mStations->empty();}
 /*std::any_of(pImpl->mWaveforms.begin(),
                                 pImpl->mWaveforms.end(),
                                 [](const Waveform &w)
@@ -236,6 +244,7 @@ void StationScene::setStations(
         throw std::invalid_argument("No stations");
     }
     pImpl->mStations = stations;
+    populateScene();
 }
 //template class QPhase::Widgets::Waveforms::StationScene<double>;
 //template class QPhase::Widgets::Waveforms::StationScene<float>;

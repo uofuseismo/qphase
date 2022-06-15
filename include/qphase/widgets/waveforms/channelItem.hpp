@@ -33,7 +33,11 @@ class ChannelItem : public QGraphicsRectItem
 public:
     /// @brief Constructor.
     explicit ChannelItem(const QRectF &globalShape, QGraphicsItem *parent = nullptr);
-
+    /// @brief Constructor from a given channel.
+    template<typename U>
+    ChannelItem(const QPhase::Waveforms::Channel<U> &channel,
+                const QRectF &globalShape, QGraphicsItem *parent = nullptr);
+ 
     /// @name Name
     /// @{
 
