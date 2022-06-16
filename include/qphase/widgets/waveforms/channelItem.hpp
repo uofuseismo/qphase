@@ -9,6 +9,7 @@ QT_BEGIN_NAMESPACE
  class QPainterPath;
  class QPen;
  class QStyleOptionGraphicsItem;
+ class QString;
  class QWidget;
 QT_END_NAMESPACE
 namespace QPhase
@@ -49,6 +50,13 @@ public:
     void setNamePen(const QPen &pen);
     void setNameFont(const QFont &font);
     /// @}
+
+    /// @name Time Limits
+    /// @{
+
+    void setAbsoluteTimeLimits(const std::pair<std::chrono::microseconds, 
+                                               std::chrono::microseconds> &plotLimits);
+    /// @}
    
     /// @name Waveform
     /// @{
@@ -57,6 +65,8 @@ public:
     /// @param[in] channel  The channel to plot.
     template<typename U>
     void setWaveform(const QPhase::Waveforms::Channel<U> &channel);
+    /// @brief Sets the waveform's name.
+    void setName(const QString &name);
     /// @}
 
     /// @name Arrival
@@ -90,6 +100,7 @@ public:
     ChannelItem& operator=(ChannelItem &&) noexcept = delete;
 
 private:
+    void drawGrid(QPainter *painter);
     void drawName(QPainter *painter);
 private:
     class ChannelItemImpl;

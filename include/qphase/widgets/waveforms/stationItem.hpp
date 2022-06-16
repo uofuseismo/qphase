@@ -60,6 +60,7 @@ public:
     ///                        microseconds since the epoch of the plot while
     ///                        plotLimits.second is the end time (UTC) in
     ///                        microseconds since the epoch of the plot.
+    /// @throws std::invalid_argument if plotLimits.first > plotLimits.second.
     void setAbsoluteTimeLimits(const std::pair<std::chrono::microseconds, 
                                                std::chrono::microseconds> &plotLimits);
 

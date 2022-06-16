@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cmath>
 #include <vector>
 #include <QColor>
@@ -29,14 +30,18 @@ public:
     {
         auto availableHeight = static_cast<double> (mCurrentSize.height());
         int denominator = 1;
-        //auto nChannels = mStations->getNumberOfChannels();
-/*
-        if (!mWaveforms.empty())
+        int nChannels = 0;
+        if (mStations)
         {
-            denominator = std::min(static_cast<int> (mWaveforms.size()),
-                                   mMaxTracesPerScene);
+            for (const auto &station : *mStations)
+            {
+                nChannels = nChannels + station.getNumberOfChannels();
+            }
         }
-*/
+        if (nChannels > 0)
+        {
+            denominator = std::min(nChannels, mMaxTracesPerScene);
+        }
         mTraceHeight
             = static_cast<int> (std::floor(availableHeight/denominator));
     }
@@ -48,11 +53,12 @@ public:
     QFont mBackgroundFont{"Helvetica", 22, QFont::Light, false};
     std::chrono::microseconds mPlotEarliestTime{0};
     std::chrono::microseconds mPlotLatestTime{0};
+    std::map<QString, StationItem *> mStationItems;
     double mZoomFactor{1.1};
     int mNumberOfZooms{0};
     int mTraceWidth{400};
     int mTraceHeight{150};
-    int mMaxTracesPerScene = 11;
+    int mMaxTracesPerScene = 9;
     TimeConvention mTimeConvention{TimeConvention::Absolute};
     bool mNormalZoom{true}; // Wheel forward zooms in
     bool mNormalTimeAdvance{true}; // Wheel in goes back in time
@@ -88,17 +94,16 @@ void StationScene::setAbsoluteTimeLimits(
     const std::pair<std::chrono::microseconds, std::chrono::microseconds>
     &timeLimits)
 {
-    if (timeLimits.first >= timeLimits.second)
-    {   
-        throw std::invalid_argument("timeLimits.first >= timeLimits.second");
+    if (timeLimits.first > timeLimits.second)
+    {
+        throw std::invalid_argument("timeLimits.first > timeLimits.second");
     }
     pImpl->mPlotEarliestTime = timeLimits.first;
     pImpl->mPlotLatestTime = timeLimits.second;
     pImpl->mTimeConvention = TimeConvention::Absolute;
-    for (auto &item : items())
+    for (auto &stationItem : pImpl->mStationItems)
     {
-        //auto traceItem = reinterpret_cast<StationItem *> (item);
-        //traceItem->setXAxisLimits(axisLimits);
+        stationItem.second->setAbsoluteTimeLimits(timeLimits);
     }
 }
 
@@ -135,6 +140,7 @@ void StationScene::populateScene()
         int traceHeight = pImpl->mTraceHeight;
         setSceneRect(0, 0, traceWidth, traceHeight*nTraces);
         clear();
+        pImpl->mStationItems.clear();
         int nTotalChannels = 0;
         for (const auto &station : *pImpl->mStations) 
         {
@@ -143,6 +149,8 @@ void StationScene::populateScene()
                                    static_cast<qreal> (traceWidth),
                                    static_cast<qreal> (traceHeight*nChannels)};
             auto stationItem = new StationItem(station, stationPlotArea);
+            pImpl->mStationItems.insert(std::pair(stationItem->getName(),
+                                                  stationItem));
             stationItem->setPos(0, 1 + nTotalChannels*traceHeight);
             nTotalChannels = nTotalChannels
                            + stationItem->getNumberOfChannels();
@@ -244,7 +252,9 @@ void StationScene::setStations(
         throw std::invalid_argument("No stations");
     }
     pImpl->mStations = stations;
+    pImpl->recomputeTraceHeight();
     populateScene();
 }
+
 //template class QPhase::Widgets::Waveforms::StationScene<double>;
 //template class QPhase::Widgets::Waveforms::StationScene<float>;

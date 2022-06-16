@@ -1,3 +1,4 @@
+#include <cmath>
 #include <chrono>
 #include <vector>
 #include <QDebug>
@@ -7,6 +8,71 @@
 #include "qphase/widgets/waveforms/stationView.hpp"
 #include "qphase/widgets/waveforms/stationScene.hpp"
 #include "qphase/waveforms/station.hpp"
+#include "qphase/waveforms/channel.hpp"
+#include "qphase/waveforms/waveform.hpp"
+#include "qphase/waveforms/threeChannelSensor.hpp"
+#include "qphase/waveforms/singleChannelSensor.hpp"
+
+namespace
+{
+template<typename T>
+std::pair<std::chrono::microseconds, std::chrono::microseconds> 
+    getStopEndTimes(const QPhase::Waveforms::Station<T> &station)
+{
+    std::chrono::microseconds tMin{std::numeric_limits<int64_t>::max()};
+    std::chrono::microseconds tMax{std::numeric_limits<int64_t>::lowest()};
+    auto sensors3C = station.getThreeChannelSensorsReference();
+    for (const auto &channel : sensors3C)
+    {
+        try
+        {
+            tMin = std::min(tMin, channel.getVerticalChannelReference()
+                                     .getWaveformReference().getEarliestTime());
+            tMax = std::max(tMax, channel.getVerticalChannelReference()
+                                     .getWaveformReference().getLatestTime());
+        }
+        catch (...)
+        {
+        }
+        try
+        {
+            tMin = std::min(tMin, channel.getNorthChannelReference()
+                                     .getWaveformReference().getEarliestTime());
+            tMax = std::max(tMax, channel.getNorthChannelReference()
+                                     .getWaveformReference().getLatestTime());
+        }
+        catch (...)
+        {
+        }
+        try
+        {
+            tMin = std::min(tMin, channel.getEastChannelReference()
+                                     .getWaveformReference().getEarliestTime());
+            tMax = std::max(tMax, channel.getEastChannelReference()
+                                     .getWaveformReference().getLatestTime());
+        }
+        catch (...)
+        {
+        }
+    }
+    auto sensors1C = station.getSingleChannelSensorsReference();
+    for (const auto &channel : sensors1C)
+    {
+        try
+        {
+            tMin = std::min(tMin, channel.getVerticalChannelReference()
+                                     .getWaveformReference().getEarliestTime());
+            tMax = std::max(tMax, channel.getVerticalChannelReference()
+                                     .getWaveformReference().getLatestTime());
+        }
+        catch (...)
+        {
+        }
+    }
+    return std::pair{tMin, tMax};
+}
+
+}
 
 #define DEFAULT_TRACE_HEIGHT 150
 
@@ -65,12 +131,12 @@ void StationView::resizeEvent(QResizeEvent *event)
 
 /// Time limits
 void StationView::setTimeLimits(const std::pair<std::chrono::microseconds,
-                                              std::chrono::microseconds>
+                                                std::chrono::microseconds>
                                &timeLimits)
 {
     if (pImpl->mScene == nullptr)
     {
-        qCritical() << __func__ << "Scene is NULL";
+        qCritical() << "Scene is NULL";
         return;
     }
     try
@@ -80,7 +146,7 @@ void StationView::setTimeLimits(const std::pair<std::chrono::microseconds,
     }
     catch (const std::exception &e)
     {
-        qCritical() << __func__ << "Failed to set time limits: " << e.what();
+        qCritical() << "Failed to set time limits: " << e.what();
     }
 }
 
@@ -99,6 +165,21 @@ void StationView::setStations(
     {
         throw std::invalid_argument("No stations");
     }
+    // If not present then set the time limits
+    if (pImpl->mPlotEarliestTime.count() == 0 &&
+        pImpl->mPlotLatestTime.count() == 0)
+    {
+        std::chrono::microseconds tMin{std::numeric_limits<int64_t>::max()};
+        std::chrono::microseconds tMax{std::numeric_limits<int64_t>::lowest()};
+        for (const auto &station : *stations)
+        {
+            auto [t0, t1] = getStopEndTimes(station);
+            tMin = std::min(tMin, t0);
+            tMax = std::max(tMax, t1);
+        }
+        setTimeLimits(std::pair(tMin, tMax));
+    }
+    // Now get a pointer to the stations
     pImpl->mStations = stations;
     pImpl->mScene->setStations(stations);
     redrawScene();

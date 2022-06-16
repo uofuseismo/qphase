@@ -195,7 +195,7 @@ void Station<T>::setNetworkCode(const std::string &network)
 {
     auto s = removeBlanksAndCapitalize(network);
     if (s.empty()){throw std::invalid_argument("Network code is empty");}
-    pImpl->mName = s;
+    pImpl->mNetworkCode = s;
 }
 
 template<class T>
@@ -248,6 +248,22 @@ int Station<T>::getNumberOfChannels() const noexcept
     auto nChannels = static_cast<int> (pImpl->mThreeChannelSensors.size())*3
                    + static_cast<int> (pImpl->mSingleChannelSensors.size());
     return nChannels;
+}
+
+/// Gets the three channel sensors
+template<class T>
+const std::vector<ThreeChannelSensor<T>>&
+    Station<T>::getThreeChannelSensorsReference() const noexcept
+{
+    return pImpl->mThreeChannelSensors;
+}
+
+/// Gets the three channel sensors
+template<class T>
+const std::vector<SingleChannelSensor<T>>&
+    Station<T>::getSingleChannelSensorsReference() const noexcept
+{
+    return pImpl->mSingleChannelSensors;
 }
 
 ///--------------------------------------------------------------------------///

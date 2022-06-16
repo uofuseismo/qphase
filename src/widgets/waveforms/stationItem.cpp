@@ -9,6 +9,8 @@
 #include "qphase/widgets/waveforms/channelItem.hpp"
 #include "qphase/waveforms/station.hpp"
 #include "qphase/waveforms/channel.hpp"
+#include "qphase/waveforms/threeChannelSensor.hpp"
+#include "qphase/waveforms/singleChannelSensor.hpp"
 
 using namespace QPhase::Widgets::Waveforms;
 
@@ -19,6 +21,8 @@ public:
     QRectF mGlobalBounds{mLocalBounds};
     QPainterPath mLocalBoundsPainterPath;
     QString mName;
+    std::chrono::microseconds mPlotEarliestTime{0};
+    std::chrono::microseconds mPlotLatestTime{0};
     int mNumberOfChannels = 0;
     VisibleChannels mVisibleChannels = VisibleChannels::All;
 };
@@ -56,20 +60,71 @@ void StationItem::setWaveforms(
     pImpl->mName.clear();
     try
     {
-        pImpl->mName.fromStdString(stationWaveforms.getNetworkCode() + "."
-                                 + stationWaveforms.getName());
+        auto name = stationWaveforms.getNetworkCode() + "."
+                  + stationWaveforms.getName();
+        pImpl->mName = QString::fromStdString(name);
     }
     catch (const std::exception &e)
     {
         qWarning() << "Failed to set name: " << e.what();
     }
+    auto threeComponentSensors
+        = stationWaveforms.getThreeChannelSensorsReference();
+    auto singleComponentSensors
+        = stationWaveforms.getSingleChannelSensorsReference(); 
     auto nChannels = stationWaveforms.getNumberOfChannels();
     pImpl->mNumberOfChannels = nChannels;
-    auto channelWidth  = boundingRect().width(); 
+    auto channelWidth  = boundingRect().width();
     auto channelHeight = boundingRect().height()/std::max(1, nChannels);
-//    for (const auto &channel : stationWaveforms)
+    // Make the channels
+    QRectF channelPlotArea{0, 0, channelWidth, channelHeight};
+    int iChannel = 0;
+    for (const auto &sensor : threeComponentSensors)
     {
-        QRectF channelShape{0, 0, channelWidth, channelHeight};
+        auto nameBase = pImpl->mName;
+        auto locationCode = QString::fromStdString(sensor.getLocationCode());
+        auto verticalChannel = sensor.getVerticalChannelReference();
+        auto name = nameBase + "."
+                  + QString::fromStdString(verticalChannel.getChannelCode());
+        if (!locationCode.isEmpty()){name = name + "." + locationCode;}
+        auto zChannelItem
+            = new ChannelItem(verticalChannel, channelPlotArea, this);
+        zChannelItem->setPos(0, iChannel*channelHeight);
+        zChannelItem->setName(name);
+        iChannel = iChannel + 1;
+
+        auto northChannel = sensor.getNorthChannelReference();
+        name = nameBase + "." 
+             + QString::fromStdString(northChannel.getChannelCode());
+        if (!locationCode.isEmpty()){name = name + "." + locationCode;}
+        auto nChannelItem
+            = new ChannelItem(northChannel, channelPlotArea, this);
+        nChannelItem->setPos(0, iChannel*channelHeight);
+        nChannelItem->setName(name);
+        iChannel = iChannel + 1;
+
+        auto eastChannel = sensor.getEastChannelReference();
+        name = nameBase + "." 
+             + QString::fromStdString(eastChannel.getChannelCode());
+        if (!locationCode.isEmpty()){name = name + "." + locationCode;}
+        auto eChannelItem
+            = new ChannelItem(eastChannel, channelPlotArea, this);
+        eChannelItem->setPos(0, iChannel*channelHeight);
+        eChannelItem->setName(name);
+        iChannel = iChannel + 1;
+    }
+    for (const auto &sensor : singleComponentSensors)
+    {
+        auto verticalChannel = sensor.getVerticalChannelReference();
+        auto locationCode = QString::fromStdString(sensor.getLocationCode());
+        auto name = pImpl->mName + "." 
+                  + QString::fromStdString(verticalChannel.getChannelCode());
+        if (!locationCode.isEmpty()){name = name + "." + locationCode;}
+        auto zChannelItem
+            = new ChannelItem(verticalChannel, channelPlotArea, this);
+        zChannelItem->setPos(0, iChannel*channelHeight);
+        zChannelItem->setName(name);
+        iChannel = iChannel + 1; 
     }
 }
 
@@ -88,7 +143,7 @@ int StationItem::getNumberOfChannels() const noexcept
 /// Destructor
 StationItem::~StationItem() = default;
 
-/// The shape in local coordaintes
+/// The shape in local coordinates
 QPainterPath StationItem::shape() const
 {
     return pImpl->mLocalBoundsPainterPath;
@@ -99,6 +154,25 @@ QRectF StationItem::boundingRect() const
 {
     return pImpl->mGlobalBounds;
 }
+
+/// Limits
+void StationItem::setAbsoluteTimeLimits(
+    const std::pair<std::chrono::microseconds, 
+                    std::chrono::microseconds> &plotLimits)
+{
+    if (plotLimits.first > plotLimits.second)
+    {
+        throw std::invalid_argument("plotLimits.first > plotLimits.second");
+    }
+    pImpl->mPlotEarliestTime = plotLimits.first;
+    pImpl->mPlotLatestTime   = plotLimits.second;
+    for (auto &childItem : childItems())
+    {
+        auto channelItem = reinterpret_cast<ChannelItem *> (childItem);
+        channelItem->setAbsoluteTimeLimits(plotLimits);
+    }
+}
+
 
 ///--------------------------------------------------------------------------///
 ///                          Template Instantiation                          ///
