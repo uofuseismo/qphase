@@ -53,6 +53,8 @@ public:
     QFont mBackgroundFont{"Helvetica", 22, QFont::Light, false};
     std::chrono::microseconds mPlotEarliestTime{0};
     std::chrono::microseconds mPlotLatestTime{0};
+    std::chrono::microseconds mOriginalEarliestTime{0};
+    std::chrono::microseconds mOriginalLatestTime{0};
     std::map<QString, StationItem *> mStationItems;
     double mZoomFactor{1.1};
     int mNumberOfZooms{0};
@@ -62,6 +64,7 @@ public:
     TimeConvention mTimeConvention{TimeConvention::Absolute};
     bool mNormalZoom{true}; // Wheel forward zooms in
     bool mNormalTimeAdvance{true}; // Wheel in goes back in time
+    bool mRedraw{true}; // Something was updated that requires a redraw
 };
 
 
@@ -100,13 +103,26 @@ void StationScene::setAbsoluteTimeLimits(
     }
     pImpl->mPlotEarliestTime = timeLimits.first;
     pImpl->mPlotLatestTime = timeLimits.second;
+    pImpl->mOriginalEarliestTime = timeLimits.first;
+    pImpl->mOriginalLatestTime = timeLimits.second;
     pImpl->mTimeConvention = TimeConvention::Absolute;
     for (auto &stationItem : pImpl->mStationItems)
     {
         stationItem.second->setAbsoluteTimeLimits(timeLimits);
     }
+    updatePlot();
 }
 
+/// Update the plot
+void StationScene::updatePlot()
+{
+/*
+    for (auto &stationItem : pImpl->mStationItems)
+    {
+        //stationItem.update();
+    }
+*/
+}
 
 /// Populate scene 
 void StationScene::populateScene()
@@ -152,6 +168,7 @@ void StationScene::populateScene()
             pImpl->mStationItems.insert(std::pair(stationItem->getName(),
                                                   stationItem));
             stationItem->setPos(0, 1 + nTotalChannels*traceHeight);
+            stationItem->setAbsoluteTimeLimits(axisLimits);
             nTotalChannels = nTotalChannels
                            + stationItem->getNumberOfChannels();
             addItem(stationItem);
@@ -175,24 +192,27 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
                                 });
 */
     // Is there anything to do?
+    std::chrono::microseconds plotT0{0};
+    std::chrono::microseconds plotT1{0};
     if (haveData)
     {
-/*
+        // Get the current plot limits
         auto tMin = pImpl->mPlotEarliestTime.count();
         auto tMax = pImpl->mPlotLatestTime.count();
-        auto durationInMicroSeconds = tMax - tMin;
-        auto halfDurationInMicroSeconds
-            = static_cast<int64_t> (std::round(durationInMicroSeconds/2));
-        auto newDurationInMicroSeconds = durationInMicroSeconds;
+        auto durationMuS = tMax - tMin;
+        auto halfDurationMuS = static_cast<int64_t> (std::round(durationMuS/2));
+        // Get the location to approximately zoom in/out on
         auto xPosition = static_cast<double> (event->scenePos().x());
         double centerFraction = xPosition/width();
-        auto currentCenterTimeInMicroSeconds = tMin
-                                             + halfDurationInMicroSeconds;
-        auto pickedCenterTime
+        auto currentCenterTimeMuS = tMin + halfDurationMuS;
+        auto pickedCenterTimeMuS
             = tMin
-            + static_cast<int64_t> (std::round(durationInMicroSeconds
-                                             *centerFraction));
-*/
+            + static_cast<int64_t> (std::round(durationMuS*centerFraction));
+        // Don't snap to the location under the mouse.  Makes continuous
+        // scrolling awkward.  Instead head in the desired direction.
+        auto newCenterTimeMuS 
+            = static_cast<int64_t> (std::round(0.9*currentCenterTimeMuS
+                                             + 0.1*pickedCenterTimeMuS));
         // Zoom in/out
         if (event->modifiers() & Qt::ControlModifier)
         {
@@ -203,15 +223,43 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
             // Handle zoom in
             if (zoomIn)
             {
-                qDebug() << "Zooming in";
+                //qDebug() << "Zooming in";
+                auto newDurationMuS
+                    = static_cast<int64_t> (std::round(durationMuS
+                                                      /pImpl->mZoomFactor));
+                auto halfDurationMuS
+                    = static_cast<int64_t> (std::round(newDurationMuS/2.));
+                plotT0 = std::chrono::microseconds{newCenterTimeMuS
+                                                 - halfDurationMuS};
+                plotT1 = std::chrono::microseconds{newCenterTimeMuS
+                                                 + halfDurationMuS};
+                plotT0 = std::max(pImpl->mOriginalEarliestTime, plotT0);
+                plotT1 = std::min(pImpl->mOriginalLatestTime,   plotT1);
                 pImpl->mNumberOfZooms = pImpl->mNumberOfZooms + 1;
                 updatePlot = true;
             }
             // Handle zoom out
             else if (!zoomIn && pImpl->mNumberOfZooms > 0)
             {
-                qDebug() << "Zooming out";
+                //qDebug() << "Zooming out";
+                auto newDurationMuS
+                    = static_cast<int64_t> (std::round(durationMuS
+                                                      *pImpl->mZoomFactor));
+                auto halfDurationMuS
+                    = static_cast<int64_t> (std::round(newDurationMuS/2.));
+                plotT0 = std::chrono::microseconds{newCenterTimeMuS
+                                                 - halfDurationMuS};
+                plotT1 = std::chrono::microseconds{newCenterTimeMuS
+                                                 + halfDurationMuS};
+                plotT0 = std::max(pImpl->mOriginalEarliestTime, plotT0);
+                plotT1 = std::min(pImpl->mOriginalLatestTime,   plotT1);
                 pImpl->mNumberOfZooms = pImpl->mNumberOfZooms - 1;
+                if (pImpl->mNumberOfZooms == 0)
+                {
+                    //qDebug() << "Zooming out to max";
+                    plotT0 = pImpl->mOriginalEarliestTime;
+                    plotT1 = pImpl->mOriginalLatestTime;
+                }
                 updatePlot = true;
             }
         }
@@ -219,23 +267,63 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
         else if (event->modifiers() & Qt::ShiftModifier)
         {
             handled = true;
+            double shiftFactor = 0.1;
             // Are we panning left or right?
             bool advanceTime = (event->delta() < 0);
             if (!pImpl->mNormalTimeAdvance){advanceTime = !advanceTime;}
             // Move forward in time
             if (advanceTime)
             {
-                qDebug() << "Moving to earlier time";
+                if (tMax < pImpl->mOriginalLatestTime.count())
+                {
+                    auto t0 = tMin
+                            + static_cast<int64_t> (std::round(shiftFactor
+                                                              *durationMuS));
+                    auto t1 = t0 + durationMuS;
+                    // Shifted beyond trace
+                    if (t1 > pImpl->mOriginalLatestTime.count())
+                    {
+                        t1 = pImpl->mOriginalLatestTime.count();
+                        t0 = std::max(pImpl->mOriginalEarliestTime.count(),
+                                      t1 - durationMuS);
+                    }
+                    plotT0 = std::chrono::microseconds{t0};
+                    plotT1 = std::chrono::microseconds{t1};
+                    updatePlot = true;
+                }
             }
             else
             {
-                qDebug() << "Moving to later time";
+                if (tMin > pImpl->mOriginalEarliestTime.count())
+                {
+                    auto t0 = tMin
+                            - static_cast<int64_t> (std::round(shiftFactor
+                                                              *durationMuS));
+                    auto t1 = t0 + durationMuS;
+                    // Shifted beyond trace
+                    if (t0 < pImpl->mOriginalEarliestTime.count())
+                    {
+                        t0 = pImpl->mOriginalEarliestTime.count();
+                        t1 = std::min(pImpl->mOriginalLatestTime.count(),
+                                      t0 + durationMuS);
+                    }
+                    plotT0 = std::chrono::microseconds{t0};
+                    plotT1 = std::chrono::microseconds{t1};
+                    updatePlot = true;
+                }
             }
         }
     }
     // Actually update the plot?
     if (updatePlot)
     {
+        pImpl->mPlotEarliestTime = plotT0;
+        pImpl->mPlotLatestTime = plotT1;
+        for (auto &stationItem : pImpl->mStationItems)
+        {
+            stationItem.second->setAbsoluteTimeLimits(std::pair{plotT0, plotT1});
+        }
+        update();
     }
     // Was the event handled?
     event->ignore();

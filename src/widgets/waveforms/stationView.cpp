@@ -139,6 +139,10 @@ void StationView::setTimeLimits(const std::pair<std::chrono::microseconds,
         qCritical() << "Scene is NULL";
         return;
     }
+    if (timeLimits.first > timeLimits.second)
+    {
+        throw std::runtime_error("timeLimits.first > timeLimits.second");
+    }
     try
     {
         pImpl->mTimeConvention = TimeConvention::Absolute;
@@ -147,7 +151,11 @@ void StationView::setTimeLimits(const std::pair<std::chrono::microseconds,
     catch (const std::exception &e)
     {
         qCritical() << "Failed to set time limits: " << e.what();
+        return; 
     }
+    pImpl->mPlotEarliestTime = timeLimits.first;
+    pImpl->mPlotLatestTime   = timeLimits.second;
+    redrawScene();
 }
 
 /// Force a redraw
