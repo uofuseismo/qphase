@@ -25,10 +25,7 @@ class Channel<T>::ChannelImpl
 public:
     Waveform<T> mWaveform;
     SimpleResponse mSimpleResponse;
-    std::string mNetworkCode;
-    std::string mStationName;
     std::string mChannelCode;
-    std::string mLocationCode;
     double mDip{0}; 
     double mAzimuth{0};
     bool mHaveWaveform{false};
@@ -79,6 +76,7 @@ Channel<T>& Channel<T>::operator=(Channel<T> &&channel) noexcept
 template<class T>
 Channel<T>::~Channel() = default;
 
+/*
 /// Network code
 template<class T>
 void Channel<T>::setNetworkCode(const std::string &networkCode)
@@ -101,7 +99,7 @@ bool Channel<T>::haveNetworkCode() const noexcept
     return !pImpl->mNetworkCode.empty();
 }
 
-/// Network code
+/// Station name
 template<class T>
 void Channel<T>::setStationName(const std::string &stationName)
 {
@@ -122,6 +120,7 @@ bool Channel<T>::haveStationName() const noexcept
 {
     return !pImpl->mStationName.empty();
 }
+*/
 
 /// Channel code
 template<class T>
@@ -149,6 +148,7 @@ bool Channel<T>::haveChannelCode() const noexcept
 }
 
 /// Location code
+/*
 template<class T>
 void Channel<T>::setLocationCode(const std::string &locationCode)
 {
@@ -160,6 +160,7 @@ std::string Channel<T>::getLocationCode() const noexcept
 {
     return pImpl->mLocationCode;
 }
+*/
 
 /// Dip
 template<class T>
@@ -287,8 +288,60 @@ bool Channel<T>::haveSimpleResponse() const noexcept
     return pImpl->mSimpleResponse.haveScalar();
 }
 
+template<class T>
+void Channel<T>::clear() noexcept
+{
+     pImpl = std::make_unique<ChannelImpl> ();
+}
+
+/// Convert
+/*
+template<typename T, typename U>
+Channel<T> QPhase::Waveforms::convert(const Channel<U> &channel)
+{
+    Channel<T> result;
+
+    if (channel.haveWaveform())
+    {
+        auto waveform = channel.getWaveformReference();
+        result.setWaveform(std::move(convert<T>(waveform)));
+    }
+    if (channel.haveSimpleResponse())
+    {
+        result.setSimpleResponse(channel.getSimpleResponse());
+    }
+    if (channel.haveChannelCode())
+    {
+        result.setChannelCode(channel.getChannelCode());
+    }
+    if (channel.haveDip())
+    {
+        result.setDip(channel.getDip());
+    }
+    if (channel.haveAzimuth())
+    {
+        result.setAzimuth(channel.getAzimuth());
+    }
+    return result;
+}
+
+template<>
+Channel<double> QPhase::Waveforms::convert(const Channel<double> &channel)
+{
+    return channel;
+}
+
+template<>
+Channel<float> QPhase::Waveforms::convert(const Channel<float> &channel)
+{
+    return channel;
+}
+*/
+
 ///--------------------------------------------------------------------------///
 ///                            Template Instantiation                        ///
 ///--------------------------------------------------------------------------///
 template class QPhase::Waveforms::Channel<double>;
 template class QPhase::Waveforms::Channel<float>;
+//template Channel<double> QPhase::Waveforms::convert(const Channel<float> &);
+//template Channel<float> QPhase::Waveforms::convert(const Channel<double> &);

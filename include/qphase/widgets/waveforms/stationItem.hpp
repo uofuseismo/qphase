@@ -21,7 +21,7 @@ namespace QPhase
  }
  namespace Widgets::Waveforms
  {
-  class ChannelItem;
+  template<class T> class ChannelItem;
  }
 }
 namespace QPhase::Widgets::Waveforms
@@ -39,15 +39,15 @@ public:
     explicit StationItem(const QRectF &globalShape,
                          QGraphicsItem *parent = nullptr);
     /// @brief Constructor with a station.
-    template<typename U>
-    StationItem(const QPhase::Waveforms::Station<U> &stationWaveforms,
+    template<typename T>
+    StationItem(const QPhase::Waveforms::Station<T> &stationWaveforms,
                 const QRectF &globalShape,
                 QGraphicsItem *parent = nullptr);
     /// @}
 
     /// @brief Sets the station data to plot.
-    template<typename U>
-    void setWaveforms(const QPhase::Waveforms::Station<U> &stationWaveforms); 
+    template<typename T>
+    void setWaveforms(const QPhase::Waveforms::Station<T> &stationWaveforms); 
 
     /// @result The name of the station.
     [[nodiscard]] QString getName() const noexcept;
@@ -74,7 +74,7 @@ public:
     [[nodiscard]] QPainterPath shape() const override;
     /// @brief Plots a trace.
     //void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-    //           QWidget *widget = nullptr) override;
+    //           QWidget *widget) override;
     /// @}
 
 

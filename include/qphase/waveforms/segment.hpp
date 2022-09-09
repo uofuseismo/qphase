@@ -1,6 +1,7 @@
 #ifndef QPHASE_WAVEFORMS_SEGMENT_HPP
 #define QPHASE_WAVEFORMS_SEGMENT_HPP
 #include <memory>
+#include <vector>
 #include <chrono>
 namespace QPhase::Waveforms
 {
@@ -49,7 +50,7 @@ public:
     /// @param[in] nSamples  The number of samples in the data.
     /// @param[in] data      The waveform data for this segment to set.
     ///                      This is an array with dimension [nSamples].
-    template<typename U> void setData(const int nSamples, const U *data);
+    template<typename U> void setData(int nSamples, const U *data);
     /// @result A pointer to the waveform data for this segment. 
     const T *getDataPointer() const noexcept;
     /// @result The waveform data for thsi segment.
@@ -108,5 +109,10 @@ private:
     class SegmentImpl;
     std::unique_ptr<SegmentImpl> pImpl;
 };
+/*
+template<typename U, typename T>
+[[nodiscard]]
+Segment<U> convert(const Segment<T> &segment);
+*/
 }
 #endif

@@ -34,7 +34,7 @@ public:
     /// @name Constructors
     /// @{
 
-    EventTableView(QWidget *parent = nullptr);
+    explicit EventTableView(QWidget *parent = nullptr);
     /// @}
 
     /// @name Destructors

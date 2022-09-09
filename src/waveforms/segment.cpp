@@ -198,6 +198,39 @@ std::chrono::microseconds Segment<T>::getEndTime() const noexcept
     return pImpl->mEndTime;
 }
 
+/// Change precision
+/*
+template<typename T, typename U>
+Segment<T> QPhase::Waveforms::convert(const Segment<U> &segment)
+{
+    Segment<T> result;
+    auto nSamples = segment.getNumberOfSamples();
+    const auto dataPtr = segment.getDataPointer();
+    if (nSamples > 0 && dataPtr != nullptr)
+    {
+        result.setData(nSamples, dataPtr);
+    }
+    if (segment.haveSamplingRate())
+    {
+        result.setSamplingRate(segment.getSamplingRate());
+    }
+    result.setStartTime(segment.getStartTime()); 
+    return result;
+}
+
+template<>
+Segment<double> QPhase::Waveforms::convert(const Segment<double> &segment)
+{
+    return segment;
+}
+
+template<>
+Segment<float> QPhase::Waveforms::convert(const Segment<float> &segment)
+{
+    return segment;
+}
+*/
+
 ///--------------------------------------------------------------------------///
 ///                          Template Instantiation                          ///
 ///--------------------------------------------------------------------------///
@@ -211,4 +244,9 @@ template void QPhase::Waveforms::Segment<double>::setData(int, const double *);
 template void QPhase::Waveforms::Segment<double>::setData(int, const float *);
 template void QPhase::Waveforms::Segment<float>::setData(int, const double *); 
 template void QPhase::Waveforms::Segment<float>::setData(int, const float *); 
-
+/*
+template QPhase::Waveforms::Segment<float>
+    QPhase::Waveforms::convert(const QPhase::Waveforms::Segment<double> &);
+template QPhase::Waveforms::Segment<double>
+    QPhase::Waveforms::convert(const QPhase::Waveforms::Segment<float> &); 
+*/

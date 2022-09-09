@@ -20,7 +20,7 @@ public:
     /// @result A pointer to the SOCI database session.
     [[nodiscard]] virtual soci::session *getSession() = 0;
     /// @result The database driver.
-    virtual std::string getDriver() const noexcept = 0;
+    [[nodiscard]] virtual std::string getDriver() const noexcept = 0;
 };
 }
 #endif

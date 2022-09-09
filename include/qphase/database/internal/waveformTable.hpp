@@ -16,7 +16,7 @@ namespace QPhase::Database
 namespace QPhase::Database::Internal
 {
 /// @name WaveformTable "waveformTable.hpp" "qphase/database/internal/waveformTable.hpp"
-/// @brief Defines a table of Waveforms.
+/// @brief Defines a table of waveforms.
 /// @copyright Ben Baker (University of Utah) distributed under the MIT license.
 class WaveformTable
 {

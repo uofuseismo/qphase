@@ -1,8 +1,6 @@
 #ifndef QPHASE_COLORMAPS_COLORMAP_HPP
 #define QPHASE_COLORMAPS_COLORMAP_HPP
-QT_BEGIN_NAMESPACE
- class QColor;
-QT_END_NAMESPACE
+#include <QColor>
 namespace QPhase::Widgets::ColorMaps
 {
 /// @class IColorMap "colorMap.hpp" "qphase/widgets/colorMaps/colorMap.hpp"
@@ -17,7 +15,7 @@ public:
     /// @result The interpolated value on the range [x0, x1].
     [[nodiscard]] virtual QColor evaluate(const double x) const = 0;
     /// @result True indicates that class is initialized.
-    [[nodiscard]] bool isInitialized() const noexcept = 0;
+    [[nodiscard]] virtual bool isInitialized() const noexcept = 0;
 };
 }
 #endif

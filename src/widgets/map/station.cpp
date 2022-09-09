@@ -1,12 +1,10 @@
 #include <array>
 #include <limits>
-#include <iostream>
 #include <QBrush>
 #include <QColor>
 #include <QPainter>
 #include <QPen>
 #include <QString>
-#include <QVector>
 #include "qphase/widgets/map/station.hpp"
 #include "qphase/database/internal/stationData.hpp"
 

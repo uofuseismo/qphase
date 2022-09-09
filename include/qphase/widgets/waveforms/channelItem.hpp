@@ -3,8 +3,10 @@
 #include <QGraphicsRectItem>
 #include <memory>
 #include <set>
+#include "qphase/widgets/waveforms/enums.hpp"
 QT_BEGIN_NAMESPACE
  class QFont;
+ class QGraphicsSceneMouseEvent; 
  class QPainter;
  class QPainterPath;
  class QPen;
@@ -29,15 +31,17 @@ namespace QPhase::Widgets::Waveforms
 /// @brief The graphics item that draws the waveform and auxiliary items (e.g.,
 ///        picks, characteristic functions, etc.)
 /// @copyright Ben Baker (University of Utah) distributed under the MIT license.
+template<class T = double>
 class ChannelItem : public QGraphicsRectItem
 {
 public:
     /// @brief Constructor.
     explicit ChannelItem(const QRectF &globalShape, QGraphicsItem *parent = nullptr);
     /// @brief Constructor from a given channel.
-    template<typename U>
-    ChannelItem(const QPhase::Waveforms::Channel<U> &channel,
-                const QRectF &globalShape, QGraphicsItem *parent = nullptr);
+    ChannelItem(const QPhase::Waveforms::Channel<T> &channel,
+                const QRectF &globalShape,
+                WaveformType waveformType = WaveformType::Seismogram,
+                QGraphicsItem *parent = nullptr);
  
     /// @name Name
     /// @{
@@ -62,9 +66,10 @@ public:
     /// @{
 
     /// @brief Sets the channel to plot.
-    /// @param[in] channel  The channel to plot.
-    template<typename U>
-    void setWaveform(const QPhase::Waveforms::Channel<U> &channel);
+    /// @param[in] channel       The channel to plot.
+    /// @param[in] waveformType  The waveform to plot.
+    void setWaveform(const QPhase::Waveforms::Channel<T> &channel,
+                     WaveformType waveformType = WaveformType::Seismogram);
     /// @brief Sets the waveform's name.
     void setName(const QString &name);
     /// @}
@@ -83,8 +88,9 @@ public:
     /// @result The item's shape in local coordinates.
     [[nodiscard]] QPainterPath shape() const override;
     /// @brief Plots a trace.
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget = nullptr) override;
+    void paint(QPainter *painter,
+               const QStyleOptionGraphicsItem *option,
+               QWidget *widget) override;
     /// @}
 
     /// @name Destructors
@@ -99,6 +105,8 @@ public:
     ChannelItem& operator=(const ChannelItem &) = delete;
     ChannelItem& operator=(ChannelItem &&) noexcept = delete;
 
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override; 
 private:
     void drawGrid(QPainter *painter);
     void drawName(QPainter *painter);

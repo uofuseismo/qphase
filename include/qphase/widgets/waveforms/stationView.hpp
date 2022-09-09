@@ -1,5 +1,5 @@
-#ifndef QPHASE_WIDGETS_WAVEFORMS_TRACEVIEW_HPP
-#define QPHASE_WIDGETS_WAVEFORMS_TRACEVIEW_HPP
+#ifndef QPHASE_WIDGETS_WAVEFORMS_STATIONVIEW_HPP
+#define QPHASE_WIDGETS_WAVEFORMS_STATIONVIEW_HPP
 #include <memory>
 #include <chrono>
 #include <QGraphicsView>
@@ -7,14 +7,25 @@
 QT_BEGIN_NAMESPACE
  class QResizeEvent;
 QT_END_NAMESPACE
-namespace QPhase::Waveforms
+namespace QPhase
 {
- template<class T> class Station;
-}
-namespace QPhase::Widgets::Waveforms
-{
- //template<class T> class StationScene;
- class StationItem;
+ namespace Database::Connection
+ {
+  class IConnection;
+ }
+ namespace Database::Internal
+ {
+  class Event;
+ }
+ namespace Waveforms
+ {
+  template<class T> class Station;
+ }
+ namespace Widgets::Waveforms
+ {
+  //template<class T> class StationScene;
+  class StationItem;
+ }
 }
 namespace QPhase::Widgets::Waveforms
 {
@@ -28,8 +39,10 @@ public:
     /// @brief Constructor with a given parent.
     explicit StationView(QWidget *parent = nullptr);
 
+    //void setDatabaseConnection(std::shared_ptr<QPhase::Database::Connection::IConnection> &connection);
+
     /// @brief Sets the plot's time conventions.
-    void setTimeConvention(const TimeConvention convention) noexcept;
+    void setTimeConvention(TimeConvention convention) noexcept;
     /// @brief Sets the plot's temporal limits.
     /// @param[in] plotLimits  plotLimits.first is the start time of the plot
     ///                        while plotLimits.second is the end time of the
@@ -37,6 +50,14 @@ public:
     void setTimeLimits(const std::pair<std::chrono::microseconds, std::chrono::microseconds> &plotLimits);
     /// @brief Sets the stations to plot.
     void setStations(std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations);
+
+    /// @brief Sets the event information.
+    /// @param[in] event  The event information that is currently being processed.
+    void setEvent(const QPhase::Database::Internal::Event &event);
+    /// @result The event being processed.
+    [[nodiscard]] QPhase::Database::Internal::Event getEvent() const;
+    /// @brief Clears the event.
+    void clearEvent() noexcept; 
 
     /// @brief Forces the scene to be redrawn.
     void redrawScene();

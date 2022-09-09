@@ -6,7 +6,7 @@
 namespace QPhase::Database::Internal
 {
 /// @name Waveform "waveform.hpp" "qphase/database/internal/waveform.hpp"
-/// @brief Defines a wavform in the wveform table.  A waveform
+/// @brief Defines a waveform in the waveform table.  A waveform
 ///        defines the start/end time for waveform file, the file path,
 ///        as well as, potentially, the event identifier for which the
 ///        waveform will contain.

@@ -54,10 +54,10 @@ public:
     Boundary& operator=(const Boundary &) = delete;
     Boundary& operator=(Boundary &&) noexcept = delete;
 private:
-    virtual void onProjection(QGVMap *geoMap) override;
-    [[nodiscard]] virtual QPainterPath projShape() const override;
-    virtual void projPaint(QPainter *painter) override;
-    [[nodiscard]] virtual QString projTooltip(const QPointF &projPos) const override;
+    void onProjection(QGVMap *geoMap) override;
+    [[nodiscard]] QPainterPath projShape() const override;
+    void projPaint(QPainter *painter) override;
+    [[nodiscard]] QString projTooltip(const QPointF &projPos) const override;
 private:
     class BoundaryImpl;
     std::unique_ptr<BoundaryImpl> pImpl;

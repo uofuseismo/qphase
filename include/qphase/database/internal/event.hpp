@@ -3,8 +3,11 @@
 #include <memory>
 namespace QPhase::Database::Internal
 {
-class Origin;
-class Magnitude;
+ class Origin;
+ class Magnitude;
+}
+namespace QPhase::Database::Internal
+{
 /// @name Event "event.hpp" "qphase/database/internal/event.hpp"
 /// @brief Defines an event.
 /// @copyright Ben Baker (University of Utah) distributed under the MIT license.
@@ -14,19 +17,19 @@ public:
     /// @brief Defines the event's review status.
     enum class ReviewStatus : int8_t
     {   
-        AUTOMATIC = 0,  /*!< This is an automatically created event and yes to
+        Automatic = 0,  /*!< This is an automatically created event and yes to
                              be reviewed. */
-        INCOMPLETE = 1, /*!< This event was manually reviewed but has to be
+        Incomplete = 1, /*!< This event was manually reviewed but has to be
                              finalized. */
-        FINALIZED = 2,  /*!< This is a reviewed event. */
-        CANCELLED = 3   /*!< This event has been cancelled. */
+        Finalized = 2,  /*!< This is a reviewed event. */
+        Cancelled = 3   /*!< This event has been cancelled. */
     };  
     /// @brief Defines the event type.
     enum class Type : int8_t
     {
-        UNKNOWN = 0,          /*!< The event type is unknown. */
-        LOCAL_EARTHQUAKE = 1, /*!< This is a local earthquake. */
-        QUARRY_BLAST = 2,     /*!< This event is a quarry blast. */
+        Unknown = 0,         /*!< The event type is unknown. */
+        LocalEarthquake = 1, /*!< This is a local earthquake. */
+        QuarryBlast = 2,     /*!< This event is a quarry blast. */
     }; 
 public:
     /// @name Constructors

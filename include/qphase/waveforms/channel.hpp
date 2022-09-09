@@ -57,6 +57,7 @@ public:
     /// @name Waveform Name
     /// @{
 
+/*
     /// TODO DELETE
     /// @brief Sets the station's network code.
     /// @param[in] network  The network code - e.g., UU.
@@ -76,6 +77,7 @@ public:
     [[deprecated]] [[nodiscard]] std::string getStationName() const;
     /// @result True indicates the station name was set.
     [[deprecated]] [[nodiscard]] bool haveStationName() const noexcept;
+*/
 
     /// @brief Sets the channel code.
     /// @param[in] channel  The channel code - e.g., HHZ.
@@ -86,12 +88,6 @@ public:
     /// @result True indicates the channel code was set.
     [[nodiscard]] bool haveChannelCode() const noexcept;
 
-    /// TODO DELETE
-    /// @brief Sets the location code.
-    /// @param[in] locationCode  The location code - e.g., 01.
-    [[deprecated]] void setLocationCode(const std::string &locationCode);
-    /// @result The location code.  By default this is empty.
-    [[deprecated]] [[nodiscard]] std::string getLocationCode() const noexcept;
     /// @}
 
     /// @name Orientation
@@ -151,5 +147,10 @@ public:
     class ChannelImpl;
     std::unique_ptr<ChannelImpl> pImpl;
 };
+/*
+template<typename U, typename T>
+[[nodiscard]]
+Channel<U> convert(const Channel<T> &channel);
+*/
 }
 #endif

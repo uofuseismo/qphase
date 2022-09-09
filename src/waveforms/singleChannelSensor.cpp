@@ -42,9 +42,9 @@ class SingleChannelSensor<T>::SingleChannelSensorImpl
 public:
     Channel<T> mVerticalChannel;
     std::string mLocationCode;
-    double mLatitude;
-    double mLongitude;
-    double mElevation;
+    double mLatitude{0};
+    double mLongitude{0};
+    double mElevation{0};
     bool mHaveVerticalChannel{false};
     bool mHaveLatitude{false};
     bool mHaveLongitude{false};

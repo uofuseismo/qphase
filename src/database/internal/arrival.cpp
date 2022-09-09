@@ -31,8 +31,9 @@ public:
     std::string mPhase;
     std::chrono::microseconds mTime{0};
     int64_t mIdentifier{0};
-    Arrival::CreationMode mCreationMode = Arrival::CreationMode::AUTOMATIC;
-    Arrival::FirstMotion mFirstMotion = Arrival::FirstMotion::UNKNOWN;
+    int64_t mOriginIdentifier{0};
+    Arrival::CreationMode mCreationMode{Arrival::CreationMode::Automatic};
+    Arrival::FirstMotion mFirstMotion{Arrival::FirstMotion::Unknown};
     bool mHaveIdentifier = false;
     bool mHaveOriginIdentifier = false;
     bool mHaveTime = false;
@@ -80,6 +81,27 @@ void Arrival::clear() noexcept
 
 /// Destructor
 Arrival::~Arrival() = default;
+
+/// Origin identifier
+void Arrival::setOriginIdentifier(const int64_t id) noexcept
+{
+    pImpl->mOriginIdentifier = id;
+    pImpl->mHaveOriginIdentifier = true;
+}
+
+int64_t Arrival::getOriginIdentifier() const
+{
+    if (!haveOriginIdentifier())
+    {
+        throw std::runtime_error("Origin identifier not set");
+    }
+    return pImpl->mOriginIdentifier;
+}
+
+[[nodiscard]] bool Arrival::haveOriginIdentifier() const noexcept
+{
+    return pImpl->mHaveOriginIdentifier;
+}
 
 /// Identifier
 void Arrival::setIdentifier(const int64_t id) noexcept
@@ -340,7 +362,11 @@ std::ostream& QPhase::Database::Internal::operator<<(std::ostream &os,
         result = result + "\n   Identifier: "
                + std::to_string(arrival.getIdentifier());
     }
-
+    if (arrival.haveOriginIdentifier())
+    {
+        result = result + "\n   Origin Identifier: "
+               + std::to_string(arrival.getOriginIdentifier());
+    }
     if (arrival.haveNetwork())
     {
         result = result + "\n   Network: " + arrival.getNetwork();
@@ -372,24 +398,24 @@ std::ostream& QPhase::Database::Internal::operator<<(std::ostream &os,
         result = result + "\n   Phase: " + arrival.getPhase();
     }
 
-    if (arrival.getFirstMotion() == Arrival::FirstMotion::UNKNOWN)
+    if (arrival.getFirstMotion() == Arrival::FirstMotion::Unknown)
     {
         result = result + "\n   First Motion: Unknown";
     }
-    else if (arrival.getFirstMotion() == Arrival::FirstMotion::UP)
+    else if (arrival.getFirstMotion() == Arrival::FirstMotion::Up)
     {
         result = result + "\n   First Motion: Up";
     }
-    else if (arrival.getFirstMotion() == Arrival::FirstMotion::DOWN)
+    else if (arrival.getFirstMotion() == Arrival::FirstMotion::Down)
     {
         result = result + "\n   First Motion: Down";
     }
 
-    if (arrival.getCreationMode() == Arrival::CreationMode::AUTOMATIC)
+    if (arrival.getCreationMode() == Arrival::CreationMode::Automatic)
     {
         result = result + "\n   Review Status: Automatic";
     }
-    else if (arrival.getCreationMode() == Arrival::CreationMode::MANUAL)
+    else if (arrival.getCreationMode() == Arrival::CreationMode::Manual)
     {
         result = result + "\n   Review Status: Manual";
     } 

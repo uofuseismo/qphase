@@ -59,12 +59,17 @@ public:
     [[nodiscard]] const std::vector<SingleChannelSensor<T>>& getSingleChannelSensorsReference() const noexcept;
 
     /// @brief Gets the three-channel sensors.
-    
+
+    /// @param[in] channel       The channel code.
+    /// @param[in] locationCode  The location code.
+    /// @throws std::invalid_argument if \c channelExists() is false.
     [[nodiscard]] Channel<T> getChannelReference(const std::string &channel,
                                                  const std::string &locationCode);
-    /// @brief True indicates the channel exists.
+    /// @param[in] channel       The channel code.
+    /// @param[in] locationCode  The location code.
+    /// @result True indicates the channel exists.
     [[nodiscard]] bool channelExists(const std::string &channel,
-                                     const std::string &locationCode);
+                                     const std::string &locationCode) const;
 
     /// @result The cumulative number of channels.
     [[nodiscard]] int getNumberOfChannels() const noexcept;

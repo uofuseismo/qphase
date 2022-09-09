@@ -2,6 +2,11 @@
 #define QPHASE_DATABASE_INTERNAL_ORIGIN_HPP
 #include <memory>
 #include <chrono>
+#include <vector>
+namespace QPhase::Database::Internal
+{
+ class Arrival;
+}
 namespace QPhase::Database::Internal
 {
 /// @name Origin "origin.hpp" "qphase/database/internal/origin.hpp"
@@ -13,12 +18,12 @@ public:
     /// @brief Defines the origin's review status.
     enum class ReviewStatus : int8_t
     {   
-        AUTOMATIC = 0,  /*!< This is an automatically created origin and yes to
+        Automatic = 0,  /*!< This is an automatically created origin and yes to
                              be reviewed. */
-        INCOMPLETE = 1, /*!< This event was manually reviewed but has to be
+        Incomplete = 1, /*!< This event was manually reviewed but has to be
                              finalized. */
-        FINALIZED = 2,  /*!< This is a reviewed origin. */
-        CANCELLED = 3   /*!< This origin has been cancelled. */
+        Finalized = 2,  /*!< This is a reviewed origin. */
+        Cancelled = 3   /*!< This origin has been cancelled. */
     };  
 public:
     /// @name Constructors
@@ -111,6 +116,12 @@ public:
     void setReviewStatus(Origin::ReviewStatus status) noexcept;
     /// @result The review status.
     [[nodiscard]] Origin::ReviewStatus getReviewStatus() const noexcept;
+
+    /// @brief Sets the arrivals corresponding to this origin.
+    /// @param[in] arrivals  The arrivals.
+    void setArrivals(const std::vector<Arrival> &arrivals);
+    //// @result The arrivals making up the origin.
+    [[nodiscard]] std::vector<Arrival> getArrivals() const noexcept;
     /// @}
 
     /// @name Destructors

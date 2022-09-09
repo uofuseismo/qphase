@@ -1,11 +1,32 @@
+#include <iostream>
+#include <filesystem>
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QStandardPaths>
 #include "private/paths.hpp"
 #include "private/organization.hpp"
+#include "qphase/database/connection/sqlite3.hpp"
+#include "private/database/utilities.hpp"
 #include "mainWindow.hpp"
 #include "topics.hpp"
+
+std::shared_ptr<QPhase::Database::Connection::SQLite3>
+    createScratchDatabase(const std::filesystem::path &fileName)
+{
+    auto connection
+        = std::make_shared<QPhase::Database::Connection::SQLite3> ();
+    if (std::filesystem::exists(fileName))
+    {
+        std::filesystem::remove(fileName);
+    }
+    connection->setFileName(fileName);
+    connection->setReadWrite();
+    connection->connect();
+    createTable(*connection->getSession());
+    deleteTable(*connection->getSession());
+    return connection;
+}
 
 void myMessageOutput(QtMsgType type,
                      const QMessageLogContext &context,
@@ -15,7 +36,8 @@ void myMessageOutput(QtMsgType type,
     if (type == QtDebugMsg)
     {
         fprintf(stderr, "\033[0;36m"); 
-        fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        //fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stderr, "Debug: %s\n", localMsg.constData());
         fprintf(stderr, "\033[0m");
     }
     else if (type == QtInfoMsg)
@@ -48,6 +70,7 @@ void myMessageOutput(QtMsgType type,
 int main(int argc, char *argv[])
 {
     auto topics = std::make_shared<QPhase::QNode::Topics> ();
+
     Q_INIT_RESOURCE(qnode);
     qInstallMessageHandler(myMessageOutput);
 
@@ -63,6 +86,20 @@ int main(int argc, char *argv[])
     std::string defaultCachePath(CACHE_PATH);
     std::string defaultConfigPath(CONFIG_PATH);
     std::string defaultUser(std::getenv("USER"));
+
+    try
+    {
+        auto scratchDatabase = std::filesystem::path{defaultDataPath}
+                              /std::filesystem::path{"scratch.sqlite3"};
+        topics->mScratchDatabaseConnection
+            = createScratchDatabase(scratchDatabase);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to create scratch database: "
+                  << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
     // Create the main application
     QPhase::QNode::MainWindow mainWindow(topics);

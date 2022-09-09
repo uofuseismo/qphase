@@ -12,6 +12,10 @@
 #include "qphase/waveforms/waveform.hpp"
 #include "qphase/waveforms/threeChannelSensor.hpp"
 #include "qphase/waveforms/singleChannelSensor.hpp"
+#include "qphase/database/internal/event.hpp"
+#include "qphase/database/connection/sqlite3.hpp"
+
+#define DEFAULT_TRACE_HEIGHT 150
 
 namespace
 {
@@ -74,14 +78,14 @@ std::pair<std::chrono::microseconds, std::chrono::microseconds>
 
 }
 
-#define DEFAULT_TRACE_HEIGHT 150
-
 using namespace QPhase::Widgets::Waveforms;
 
 class StationView::StationViewImpl
 {
 public:
     StationScene *mScene{nullptr};
+    QPhase::Database::Connection::SQLite3 mDatabase;
+    QPhase::Database::Internal::Event mEvent;
     std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> mStations;
     std::chrono::microseconds mPlotEarliestTime{0};
     std::chrono::microseconds mPlotLatestTime{0};
@@ -102,7 +106,7 @@ StationView::StationView(QWidget *parent) :
     auto boundingRect
         = this->mapToScene(this->viewport()->geometry()).boundingRect();
     int traceHeight = DEFAULT_TRACE_HEIGHT;
-    int traceWidth  = boundingRect.width();
+    int traceWidth  = static_cast<int> (boundingRect.width());
     
     pImpl->mScene = new StationScene(traceWidth, traceHeight);
     setScene(pImpl->mScene);
@@ -191,6 +195,26 @@ void StationView::setStations(
     pImpl->mStations = stations;
     pImpl->mScene->setStations(stations);
     redrawScene();
+}
+
+/// Sets the event that is being processed
+void StationView::setEvent(const QPhase::Database::Internal::Event &event)
+{
+    if (event.haveIdentifier())
+    {
+        throw std::invalid_argument("Event identifier not set");
+    }
+    pImpl->mEvent = event;
+} 
+
+QPhase::Database::Internal::Event StationView::getEvent() const
+{
+    return pImpl->mEvent;
+}
+
+void StationView::clearEvent() noexcept
+{
+    pImpl->mEvent.clear();
 }
 
 /*

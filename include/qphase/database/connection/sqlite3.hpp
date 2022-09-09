@@ -43,7 +43,7 @@ public:
 
     /// @brief Sets the name of the sqlite3 file.
     /// @param[in] fileName  The name of the sqlite3 file.
-    /// @throws std::invalid_argument if the sqlite3 file does not exist.
+    /// @throws std::runtime_error if the path does not exist.
     void setFileName(const std::string &fileName);
     /// @result The path to the sqlite3 file.
     [[nodiscard]] std::string getFileName() const;
@@ -55,7 +55,7 @@ public:
     /// @brief Sets the connection as read/write.
     void setReadWrite() noexcept;
     /// @result True indicates this is a read-only connection.
-    bool isReadOnly() const noexcept;
+    [[nodiscard]] bool isReadOnly() const noexcept;
 
     /// @brief Loads the parameters from an initialiation file.
     /// @param[in] fileName  The name of the initialization file.

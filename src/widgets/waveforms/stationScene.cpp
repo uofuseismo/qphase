@@ -2,15 +2,12 @@
 #include <cmath>
 #include <vector>
 #include <QColor>
-#include <QDebug>
 #include <QFont>
 #include <QGraphicsSceneWheelEvent>
 #include <QString>
 #include "qphase/widgets/waveforms/stationScene.hpp"
 #include "qphase/widgets/waveforms/stationItem.hpp"
-#include "qphase/widgets/waveforms/channelItem.hpp"
 #include "qphase/waveforms/station.hpp"
-#include "qphase/waveforms/channel.hpp"
 
 using namespace QPhase::Widgets::Waveforms;
 
@@ -75,7 +72,8 @@ StationScene::StationScene(const int traceWidth,
     QGraphicsScene(parent),
     pImpl(std::make_unique<StationSceneImpl> (traceWidth, traceHeight))
 {
-    pImpl->mCurrentSize = QSize(width(), height());
+    pImpl->mCurrentSize = QSize(static_cast<int> (width()),
+                                static_cast<int> (height()));
     setBackgroundBrush(pImpl->mBackgroundColor);
     populateScene();
 }
@@ -200,19 +198,23 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
         auto tMin = pImpl->mPlotEarliestTime.count();
         auto tMax = pImpl->mPlotLatestTime.count();
         auto durationMuS = tMax - tMin;
-        auto halfDurationMuS = static_cast<int64_t> (std::round(durationMuS/2));
+        auto halfDurationMuS
+            = static_cast<int64_t> (std::round(static_cast<double> (durationMuS)
+                                              *0.5));
         // Get the location to approximately zoom in/out on
         auto xPosition = static_cast<double> (event->scenePos().x());
         double centerFraction = xPosition/width();
-        auto currentCenterTimeMuS = tMin + halfDurationMuS;
+        int64_t currentCenterTimeMuS = tMin + halfDurationMuS;
         auto pickedCenterTimeMuS
             = tMin
-            + static_cast<int64_t> (std::round(durationMuS*centerFraction));
+            + static_cast<int64_t> (std::round(static_cast<double> (durationMuS)
+                                             *centerFraction));
         // Don't snap to the location under the mouse.  Makes continuous
         // scrolling awkward.  Instead head in the desired direction.
         auto newCenterTimeMuS 
-            = static_cast<int64_t> (std::round(0.9*currentCenterTimeMuS
-                                             + 0.1*pickedCenterTimeMuS));
+            = static_cast<int64_t>
+                    (std::round(0.9*static_cast<double> (currentCenterTimeMuS)
+                              + 0.1*static_cast<double> (pickedCenterTimeMuS)));
         // Zoom in/out
         if (event->modifiers() & Qt::ControlModifier)
         {
@@ -225,32 +227,36 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
             {
                 //qDebug() << "Zooming in";
                 auto newDurationMuS
-                    = static_cast<int64_t> (std::round(durationMuS
-                                                      /pImpl->mZoomFactor));
-                auto halfDurationMuS
-                    = static_cast<int64_t> (std::round(newDurationMuS/2.));
+                    = static_cast<int64_t>
+                      (std::round(static_cast<double> (durationMuS)
+                                 /pImpl->mZoomFactor));
+                auto newHalfDurationMuS
+                    = static_cast<int64_t>
+                      (std::round(static_cast<double> (newDurationMuS)*0.5));
                 plotT0 = std::chrono::microseconds{newCenterTimeMuS
-                                                 - halfDurationMuS};
+                                                 - newHalfDurationMuS};
                 plotT1 = std::chrono::microseconds{newCenterTimeMuS
-                                                 + halfDurationMuS};
+                                                 + newHalfDurationMuS};
                 plotT0 = std::max(pImpl->mOriginalEarliestTime, plotT0);
                 plotT1 = std::min(pImpl->mOriginalLatestTime,   plotT1);
                 pImpl->mNumberOfZooms = pImpl->mNumberOfZooms + 1;
                 updatePlot = true;
             }
             // Handle zoom out
-            else if (!zoomIn && pImpl->mNumberOfZooms > 0)
+            else if (pImpl->mNumberOfZooms > 0) // !zoomIn
             {
                 //qDebug() << "Zooming out";
                 auto newDurationMuS
-                    = static_cast<int64_t> (std::round(durationMuS
-                                                      *pImpl->mZoomFactor));
-                auto halfDurationMuS
-                    = static_cast<int64_t> (std::round(newDurationMuS/2.));
+                    = static_cast<int64_t>
+                      (std::round(static_cast<double> (durationMuS)
+                                 *pImpl->mZoomFactor));
+                auto newHalfDurationMuS
+                    = static_cast<int64_t> 
+                      (std::round(static_cast<double> (newDurationMuS)*0.5));
                 plotT0 = std::chrono::microseconds{newCenterTimeMuS
-                                                 - halfDurationMuS};
+                                                 - newHalfDurationMuS};
                 plotT1 = std::chrono::microseconds{newCenterTimeMuS
-                                                 + halfDurationMuS};
+                                                 + newHalfDurationMuS};
                 plotT0 = std::max(pImpl->mOriginalEarliestTime, plotT0);
                 plotT1 = std::min(pImpl->mOriginalLatestTime,   plotT1);
                 pImpl->mNumberOfZooms = pImpl->mNumberOfZooms - 1;
@@ -277,8 +283,9 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
                 if (tMax < pImpl->mOriginalLatestTime.count())
                 {
                     auto t0 = tMin
-                            + static_cast<int64_t> (std::round(shiftFactor
-                                                              *durationMuS));
+                            + static_cast<int64_t>
+                              (std::round(shiftFactor
+                                         *static_cast<double> (durationMuS)));
                     auto t1 = t0 + durationMuS;
                     // Shifted beyond trace
                     if (t1 > pImpl->mOriginalLatestTime.count())
@@ -297,8 +304,9 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
                 if (tMin > pImpl->mOriginalEarliestTime.count())
                 {
                     auto t0 = tMin
-                            - static_cast<int64_t> (std::round(shiftFactor
-                                                              *durationMuS));
+                            - static_cast<int64_t>
+                              (std::round(shiftFactor
+                                         *static_cast<double> (durationMuS)));
                     auto t1 = t0 + durationMuS;
                     // Shifted beyond trace
                     if (t0 < pImpl->mOriginalEarliestTime.count())

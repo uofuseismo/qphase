@@ -15,12 +15,13 @@ using namespace QPhase::Database::Internal;
 class Origin::OriginImpl
 {
 public:
+    std::vector<Arrival> mArrivals;
     double mLatitude = std::numeric_limits<double>::lowest();
     double mLongitude = std::numeric_limits<double>::lowest();
     double mDepth{0};
     int64_t mIdentifier{0};
     std::chrono::microseconds mTime{0};
-    Origin::ReviewStatus mReviewStatus = Origin::ReviewStatus::AUTOMATIC;
+    Origin::ReviewStatus mReviewStatus{Origin::ReviewStatus::Automatic};
     bool mHaveIdentifier{false};
     bool mHaveDepth{false};
     bool mHaveTime{false};
@@ -155,6 +156,8 @@ void Origin::setIdentifier(const int64_t id) noexcept
 {
     pImpl->mIdentifier = id;
     pImpl->mHaveIdentifier = true;
+    // Ensure all the arrivals have this identifier
+    for (auto &arrival : pImpl->mArrivals){arrival.setOriginIdentifier(id);}
 }
 
 int64_t Origin::getIdentifier() const
@@ -169,6 +172,22 @@ int64_t Origin::getIdentifier() const
 bool Origin::haveIdentifier() const noexcept
 {
     return pImpl->mHaveIdentifier;
+}
+
+/// Sets the identifiers
+void Origin::setArrivals(const std::vector<Arrival> &arrivals)
+{
+    pImpl->mArrivals = arrivals;
+    if (haveIdentifier())
+    { 
+        auto id = getIdentifier();
+        for (auto &arrival : pImpl->mArrivals){arrival.setOriginIdentifier(id);}
+    }
+}
+
+std::vector<Arrival> Origin::getArrivals() const noexcept
+{
+    return pImpl->mArrivals;
 }
 
 /// Review status
@@ -285,19 +304,19 @@ std::ostream& QPhase::Database::Internal::operator<<(std::ostream &os,
                + std::to_string(origin.getTime().count());
     }
 
-    if (origin.getReviewStatus() == Origin::ReviewStatus::AUTOMATIC)
+    if (origin.getReviewStatus() == Origin::ReviewStatus::Automatic)
     {
         result = result + "\n   Review Status: Automatic";
     }
-    else if (origin.getReviewStatus() == Origin::ReviewStatus::INCOMPLETE)
+    else if (origin.getReviewStatus() == Origin::ReviewStatus::Incomplete)
     {
         result = result + "\n   Review Status: Incomplete";
     }
-    else if (origin.getReviewStatus() == Origin::ReviewStatus::FINALIZED)
+    else if (origin.getReviewStatus() == Origin::ReviewStatus::Finalized)
     {
         result = result + "\n   Review Status: Finalized";
     }
-    else if (origin.getReviewStatus() == Origin::ReviewStatus::CANCELLED)
+    else if (origin.getReviewStatus() == Origin::ReviewStatus::Cancelled)
     {
         result = result + "\n   Review Status: Cancelled";
     }

@@ -116,14 +116,14 @@ public:
 
     /// @name Waveform Name
     /// @{
-    void setNetwork(const std::string &network);
-    [[nodiscard]] std::string getNetwork() const;
-    void setStation(const std::string &station);
-    [[nodiscard]] std::string getStation() const;
-    void setChannel(const std::string &channel);
-    [[nodiscard]] std::string getChannel() const;
-    void setLocationCode(const std::string &locationCode);
-    [[nodiscard]] std::string getLocationCode() const;
+    //void setNetwork(const std::string &network);
+    //[[nodiscard]] std::string getNetwork() const;
+    //void setStation(const std::string &station);
+    //[[nodiscard]] std::string getStation() const;
+    //void setChannel(const std::string &channel);
+    //[[nodiscard]] std::string getChannel() const;
+    //void setLocationCode(const std::string &locationCode);
+    //[[nodiscard]] std::string getLocationCode() const;
     /// @}
 
     /// @name Destructors
@@ -139,6 +139,12 @@ private:
     class WaveformImpl;
     std::unique_ptr<WaveformImpl> pImpl;
 };
+/*
+template<typename U, typename T>
+[[nodiscard]]
+Waveform<U> convert(const Waveform<T> &waveform);
+*/
+/*
 /// @class IWaveform "waveform.hpp" "qphase/waveforms/waveform.hpp"
 /// @brief This is an abstract base class that defines the essential properties
 ///        of a waveform.
@@ -149,13 +155,13 @@ public:
     /// @brief The waveform type.
     enum class Type
     {
-        SAC /*!< This is a SAC waveform. */
+        SAC
     };
     /// @brief The precision of the underlying waveform.
     enum class Precision
     {
-        FLOAT,   /*!< The data is stored as a 32 bit floating point. */
-        DOUBLE,  /*!< The data is stored as a 64 bit floating point. */
+        FLOAT,
+        DOUBLE,
         Float = FLOAT,
         Double = DOUBLE
     };
@@ -175,5 +181,6 @@ public:
     /// @brief Destructor. 
     virtual ~IWaveform() = default;
 };
+*/
 }
 #endif

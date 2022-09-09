@@ -9,7 +9,6 @@
 #include "qphase/widgets/map/boundary.hpp"
 #include "qphase/widgets/map/event.hpp"
 #include "qphase/widgets/map/station.hpp"
-#include "qphase/widgets/map/map.hpp"
 #include "qphase/widgets/map/options.hpp"
 #include "qphase/database/internal/stationData.hpp"
 #include "private/haveMap.hpp"

@@ -52,6 +52,9 @@ protected:
     /// @brief Handles zoom and horizontal scroll events
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 private:
+    /// @brief Redraws station items in scene.
+    void updatePlot();
+private:
     class StationSceneImpl;
     std::unique_ptr<StationSceneImpl> pImpl;    
 };

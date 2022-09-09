@@ -200,10 +200,12 @@ void Event::setType(const std::string &eventType)
 }
 
 /// Sets the origin time
+[[maybe_unused]]
 void Event::setOriginTime(const double time) noexcept
 {
     std::chrono::microseconds
         tMicroSeconds{static_cast<int64_t> (std::round(time*1.e6))};
+    setOriginTime(tMicroSeconds);
 }
 
 void Event::setOriginTime(const std::chrono::microseconds &time) noexcept
@@ -256,7 +258,8 @@ QString Event::projTooltip(const QPointF &projPos) const
     {
         std::stringstream ss;
         auto originTimeMilliSeconds
-            = static_cast<double> (pImpl->mOriginTime.count()*1.e-3);
+            = static_cast<qint64>
+                    (static_cast<double> (pImpl->mOriginTime.count())*1.e-3);
         auto originTimeUTC
             = QDateTime::fromMSecsSinceEpoch(originTimeMilliSeconds,
                                              Qt::UTC);
@@ -303,4 +306,10 @@ QString Event::projTooltip(const QPointF &projPos) const
     }
 
     return result;
+}
+
+/// Allows user to set pen
+void QPhase::Widgets::Map::Event::setPen(const QPen &pen)
+{
+    pImpl->mPen = pen;
 }

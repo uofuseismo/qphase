@@ -87,10 +87,10 @@ public:
         mSegments.clear();
     }
     std::vector<Segment<T>> mSegments;
-    std::string mNetwork;
-    std::string mStation;
-    std::string mChannel;
-    std::string mLocationCode;
+    //std::string mNetwork;
+    //std::string mStation;
+    //std::string mChannel;
+    //std::string mLocationCode;
     std::chrono::microseconds mEarliestTime{0};
     std::chrono::microseconds mLatestTime{0};
     int mCumulativeNumberOfSamples{0};
@@ -200,6 +200,7 @@ void Waveform<T>::load(const std::string &fileName,
             throw std::runtime_error(errorMessage);
         }
         // Figure out some header information
+/*
         auto network = sacWaveform.getHeader(SFF::SAC::Character::KNETWK);
         auto station = sacWaveform.getHeader(SFF::SAC::Character::KSTNM);
         auto channel = sacWaveform.getHeader(SFF::SAC::Character::KCMPNM);
@@ -208,6 +209,7 @@ void Waveform<T>::load(const std::string &fileName,
         if (station != "-12345"){waveform.setStation(station);}
         if (channel != "-12345"){waveform.setChannel(channel);}
         if (locationCode != "-12345"){waveform.setLocationCode(locationCode);}
+*/
         // Copy some information 
         Segment<T> segment; 
         auto traceStartTime = sacWaveform.getStartTime().getEpoch();
@@ -316,6 +318,7 @@ std::chrono::microseconds Waveform<T>::getLatestTime() const
 }
 
 /// Network
+/*
 template<class T>
 void Waveform<T>::setNetwork(const std::string &network)
 {
@@ -342,6 +345,7 @@ void Waveform<T>::setLocationCode(const std::string &locationCode)
 {
     pImpl->mLocationCode = locationCode;
 }
+*/
 
 /// Access
 template<class T>
@@ -404,8 +408,40 @@ const Segment<T>& Waveform<T>::operator[](const size_t i) const
     return pImpl->mSegments[i];
 }
 
+/// Convert
+/*
+template<typename T, typename U>
+Waveform<T> QPhase::Waveforms::convert(const Waveform<U> &waveform)
+{
+    Waveform<T> result;
+    auto segments = waveform.getSegments();
+    std::vector<Segment<T>> segmentsToCopy;
+    segmentsToCopy.reserve(segments.size());
+    for (const auto &segment : segments)
+    {
+        segmentsToCopy.push_back(std::move(convert<T>(segment)));
+    }
+    result.setSegments(segmentsToCopy);
+    return result;
+}
+
+template<>
+Waveform<double> QPhase::Waveforms::convert(const Waveform<double> &waveform)
+{
+    return waveform;
+}
+
+template<>
+Waveform<float> QPhase::Waveforms::convert(const Waveform<float> &waveform)
+{
+    return waveform;
+}
+*/
+
 ///--------------------------------------------------------------------------///
 ///                            Template Instantiation                        ///
 ///--------------------------------------------------------------------------///
 template class QPhase::Waveforms::Waveform<double>;
 template class QPhase::Waveforms::Waveform<float>;
+//template Waveform<double> QPhase::Waveforms::convert(const Waveform<float> &waveform);
+//template Waveform<float> QPhase::Waveforms::convert(const Waveform<double> &waveform);

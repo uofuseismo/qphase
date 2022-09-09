@@ -3,10 +3,10 @@
 #include <memory>
 namespace QPhase::Waveforms
 {
-template<class T> class Channel;
-class SimpleResponse;
-class InstrumentResponse;
-};
+ template<class T> class Channel;
+ class SimpleResponse;
+ class InstrumentResponse;
+}
 namespace QPhase::Waveforms
 {
 /// @class SingleChannelSensor "singleChannelSensor.hpp" "qphase/waveforms/singleChannelSensor.hpp"
@@ -105,35 +105,37 @@ public:
     /// @name Simple Response (Optional)
     /// @{
 
+    /// TODO: Delete -> moved to channel
     /// @brief Sets a simple response.  This is useful for quick-and-dirty
-    ///        `deconvolutions' which amount to multiplying the trace by
+    ///        `deconvolution' which amount to multiplying the trace by
     ///        a scalar.  This is appropriate for when the energy of signal of
     ///        interest is primarily captured by the flat passband of the 
     ///        instrument. 
     /// @param[in] response  The simple response.
     /// @throws std::invalid_argument if the scalar constant, input, or output
     ///         uses are not set.
-    void setSimpleResponse(const SimpleResponse &response);
+    //void setSimpleResponse(const SimpleResponse &response);
     /// @result The simple response.
     /// @throws std::runtime_error if \c haveSimpleResponse() is false.
-    [[nodiscard]] SimpleResponse getSimpleResponse() const;
+    //[[nodiscard]] SimpleResponse getSimpleResponse() const;
     /// @result True indicates the simple response was set.
-    [[nodiscard]] bool haveSimpleResponse() const noexcept;
+    //[[nodiscard]] bool haveSimpleResponse() const noexcept;
     /// @}
 
     /// @name Response (Optional)
     /// @{
 
+    /// TODO remove
     /// @brief Sets the instrument response.
     /// @param[in] response  The instrument response.
     /// @throws std::invalid_argument if the requisite response parameters
     ///         are not specified.
-    void setInstrumentResponse(const InstrumentResponse &response);
+    //void setInstrumentResponse(const InstrumentResponse &response);
     /// @result The instrument response.
     /// @throws std::runtime_error if \c haveResponse() is false.
-    [[nodiscard]] InstrumentResponse getInstrumentResponse() const;
+    //[[nodiscard]] InstrumentResponse getInstrumentResponse() const;
     /// @result True indicates the response was set.
-    [[nodiscard]] bool haveInstrumentResponse() const noexcept;
+    //[[nodiscard]] bool haveInstrumentResponse() const noexcept;
     /// @}
 
     /// @name Location Code

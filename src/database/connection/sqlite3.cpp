@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <filesystem>
 #include <soci/soci.h>
@@ -51,17 +52,15 @@ void SQLite3::setFileName(const std::string &fileName)
 {
     if (!std::filesystem::exists(fileName))
     {
-        throw std::invalid_argument("sqlite3 file: " + fileName
-                                  + " does not exist");
-        //auto parentPath = std::filesystem::path(fileName).parent_path();
-        //if (!std::filesystem::exists(parentPath))
-        //{
-        //    if (!std::filesystem::create_directories(parentPath))
-        //    {
-        //        throw std::runtime_error("Failed to create directory: "
-        //                                + std::string(parentPath));
-        //    }                           
-        //}
+        auto parentPath = std::filesystem::path(fileName).parent_path();
+        if (!parentPath.empty() && !std::filesystem::exists(parentPath))
+        {
+            if (!std::filesystem::create_directories(parentPath))
+            {
+                throw std::runtime_error("Failed to create directory: "
+                                        + std::string(parentPath));
+            }
+        }
     }
     pImpl->mFileName = fileName;
 }
@@ -80,14 +79,16 @@ bool SQLite3::haveFileName() const noexcept
 /// Connect to the database
 void SQLite3::connect()
 {
-    auto connectionString = "db=" + getFileName(); // Throws
+    auto fileName = getFileName(); // Throws
+    auto connectionString = "db=" + fileName;
     if (isReadOnly())
     {
-        connectionString = connectionString + " readonly=true";
-    }
-    else
-    {
-        connectionString = connectionString + " readonly=false";
+        if (!std::filesystem::exists(fileName))
+        {
+            throw std::runtime_error("sqlite3 database " + fileName
+                                   + " does not exist");
+        }
+        connectionString = connectionString + " readonly";
     }
     try
     {

@@ -37,8 +37,9 @@ TEST(DatabaseInternal, Arrival)
     const double time{110.12};
     const std::chrono::microseconds referenceTime{110120000};
     const int64_t arrivalID = 103;
-    const auto creationMode = Arrival::CreationMode::MANUAL;
-    const auto firstMotion = Arrival::FirstMotion::DOWN;
+    const int64_t originID{104};
+    const auto creationMode = Arrival::CreationMode::Manual;
+    const auto firstMotion = Arrival::FirstMotion::Down;
     Arrival arrival;
     arrival.setNetwork(network);
     arrival.setStation(station);
@@ -46,6 +47,7 @@ TEST(DatabaseInternal, Arrival)
     arrival.setLocationCode(locationCode);
     arrival.setTime(time);
     arrival.setIdentifier(arrivalID);
+    arrival.setOriginIdentifier(originID);
     arrival.setCreationMode(creationMode);
     arrival.setFirstMotion(firstMotion);
     arrival.setPhase(phase);
@@ -56,6 +58,7 @@ TEST(DatabaseInternal, Arrival)
     EXPECT_EQ(aCopy.getChannel(), channel);
     EXPECT_EQ(aCopy.getLocationCode(), locationCode);
     EXPECT_EQ(aCopy.getIdentifier(), arrivalID);
+    EXPECT_EQ(aCopy.getOriginIdentifier(), originID);
     EXPECT_EQ(aCopy.getCreationMode(), creationMode);
     EXPECT_EQ(aCopy.getFirstMotion(), firstMotion);
     EXPECT_EQ(aCopy.getTime(), referenceTime);
@@ -65,8 +68,8 @@ TEST(DatabaseInternal, Arrival)
 
     arrival.clear();
     EXPECT_TRUE(aCopy != arrival);
-    EXPECT_EQ(arrival.getFirstMotion(), Arrival::FirstMotion::UNKNOWN);
-    EXPECT_EQ(arrival.getCreationMode(), Arrival::CreationMode::AUTOMATIC); 
+    EXPECT_EQ(arrival.getFirstMotion(), Arrival::FirstMotion::Unknown);
+    EXPECT_EQ(arrival.getCreationMode(), Arrival::CreationMode::Automatic);
 
     // Test macros
     arrival.setPhase(Arrival::Phase::P);
@@ -103,7 +106,7 @@ TEST(DatabaseInternal, Origin)
     const double latitude{41};
     const double longitude{-112 + 360};
     const std::chrono::microseconds referenceTime{110120000};
-    auto reviewStatus = Origin::ReviewStatus::FINALIZED;
+    auto reviewStatus = Origin::ReviewStatus::Finalized;
     const int64_t id = 103;
 
     Origin origin;
@@ -123,7 +126,7 @@ TEST(DatabaseInternal, Origin)
     EXPECT_EQ(oCopy.getReviewStatus(), reviewStatus);
 
     origin.clear();
-    EXPECT_EQ(origin.getReviewStatus(), Origin::ReviewStatus::AUTOMATIC);
+    EXPECT_EQ(origin.getReviewStatus(), Origin::ReviewStatus::Automatic);
 }
 
 TEST(DatabaseInternal, Event)
@@ -141,7 +144,7 @@ TEST(DatabaseInternal, Event)
     const double depth{11};
     const double latitude{41.1};
     const double longitude{-112.5};
-    auto originReviewStatus = Origin::ReviewStatus::FINALIZED;
+    auto originReviewStatus = Origin::ReviewStatus::Finalized;
     const int64_t originIdentifier = 103;
 
     Origin origin;
@@ -153,8 +156,8 @@ TEST(DatabaseInternal, Event)
     origin.setReviewStatus(originReviewStatus);
 
     Event event;
-    const auto reviewStatus = Event::ReviewStatus::INCOMPLETE;
-    const auto eventType = Event::Type::QUARRY_BLAST;
+    const auto reviewStatus = Event::ReviewStatus::Incomplete;
+    const auto eventType = Event::Type::QuarryBlast;
     EXPECT_NO_THROW(event.setOrigin(origin));
     EXPECT_NO_THROW(event.setMagnitude(magnitude));
     event.setType(eventType);
@@ -170,8 +173,8 @@ TEST(DatabaseInternal, Event)
 
     eCopy.clear();
     EXPECT_TRUE(eCopy != event);
-    EXPECT_EQ(eCopy.getReviewStatus(), Event::ReviewStatus::AUTOMATIC);
-    EXPECT_EQ(eCopy.getType(), Event::Type::UNKNOWN);
+    EXPECT_EQ(eCopy.getReviewStatus(), Event::ReviewStatus::Automatic);
+    EXPECT_EQ(eCopy.getType(), Event::Type::Unknown);
 }
 
 TEST(DatabaseInternal, StationData)

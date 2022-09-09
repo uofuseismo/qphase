@@ -7,8 +7,10 @@
 #include "qphase/database/internal/event.hpp"
 #include "qphase/database/internal/origin.hpp"
 #include "qphase/database/internal/arrival.hpp"
+#include "qphase/database/internal/arrivalTable.hpp"
 #include "qphase/database/internal/magnitude.hpp"
 #include "qphase/database/connection/connection.hpp"
+#include "private/database/utilities.hpp"
 
 using namespace QPhase::Database::Internal;
 
@@ -20,43 +22,44 @@ namespace
     std::transform(temp.begin(), temp.end(), temp.begin(), ::toupper);
     if (temp == "LE")
     {
-        return Event::Type::LOCAL_EARTHQUAKE;
+        return Event::Type::LocalEarthquake;
     }
     else if (temp == "QB")
     {
-        return Event::Type::QUARRY_BLAST;
+        return Event::Type::QuarryBlast;
     }
     else
     {
         std::cerr << "Unknown event type: " << temp << std::endl;
     }
-    return Event::Type::UNKNOWN; 
+    return Event::Type::Unknown;
 }
 [[nodiscard]] Event::ReviewStatus
     stringToEventReviewStatus(const std::string &status)
 {
     if (status == "a" || status == "A")
     {
-        return Event::ReviewStatus::AUTOMATIC;
+        return Event::ReviewStatus::Automatic;
     }
     else if (status == "i" || status == "I")
     {
-        return Event::ReviewStatus::INCOMPLETE;
+        return Event::ReviewStatus::Incomplete;
     }
     else if (status == "f" || status == "F")
     {
-        return Event::ReviewStatus::FINALIZED;
+        return Event::ReviewStatus::Finalized;
     } 
     else if (status == "c" || status == "C")
     {
-        return Event::ReviewStatus::CANCELLED;
+        return Event::ReviewStatus::Cancelled;
     }
     else
     {
         std::cerr << "Unknown review status: " << status << std::endl;
     }
-    return Event::ReviewStatus::AUTOMATIC;
+    return Event::ReviewStatus::Automatic;
 }
+
 }
 
 template<> struct soci::type_conversion<Event>
@@ -123,11 +126,28 @@ public:
                 << "FROM "
                 << "   event "
                 << "   INNER JOIN origin ON event.preferred_origin = origin.identifier "
-                << "   INNER JOIN magnitude ON event.preferred_magnitude =  magnitude.identifier");
+                << "   INNER JOIN magnitude ON event.preferred_magnitude = magnitude.identifier");
         std::vector<Event> events;
         for (auto &it : rows)
         {
             events.push_back(it);
+        }
+        // Get the arrivals
+        ArrivalTable arrivalTable;
+        arrivalTable.setConnection(mConnection);
+        for (auto &event : events)
+        {
+            if (event.haveOrigin())
+            {
+                auto origin = event.getOrigin();
+                if (origin.haveIdentifier())
+                {
+                     arrivalTable.query(origin.getIdentifier());
+                     auto arrivals = arrivalTable.getArrivals();
+                     origin.setArrivals(arrivals);
+                }
+                event.setOrigin(origin);
+             }
         }
         mEvents = std::move(events);
     }

@@ -36,7 +36,7 @@ public:
     Event(const Event &event);
     /// @brief Constructs an event from a database event.
     /// @throws std::invalid_argument if \c event.haveOrigin() is false.
-    Event(const QPhase::Database::Internal::Event &event);
+    explicit Event(const QPhase::Database::Internal::Event &event);
     /// @brief Move c'tor
     /// @param[in,out] event  The event class from which to initialize this
     ///                       class.  On exit, event's behavior is undefined.

@@ -71,7 +71,7 @@ std::vector<QPhase::Database::Internal::Event> EventTableView::getSelectedEvents
         result.reserve(rows.size());
         for (const auto &row : rows)
         {
-            auto data = eventModel->data(row);
+            auto data = eventModel->data(row, Qt::DisplayRole);
             auto eventIdentifier = static_cast<int64_t> (data.toLongLong());
             try
             {

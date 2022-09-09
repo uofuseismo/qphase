@@ -20,15 +20,15 @@ public:
     /// @brief The first motion.
     enum class FirstMotion : int8_t
     {
-        UNKNOWN = 0, /*!< The first motion of the arrival is unknown. */
-        UP =+1,      /*!< The first motion of the arrival is up. */
-        DOWN =-1     /*!< The first motion of the arrival is down. */
+        Unknown = 0, /*!< The first motion of the arrival is unknown. */
+        Up =+1,      /*!< The first motion of the arrival is up. */
+        Down =-1     /*!< The first motion of the arrival is down. */
     };
     /// @brief Defines whether this pick was created automatically or manually.
     enum class CreationMode : int8_t
     {
-        AUTOMATIC = 0, /*!< This is an automatically picked arrival. */
-        MANUAL = 1     /*!< This is a manually/reviewed picked arrival. */
+        Automatic = 0, /*!< This is an automatically picked arrival. */
+        Manual = 1     /*!< This is a manually/reviewed picked arrival. */
     };
 public:
     /// @name Constructors
@@ -121,7 +121,7 @@ public:
     [[nodiscard]] bool haveTime() const noexcept;
 
     /// @brief Sets the phase name.
-    void setPhase(const Phase phase) noexcept;
+    void setPhase(Phase phase) noexcept;
     /// @brief Sets the phase name. 
     /// @throws std::invalid_argument if the phase is empty.
     void setPhase(const std::string &phase);
@@ -129,6 +129,13 @@ public:
     [[nodiscard]] std::string getPhase() const;
     /// @result True indicates the phase was set.
     [[nodiscard]] bool havePhase() const noexcept;
+
+    /// @brief The origin identifier to which the arrival is associated.
+    void setOriginIdentifier(int64_t id) noexcept;
+    /// @result The origin to which this arrival is associated.
+    [[nodiscard]] int64_t getOriginIdentifier() const; 
+    /// @result True indicates the origin identifier was set.
+    [[nodiscard]] bool haveOriginIdentifier() const noexcept;
 
     /// @}    
 
@@ -143,7 +150,7 @@ public:
 
     /// @brief Sets the creation mode.
     /// @param[in] mode   The creation mode.
-    void setCreationMode(const CreationMode mode) noexcept;
+    void setCreationMode(CreationMode mode) noexcept;
     /// @result The creation mode.
     [[nodiscard]] CreationMode getCreationMode() const noexcept;
     /// @}

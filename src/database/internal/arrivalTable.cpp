@@ -6,6 +6,7 @@
 #include "qphase/database/internal/arrivalTable.hpp"
 #include "qphase/database/internal/arrival.hpp"
 #include "qphase/database/connection/connection.hpp"
+#include "private/database/utilities.hpp"
 
 using namespace QPhase::Database::Internal;
 
@@ -16,39 +17,39 @@ Arrival::CreationMode stringToCreationMode(const std::string &status)
 {
     if (status == "a" || status == "A")
     {
-        return Arrival::CreationMode::AUTOMATIC;
+        return Arrival::CreationMode::Automatic;
     }
     else if (status == "h" || status == "H" ||
              status == "m" || status == "M")
     {
-        return Arrival::CreationMode::MANUAL;
+        return Arrival::CreationMode::Manual;
     }
     else
     {
         std::cerr << "Unknown creation mode: " << status << std::endl;
     }
-    return Arrival::CreationMode::AUTOMATIC;
+    return Arrival::CreationMode::Automatic;
 }
 
 Arrival::FirstMotion intToFirstMotion(const int fm)
 {
     if (fm == 0)
     {
-        return Arrival::FirstMotion::UNKNOWN;
+        return Arrival::FirstMotion::Unknown;
     }
     else if (fm == 1)
     {
-        return Arrival::FirstMotion::UP;
+        return Arrival::FirstMotion::Up;
     }
     else if (fm ==-1)
     {
-        return Arrival::FirstMotion::DOWN;
+        return Arrival::FirstMotion::Down;
     }
     else
     {
         std::cerr << "Unknown first motion: " << fm << std::endl;
     }
-    return Arrival::FirstMotion::UNKNOWN;
+    return Arrival::FirstMotion::Unknown;
 }
 
 }

@@ -11,8 +11,8 @@ public:
     Origin mOrigin;
     Magnitude mMagnitude;
     int64_t mIdentifier;
-    Event::ReviewStatus mReviewStatus = Event::ReviewStatus::AUTOMATIC;
-    Event::Type mType = Event::Type::UNKNOWN;
+    Event::ReviewStatus mReviewStatus = Event::ReviewStatus::Automatic;
+    Event::Type mType = Event::Type::Unknown;
     bool mHaveIdentifier{false};
     bool mHaveOrigin{false};
     bool mHaveMagnitude{false};

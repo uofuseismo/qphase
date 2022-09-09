@@ -98,10 +98,11 @@ set(UI_SRC
     src/widgets/waveforms/stationScene.cpp
     src/widgets/waveforms/stationView.cpp
     include/qphase/widgets/waveforms/stationView.hpp
-    src/widgets/waveforms/postProcessing/traceItem.cpp
-    src/widgets/waveforms/postProcessing/traceScene.cpp
-    include/qphase/widgets/waveforms/postProcessing/traceView.hpp
-    src/widgets/waveforms/postProcessing/traceView.cpp)
+    #src/widgets/waveforms/postProcessing/traceItem.cpp
+    #src/widgets/waveforms/postProcessing/traceScene.cpp
+    #include/qphase/widgets/waveforms/postProcessing/traceView.hpp
+    #src/widgets/waveforms/postProcessing/traceView.cpp
+    )
 
 if (${FindQGeoView_FOUND})
     set(MAP_SRC
@@ -164,7 +165,7 @@ set_target_properties(qnode PROPERTIES
                       CXX_EXTENSIONS NO)
 target_include_directories(qnode PRIVATE ${SFF_INCLUDE_DIR})
 target_link_libraries(qnode
-                      PRIVATE qphase_core qphase_widgets Qt6::Core Qt6::Widgets Qt6::Network ${SFF_LIBRARY})
+                      PRIVATE qphase_core qphase_widgets Qt6::Core Qt6::Widgets Qt6::Network ${SFF_LIBRARY} SOCI::soci_core)
 ##########################################################################################
 #                                       Unit Tests                                       #
 ##########################################################################################

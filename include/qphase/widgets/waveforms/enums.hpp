@@ -16,6 +16,20 @@ enum class VisibleChannels
     Vertical,  /*!< Plot only vertical channels. */
     Horizontal /*!< Plot only horizontal channels. */
 };
-
+/// @brief Defines the waveform type to plot.
+enum class WaveformType
+{
+    Seismogram  /*!< This is a seismogram waveform. */
+};
+/// @brief Defines the ordering of stations in the station view.
+enum class StationOrdering
+{
+    Alphabetical, /*!< Sorts stations alphabetically by name - e.g.,
+                       NETWORK.STATION. This is the default ordering
+                       strategy. */
+    Distance,     /*!< Sorts stations by distance from the event. */ 
+    Azimuth       /*!< Sorts stations by station azimuth.  This is
+                       increases positive east of north. */
+};
 }
 #endif

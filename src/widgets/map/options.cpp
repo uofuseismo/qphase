@@ -84,14 +84,14 @@ public:
             auto lat = p.first;
             checkLatitude(lat);
             auto lon = shiftLongitude(p.second);
-            newBoundary.push_back(std::pair(lat, lon));
+            newBoundary.emplace_back(std::pair{lat, lon});
         }
         mBoundaries.push_back(newBoundary);
     }
     /// Sets the tile cache directory
     void setTileCacheDirectory(const std::string &directory)
     {
-        std::filesystem::path cacheDirectory(directory);;
+        std::filesystem::path cacheDirectory(directory);
         if (!std::filesystem::exists(cacheDirectory))
         {
             if (!std::filesystem::create_directories(cacheDirectory))

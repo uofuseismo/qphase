@@ -12,7 +12,7 @@ template<class T>
 class Station<T>::StationImpl
 {
 public:
-    void checkSensor(const SingleChannelSensor<T> &sensor)
+    void checkSensor(const SingleChannelSensor<T> &sensor) const
     {
         if (!sensor.haveVerticalChannel())
         {
@@ -28,7 +28,7 @@ public:
                                       + " already exists");
         }
     }
-    void checkSensor(const ThreeChannelSensor<T> &sensor)
+    void checkSensor(const ThreeChannelSensor<T> &sensor) const
     {
         if (!sensor.haveVerticalChannel())
         {   
@@ -66,9 +66,9 @@ public:
                                       + " already exists");
         }
     }
-
+    // Check if channel exists
     bool channelExists(const std::string &channel,
-                       const std::string &locationCode)
+                       const std::string &locationCode) const
     {
         for (const auto &sensor : mSingleChannelSensors)
         {
@@ -250,6 +250,16 @@ int Station<T>::getNumberOfChannels() const noexcept
     return nChannels;
 }
 
+/// Get total numbe rof vertical channels
+template<class T>
+int Station<T>::getNumberOfVerticalChannels() const noexcept
+{
+    auto nVerticalChannels
+        = static_cast<int> (pImpl->mThreeChannelSensors.size())
+        + static_cast<int> (pImpl->mSingleChannelSensors.size());
+    return nVerticalChannels;
+}
+
 /// Gets the three channel sensors
 template<class T>
 const std::vector<ThreeChannelSensor<T>>&
@@ -264,6 +274,14 @@ const std::vector<SingleChannelSensor<T>>&
     Station<T>::getSingleChannelSensorsReference() const noexcept
 {
     return pImpl->mSingleChannelSensors;
+}
+
+/// Channel exists?
+template<class T>
+bool Station<T>::channelExists(const std::string &channel,
+                               const std::string &locationCode) const
+{
+    return pImpl->channelExists(channel, locationCode);
 }
 
 ///--------------------------------------------------------------------------///
