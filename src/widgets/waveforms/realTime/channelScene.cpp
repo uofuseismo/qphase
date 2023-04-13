@@ -5,16 +5,16 @@
 #include <QFont>
 #include <QGraphicsSceneWheelEvent>
 #include <QString>
-#include "qphase/widgets/waveforms/stationScene.hpp"
-#include "qphase/widgets/waveforms/stationItem.hpp"
-#include "qphase/waveforms/station.hpp"
+#include "qphase/widgets/waveforms/realTime/channelScene.hpp"
+#include "qphase/widgets/waveforms/channelItem.hpp"
+#include "qphase/waveforms/channel.hpp"
 
-using namespace QPhase::Widgets::Waveforms;
+using namespace QPhase::Widgets::Waveforms::RealTime;
 
-class StationScene::StationSceneImpl
+class ChannelScene::ChannelSceneImpl
 {
 public:
-    StationSceneImpl(const int traceWidth,
+    ChannelSceneImpl(const int traceWidth,
                      const int traceHeight) :
         mTraceWidth(std::max(200, traceWidth)),
         mTraceHeight(std::max(20, traceHeight))
@@ -27,32 +27,29 @@ public:
     {
         auto availableHeight = static_cast<double> (mCurrentSize.height());
         int denominator = 1;
-        int nChannels = 0;
-        if (mStations)
+        if (mChannels != nullptr)
         {
-            for (const auto &station : *mStations)
+            int nChannels = static_cast<int> (mChannels->size());
+            if (nChannels > 0)
             {
-                nChannels = nChannels + station.getNumberOfChannels();
+                denominator = std::min(nChannels, mMaxTracesPerScene);
             }
-        }
-        if (nChannels > 0)
-        {
-            denominator = std::min(nChannels, mMaxTracesPerScene);
         }
         mTraceHeight
             = static_cast<int> (std::floor(availableHeight/denominator));
     }
 ///private:
-    std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> mStations;
+    std::shared_ptr<std::vector<QPhase::Waveforms::Channel<double>>>
+        mChannels{nullptr};
     QSize mCurrentSize;
     QColor mBackgroundColor{Qt::white};
-    QString mBackgroundName{tr("Station Viewer")};
+    QString mBackgroundName{tr("Channel Viewer")};
     QFont mBackgroundFont{"Helvetica", 22, QFont::Light, false};
     std::chrono::microseconds mPlotEarliestTime{0};
     std::chrono::microseconds mPlotLatestTime{0};
     std::chrono::microseconds mOriginalEarliestTime{0};
     std::chrono::microseconds mOriginalLatestTime{0};
-    std::map<QString, StationItem *> mStationItems;
+    std::map<QString, ChannelItem<double> *> mChannelItems;
     double mZoomFactor{1.1};
     int mNumberOfZooms{0};
     int mTraceWidth{400};
@@ -66,11 +63,11 @@ public:
 
 
 /// C'tor
-StationScene::StationScene(const int traceWidth,
+ChannelScene::ChannelScene(const int traceWidth,
                            const int traceHeight,
                            QObject *parent) :
     QGraphicsScene(parent),
-    pImpl(std::make_unique<StationSceneImpl> (traceWidth, traceHeight))
+    pImpl(std::make_unique<ChannelSceneImpl> (traceWidth, traceHeight))
 {
     pImpl->mCurrentSize = QSize(static_cast<int> (width()),
                                 static_cast<int> (height()));
@@ -79,10 +76,10 @@ StationScene::StationScene(const int traceWidth,
 }
 
 /// Destructor
-StationScene::~StationScene() = default;
+ChannelScene::~ChannelScene() = default;
 
 /// Resize event
-void StationScene::resize(const QSize &newSize)
+void ChannelScene::resize(const QSize &newSize)
 {
     pImpl->mCurrentSize = newSize;
     pImpl->mTraceWidth = newSize.width();
@@ -91,7 +88,7 @@ void StationScene::resize(const QSize &newSize)
 }
 
 /// Time limits
-void StationScene::setAbsoluteTimeLimits(
+void ChannelScene::setAbsoluteTimeLimits(
     const std::pair<std::chrono::microseconds, std::chrono::microseconds>
     &timeLimits)
 {
@@ -104,85 +101,60 @@ void StationScene::setAbsoluteTimeLimits(
     pImpl->mOriginalEarliestTime = timeLimits.first;
     pImpl->mOriginalLatestTime = timeLimits.second;
     pImpl->mTimeConvention = TimeConvention::Absolute;
-    for (auto &stationItem : pImpl->mStationItems)
+    for (auto &channelItem : pImpl->mChannelItems)
     {
-        stationItem.second->setAbsoluteTimeLimits(timeLimits);
+        channelItem.second->setAbsoluteTimeLimits(timeLimits);
     }
     updatePlot();
 }
 
 /// Update the plot
-void StationScene::updatePlot()
+void ChannelScene::updatePlot()
 {
 /*
-    for (auto &stationItem : pImpl->mStationItems)
+    for (auto &channelItem : pImpl->mChannelItems)
     {
-        //stationItem.update();
+        //channelItem.update();
     }
 */
 }
 
 /// Populate scene 
-void StationScene::populateScene()
+void ChannelScene::populateScene()
 {
-    int nStations = 0;
-    if (pImpl->mStations)
+    int nTraces = 0;
+    if (pImpl->mChannels != nullptr)
     {
-        nStations = static_cast<int> (pImpl->mStations->size());
+        nTraces = static_cast<int> (pImpl->mChannels->size());
     }
-    if (nStations == 0)
+    if (nTraces == 0)
     {
-        qDebug() << "No data in trace scene.  Setting default background...";
+        qDebug() << "No data in channel scene.  Setting default background...";
         addSimpleText(pImpl->mBackgroundName, pImpl->mBackgroundFont);
+        return;
     }
-    else
+    qDebug() << "Creating new channel scene with " << nTraces << " traces...";
+    // Get axis limits
+    auto axisLimits = std::pair(pImpl->mPlotEarliestTime,
+                                pImpl->mPlotLatestTime);
+    if (pImpl->mTimeConvention == TimeConvention::Relative)
     {
-        int nTraces = 0;
-        for (const auto &station : *pImpl->mStations)
-        {
-            nTraces = nTraces + station.getNumberOfChannels();
-        }
-        qDebug() << "Creating new station scene with "
-                 << nTraces << " traces...";
-        // Get axis limits
-        auto axisLimits = std::pair(pImpl->mPlotEarliestTime,
-                                    pImpl->mPlotLatestTime);
-        if (pImpl->mTimeConvention == TimeConvention::Relative)
-        {
-            qCritical() << "Not done";
-        }
-        int traceWidth = pImpl->mTraceWidth;
-        int traceHeight = pImpl->mTraceHeight;
-        setSceneRect(0, 0, traceWidth, traceHeight*nTraces);
-        clear();
-        pImpl->mStationItems.clear();
-        int nTotalChannels = 0;
-        for (const auto &station : *pImpl->mStations) 
-        {
-            auto nChannels = station.getNumberOfChannels();
-            QRectF stationPlotArea{0, 0,
-                                   static_cast<qreal> (traceWidth),
-                                   static_cast<qreal> (traceHeight*nChannels)};
-            auto stationItem = new StationItem(station, stationPlotArea);
-            pImpl->mStationItems.insert(std::pair(stationItem->getName(),
-                                                  stationItem));
-            stationItem->setPos(0, 1 + nTotalChannels*traceHeight);
-            stationItem->setAbsoluteTimeLimits(axisLimits);
-            nTotalChannels = nTotalChannels
-                           + stationItem->getNumberOfChannels();
-            addItem(stationItem);
-        }
+         qCritical() << "Not done";
     }
+    int traceWidth = pImpl->mTraceWidth;
+    int traceHeight = pImpl->mTraceHeight;
+    setSceneRect(0, 0, traceWidth, traceHeight*nTraces);
+    clear();
 }
 
 /// Wheel event - handles zooming and scrolling left / right
-void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
+void ChannelScene::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
     // 
     bool updatePlot = false;
     bool handled = false;
     bool haveData = false;
-    if (pImpl->mStations){haveData = !pImpl->mStations->empty();}
+    if (pImpl->mChannels){haveData = !pImpl->mChannels->empty();}
 /*std::any_of(pImpl->mWaveforms.begin(),
                                 pImpl->mWaveforms.end(),
                                 [](const Waveform &w)
@@ -328,9 +300,9 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
     {
         pImpl->mPlotEarliestTime = plotT0;
         pImpl->mPlotLatestTime = plotT1;
-        for (auto &stationItem : pImpl->mStationItems)
+        for (auto &channelItem : pImpl->mChannelItems)
         {
-            stationItem.second->setAbsoluteTimeLimits(std::pair{plotT0, plotT1});
+            channelItem.second->setAbsoluteTimeLimits(std::pair{plotT0, plotT1});
         }
         update();
     }
@@ -339,19 +311,17 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
     if (handled){event->accept();}
 }
 
-/// Sets the stations
-void StationScene::setStations(
-    std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations)
+/// Sets the channels
+void ChannelScene::setChannels(
+    std::shared_ptr<std::vector<QPhase::Waveforms::Channel<double>>> &channels)
 {
-    if (stations == nullptr){throw std::invalid_argument("Stations is NULL");}
-    if (stations->empty())
+    if (channels == nullptr){throw std::invalid_argument("Channels is NULL");}
+    if (channels->empty())
     {
-        throw std::invalid_argument("No stations");
+        throw std::invalid_argument("No channels");
     }
-    pImpl->mStations = stations;
+    pImpl->mChannels = channels;
     pImpl->recomputeTraceHeight();
     populateScene();
 }
 
-//template class QPhase::Widgets::Waveforms::StationScene<double>;
-//template class QPhase::Widgets::Waveforms::StationScene<float>;

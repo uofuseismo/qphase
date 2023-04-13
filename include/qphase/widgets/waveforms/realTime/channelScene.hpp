@@ -1,5 +1,5 @@
-#ifndef QPHASE_WIDGETS_WAVEFORMS_STATION_SCENE_HPP
-#define QPHASE_WIDGETS_WAVEFORMS_STATION_SCENE_HPP
+#ifndef QPHASE_WIDGETS_WAVEFORMS_REAL_TIME_CHANNEL_SCENE_HPP
+#define QPHASE_WIDGETS_WAVEFORMS_REAL_TIME_CHANNEL_SCENE_HPP
 #include <QGraphicsScene>
 #include <memory>
 #include "qphase/widgets/waveforms/enums.hpp"
@@ -9,21 +9,21 @@ QT_BEGIN_NAMESPACE
 QT_END_NAMESPACE
 namespace QPhase::Waveforms
 {
- template<class T> class Station;
+ template<class T> class Channel;
 }
-namespace QPhase::Widgets::Waveforms
+namespace QPhase::Widgets::Waveforms::RealTime
 {
-/// @class StationScene "stationScene.hpp" "qphase/widgets/stationScene.hpp"
-/// @brief This is a QGraphicScene that manages stations.
+/// @class ChannelScene "channelScene.hpp" "qphase/widgets/realTime/channelScene.hpp"
+/// @brief This is a QGraphicScene that manages channels.
 /// @copyright Ben Baker (University of Utah) distributed under the MIT license.
-class StationScene : public QGraphicsScene
+class ChannelScene : public QGraphicsScene
 {
 public:
     /// @brief Constructs a scene with a given trace width and height. 
-    StationScene(int traceWidth, int traceHeight, QObject *parent = nullptr);
+    ChannelScene(int traceWidth, int traceHeight, QObject *parent = nullptr);
 
     /// @brief Destructor.
-    ~StationScene() override;
+    ~ChannelScene() override;
 
     /// @brief Populates the trace items in the scene.  If there are no items
     ///        then this will just draw the default background.
@@ -41,22 +41,22 @@ public:
     /// @param[in] time  The time in UTC seconds since the epoch.  
     ///                  This will represent the "zero" time.
     void setRelativeTimeLimits(const std::chrono::microseconds &time);
-    /// @brief Sets the stations to plot.
-    void setStations(std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations);
+    /// @brief Sets the channels to plot.
+    void setChannels(std::shared_ptr<std::vector<QPhase::Waveforms::Channel<double>>> &channels);
 
-    StationScene(const StationScene &) = delete;
-    StationScene(StationScene &&) noexcept = delete;
-    StationScene& operator=(const StationScene &) = delete;
-    StationScene& operator=(StationScene &&) noexcept = delete;
+    ChannelScene(const ChannelScene &) = delete;
+    ChannelScene(ChannelScene &&) noexcept = delete;
+    ChannelScene& operator=(const ChannelScene &) = delete;
+    ChannelScene& operator=(ChannelScene &&) noexcept = delete;
 protected:
     /// @brief Handles zoom and horizontal scroll events
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 private:
-    /// @brief Redraws station items in scene.
+    /// @brief Redraws channels items in scene.
     void updatePlot();
 private:
-    class StationSceneImpl;
-    std::unique_ptr<StationSceneImpl> pImpl;    
+    class ChannelSceneImpl;
+    std::unique_ptr<ChannelSceneImpl> pImpl;    
 };
 }
 #endif

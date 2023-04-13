@@ -1,5 +1,5 @@
-#ifndef QPHASE_WAVEFORMS_SINGLECHANNELSENSOR_HPP
-#define QPHASE_WAVEFORMS_SINGLECHANNELSENSOR_HPP
+#ifndef QPHASE_WAVEFORMS_SINGLE_CHANNEL_SENSOR_HPP
+#define QPHASE_WAVEFORMS_SINGLE_CHANNEL_SENSOR_HPP
 #include <memory>
 namespace QPhase::Waveforms
 {
@@ -10,7 +10,7 @@ namespace QPhase::Waveforms
 namespace QPhase::Waveforms
 {
 /// @class SingleChannelSensor "singleChannelSensor.hpp" "qphase/waveforms/singleChannelSensor.hpp"
-/// @brief Defines a single-channel (vertical) sensor.
+/// @brief Defines a single-channel sensor.
 /// @copyright Ben Baker (University of Utah) distributed under the MIT license.
 template<class T>
 class SingleChannelSensor
@@ -41,8 +41,8 @@ public:
     SingleChannelSensor& operator=(const SingleChannelSensor &sensor);
     /// @brief Move assignment.
     /// @param[in,out] sensor  The single-channel sensor whose memory will be
-    ///                         moved to this.  On exit, sensor's behavior is
-    ///                         undefined.
+    ///                        moved to this.  On exit, sensor's behavior is
+    ///                        undefined.
     /// @result The memory from sensor moved to this.
     SingleChannelSensor& operator=(SingleChannelSensor &&sensor) noexcept;
     /// @}
@@ -100,42 +100,6 @@ public:
     [[nodiscard]] double getElevation() const;
     /// @result True indicates the sensor's elevation was set.
     [[nodiscard]] bool haveElevation() const noexcept;
-    /// @}
-
-    /// @name Simple Response (Optional)
-    /// @{
-
-    /// TODO: Delete -> moved to channel
-    /// @brief Sets a simple response.  This is useful for quick-and-dirty
-    ///        `deconvolution' which amount to multiplying the trace by
-    ///        a scalar.  This is appropriate for when the energy of signal of
-    ///        interest is primarily captured by the flat passband of the 
-    ///        instrument. 
-    /// @param[in] response  The simple response.
-    /// @throws std::invalid_argument if the scalar constant, input, or output
-    ///         uses are not set.
-    //void setSimpleResponse(const SimpleResponse &response);
-    /// @result The simple response.
-    /// @throws std::runtime_error if \c haveSimpleResponse() is false.
-    //[[nodiscard]] SimpleResponse getSimpleResponse() const;
-    /// @result True indicates the simple response was set.
-    //[[nodiscard]] bool haveSimpleResponse() const noexcept;
-    /// @}
-
-    /// @name Response (Optional)
-    /// @{
-
-    /// TODO remove
-    /// @brief Sets the instrument response.
-    /// @param[in] response  The instrument response.
-    /// @throws std::invalid_argument if the requisite response parameters
-    ///         are not specified.
-    //void setInstrumentResponse(const InstrumentResponse &response);
-    /// @result The instrument response.
-    /// @throws std::runtime_error if \c haveResponse() is false.
-    //[[nodiscard]] InstrumentResponse getInstrumentResponse() const;
-    /// @result True indicates the response was set.
-    //[[nodiscard]] bool haveInstrumentResponse() const noexcept;
     /// @}
 
     /// @name Location Code

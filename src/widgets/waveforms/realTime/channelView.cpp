@@ -5,9 +5,8 @@
 #include <QGraphicsView>
 #include <QResizeEvent>
 #include <QScrollBar>
-#include "qphase/widgets/waveforms/stationView.hpp"
-#include "qphase/widgets/waveforms/stationScene.hpp"
-#include "qphase/waveforms/station.hpp"
+#include "qphase/widgets/waveforms/realTime/channelView.hpp"
+#include "qphase/widgets/waveforms/realTime/channelScene.hpp"
 #include "qphase/waveforms/channel.hpp"
 #include "qphase/waveforms/waveform.hpp"
 #include "qphase/waveforms/threeChannelSensor.hpp"
@@ -21,72 +20,32 @@ namespace
 {
 template<typename T>
 std::pair<std::chrono::microseconds, std::chrono::microseconds> 
-    getStopEndTimes(const QPhase::Waveforms::Station<T> &station)
+    getStopEndTimes(const QPhase::Waveforms::Channel<T> &channel)
 {
     std::chrono::microseconds tMin{std::numeric_limits<int64_t>::max()};
     std::chrono::microseconds tMax{std::numeric_limits<int64_t>::lowest()};
-    auto sensors3C = station.getThreeChannelSensorsReference();
-    for (const auto &channel : sensors3C)
+    try
     {
-        try
-        {
-            tMin = std::min(tMin, channel.getVerticalChannelReference()
-                                     .getWaveformReference().getEarliestTime());
-            tMax = std::max(tMax, channel.getVerticalChannelReference()
-                                     .getWaveformReference().getLatestTime());
-        }
-        catch (...)
-        {
-        }
-        try
-        {
-            tMin = std::min(tMin, channel.getNorthChannelReference()
-                                     .getWaveformReference().getEarliestTime());
-            tMax = std::max(tMax, channel.getNorthChannelReference()
-                                     .getWaveformReference().getLatestTime());
-        }
-        catch (...)
-        {
-        }
-        try
-        {
-            tMin = std::min(tMin, channel.getEastChannelReference()
-                                     .getWaveformReference().getEarliestTime());
-            tMax = std::max(tMax, channel.getEastChannelReference()
-                                     .getWaveformReference().getLatestTime());
-        }
-        catch (...)
-        {
-        }
+        tMin = channel.getWaveformReference().getEarliestTime();
+        tMax = channel.getWaveformReference().getLatestTime();
     }
-    auto sensors1C = station.getSingleChannelSensorsReference();
-    for (const auto &channel : sensors1C)
+    catch (...)
     {
-        try
-        {
-            tMin = std::min(tMin, channel.getVerticalChannelReference()
-                                     .getWaveformReference().getEarliestTime());
-            tMax = std::max(tMax, channel.getVerticalChannelReference()
-                                     .getWaveformReference().getLatestTime());
-        }
-        catch (...)
-        {
-        }
     }
     return std::pair{tMin, tMax};
 }
 
 }
 
-using namespace QPhase::Widgets::Waveforms;
+using namespace QPhase::Widgets::Waveforms::RealTime;
 
-class StationView::StationViewImpl
+class ChannelView::ChannelViewImpl
 {
 public:
-    StationScene *mScene{nullptr};
+    ChannelScene *mScene{nullptr};
     QPhase::Database::Connection::SQLite3 mDatabase;
     QPhase::Database::Internal::Event mEvent;
-    std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> mStations;
+    std::shared_ptr<std::vector<QPhase::Waveforms::Channel<double>>> mChannels;
     std::chrono::microseconds mPlotEarliestTime{0};
     std::chrono::microseconds mPlotLatestTime{0};
     int mMinimumWidth{600};
@@ -97,9 +56,9 @@ public:
 };
 
 /// C'tor
-StationView::StationView(QWidget *parent) :
+ChannelView::ChannelView(QWidget *parent) :
     QGraphicsView(parent),
-    pImpl(std::make_unique<StationViewImpl> ())
+    pImpl(std::make_unique<ChannelViewImpl> ())
 {
     setMinimumSize(pImpl->mMinimumWidth, pImpl->mMinimumHeight);
 
@@ -108,7 +67,7 @@ StationView::StationView(QWidget *parent) :
     int traceHeight = DEFAULT_TRACE_HEIGHT;
     int traceWidth  = static_cast<int> (boundingRect.width());
     
-    pImpl->mScene = new StationScene(traceWidth, traceHeight);
+    pImpl->mScene = new ChannelScene(traceWidth, traceHeight);
     setScene(pImpl->mScene);
 
     setRenderHint(QPainter::Antialiasing);
@@ -121,10 +80,10 @@ StationView::StationView(QWidget *parent) :
 }
 
 /// Destructor
-StationView::~StationView() = default;
+ChannelView::~ChannelView() = default;
 
 /// Resize event
-void StationView::resizeEvent(QResizeEvent *event)
+void ChannelView::resizeEvent(QResizeEvent *event)
 {
     auto newSize = event->size();
     int innerWidth = newSize.width();
@@ -134,7 +93,7 @@ void StationView::resizeEvent(QResizeEvent *event)
 }
 
 /// Time limits
-void StationView::setTimeLimits(const std::pair<std::chrono::microseconds,
+void ChannelView::setTimeLimits(const std::pair<std::chrono::microseconds,
                                                 std::chrono::microseconds>
                                &timeLimits)
 {
@@ -163,19 +122,19 @@ void StationView::setTimeLimits(const std::pair<std::chrono::microseconds,
 }
 
 /// Force a redraw
-void StationView::redrawScene()
+void ChannelView::redrawScene()
 {
     pImpl->mScene->update();
 }
 
-/// Sets the stations
-void StationView::setStations(
-    std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations)
+/// Sets the channels
+void ChannelView::setChannels(
+    std::shared_ptr<std::vector<QPhase::Waveforms::Channel<double>>> &channels)
 {
-    if (stations == nullptr){throw std::invalid_argument("Stations is NULL");}
-    if (stations->empty())
+    if (channels == nullptr){throw std::invalid_argument("Channels is NULL");}
+    if (channels->empty())
     {
-        throw std::invalid_argument("No stations");
+        throw std::invalid_argument("No channels");
     }
     // If not present then set the time limits
     if (pImpl->mPlotEarliestTime.count() == 0 &&
@@ -183,22 +142,22 @@ void StationView::setStations(
     {
         std::chrono::microseconds tMin{std::numeric_limits<int64_t>::max()};
         std::chrono::microseconds tMax{std::numeric_limits<int64_t>::lowest()};
-        for (const auto &station : *stations)
+        for (const auto &channel : *channels)
         {
-            auto [t0, t1] = ::getStopEndTimes(station);
+            auto [t0, t1] = ::getStopEndTimes(channel);
             tMin = std::min(tMin, t0);
             tMax = std::max(tMax, t1);
         }
         setTimeLimits(std::pair(tMin, tMax));
     }
-    // Now get a pointer to the stations
-    pImpl->mStations = stations;
-    pImpl->mScene->setStations(stations);
+    // Now get a pointer to the channels 
+    pImpl->mChannels = channels;
+    pImpl->mScene->setChannels(channels);
     redrawScene();
 }
 
 /// Sets the event that is being processed
-void StationView::setEvent(const QPhase::Database::Internal::Event &event)
+void ChannelView::setEvent(const QPhase::Database::Internal::Event &event)
 {
     if (event.haveIdentifier())
     {
@@ -207,27 +166,13 @@ void StationView::setEvent(const QPhase::Database::Internal::Event &event)
     pImpl->mEvent = event;
 } 
 
-QPhase::Database::Internal::Event StationView::getEvent() const
+QPhase::Database::Internal::Event ChannelView::getEvent() const
 {
     return pImpl->mEvent;
 }
 
-void StationView::clearEvent() noexcept
+void ChannelView::clearEvent() noexcept
 {
     pImpl->mEvent.clear();
 }
 
-/*
-template<>
-void StationView::setStations<float>(
-    std::shared_ptr<std::vector<QPhase::Waveforms::Station<float>>> &stations)
-{
-    if (stations == nullptr){throw std::invalid_argument("Stations is NULL");}
-    if (stations->empty())
-    {
-        throw std::invalid_argument("No stations");
-    }
-    pImpl->mDoubleStations = nullptr;
-    pImpl->mFloatStations = stations;
-}
-*/

@@ -1,5 +1,5 @@
-#ifndef QPHASE_WAVEFORMS_SIMPLERESPONSE_HPP
-#define QPHASE_WAVEFORMS_SIMPLERESPONSE_HPP
+#ifndef QPHASE_WAVEFORMS_SIMPLE_RESPONSE_HPP
+#define QPHASE_WAVEFORMS_SIMPLE_RESPONSE_HPP
 #include "qphase/waveforms/enums.hpp"
 #include <chrono>
 #include <memory>

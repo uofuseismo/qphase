@@ -57,28 +57,6 @@ public:
     /// @name Waveform Name
     /// @{
 
-/*
-    /// TODO DELETE
-    /// @brief Sets the station's network code.
-    /// @param[in] network  The network code - e.g., UU.
-    [[deprecated]] void setNetworkCode(const std::string &network);
-    /// @result The network code.    
-    /// @throws std::runtime_error if \c haveNetworkCode() is false.
-    [[deprecated]] [[nodiscard]] std::string getNetworkCode() const;
-    /// @result True indicates the network code was set.
-    [[deprecated]] [[nodiscard]] bool haveNetworkCode() const noexcept;
-
-    /// TODO DELETE
-    /// @brief Sets the station's name.
-    /// @param[in] station  The station's name - e.g., CTU.
-    [[deprecated]] void setStationName(const std::string &station);
-    /// @result The station name.
-    /// @throws std::runtime_error if \c haveStation() is false.
-    [[deprecated]] [[nodiscard]] std::string getStationName() const;
-    /// @result True indicates the station name was set.
-    [[deprecated]] [[nodiscard]] bool haveStationName() const noexcept;
-*/
-
     /// @brief Sets the channel code.
     /// @param[in] channel  The channel code - e.g., HHZ.
     /// @throws std::invalid_argument if this is not 3 letters.

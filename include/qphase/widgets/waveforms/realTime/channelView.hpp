@@ -1,5 +1,5 @@
-#ifndef QPHASE_WIDGETS_WAVEFORMS_STATION_VIEW_HPP
-#define QPHASE_WIDGETS_WAVEFORMS_STATION_VIEW_HPP
+#ifndef QPHASE_WIDGETS_WAVEFORMS_REAL_TIME_CHANNEL_VIEW_HPP
+#define QPHASE_WIDGETS_WAVEFORMS_REAL_TIME_CHANNEL_VIEW_HPP
 #include <memory>
 #include <chrono>
 #include <QGraphicsView>
@@ -19,25 +19,24 @@ namespace QPhase
  }
  namespace Waveforms
  {
-  template<class T> class Station;
+  template<class T> class Channel;
  }
  namespace Widgets::Waveforms
  {
-  //template<class T> class StationScene;
-  class StationItem;
+  class ChannelItem;
  }
 }
-namespace QPhase::Widgets::Waveforms
+namespace QPhase::Widgets::Waveforms::RealTime
 {
-/// @class StationView "stationView.hpp" "qphase/widgets/stationView.hpp"
-/// @brief This is a QGraphicView that manages a StationScene.
+/// @class ChannelView "channelView.hpp" "qphase/widgets/realTime/channelView.hpp"
+/// @brief This is a QGraphicView that manages a ChannelScene.
 /// @copyright Ben Baker (University of Utah) distributed under the MIT license.
-class StationView : public QGraphicsView
+class ChannelView : public QGraphicsView
 {
     Q_OBJECT;
 public:
     /// @brief Constructor with a given parent.
-    explicit StationView(QWidget *parent = nullptr);
+    explicit ChannelView(QWidget *parent = nullptr);
 
     //void setDatabaseConnection(std::shared_ptr<QPhase::Database::Connection::IConnection> &connection);
 
@@ -48,8 +47,8 @@ public:
     ///                        while plotLimits.second is the end time of the
     ///                        plot.  
     void setTimeLimits(const std::pair<std::chrono::microseconds, std::chrono::microseconds> &plotLimits);
-    /// @brief Sets the stations to plot.
-    void setStations(std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations);
+    /// @brief Sets the channels to plot.
+    void setChannels(std::shared_ptr<std::vector<QPhase::Waveforms::Channel<double>>> &channel);
 
     /// @brief Sets the event information.
     /// @param[in] event  The event information that is currently being processed.
@@ -62,12 +61,12 @@ public:
     /// @brief Forces the scene to be redrawn.
     void redrawScene();
     /// @brief Destructor.
-    ~StationView() override;
+    ~ChannelView() override;
 protected:
     void resizeEvent(QResizeEvent *event) override;
 private:
-    class StationViewImpl;
-    std::unique_ptr<StationViewImpl> pImpl;
+    class ChannelViewImpl;
+    std::unique_ptr<ChannelViewImpl> pImpl;
 };
 }
 #endif

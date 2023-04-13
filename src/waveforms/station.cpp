@@ -70,7 +70,7 @@ public:
     bool channelExists(const std::string &channel,
                        const std::string &locationCode) const
     {
-        for (const auto &sensor : mSingleChannelSensors)
+        for (const auto &sensor : mSingleChannelVerticalSensors)
         {
             auto sensorLocationCode = sensor.getLocationCode();
             if (sensorLocationCode == locationCode)
@@ -108,11 +108,11 @@ public:
                 }
             }
         }
-
         return false;
     }
     std::vector<ThreeChannelSensor<T>> mThreeChannelSensors;
-    std::vector<SingleChannelSensor<T>> mSingleChannelSensors;
+    std::vector<SingleChannelSensor<T>> mSingleChannelVerticalSensors;
+    std::vector<Channel<T>> mSingleChannelSensors;
     std::string mName;
     std::string mNetworkCode;
 };
@@ -231,22 +231,23 @@ template<class T>
 void Station<T>::add(const SingleChannelSensor<T> &sensor)
 {
     pImpl->checkSensor(sensor);
-    pImpl->mSingleChannelSensors.push_back(sensor);
+    pImpl->mSingleChannelVerticalSensors.push_back(sensor);
 }
 
 template<class T>
 void Station<T>::add(SingleChannelSensor<T> &&sensor)
 {
     pImpl->checkSensor(sensor);
-    pImpl->mSingleChannelSensors.push_back(std::move(sensor));
+    pImpl->mSingleChannelVerticalSensors.push_back(std::move(sensor));
 }
 
 /// Get total number of channels
 template<class T>
 int Station<T>::getNumberOfChannels() const noexcept
 {
-    auto nChannels = static_cast<int> (pImpl->mThreeChannelSensors.size())*3
-                   + static_cast<int> (pImpl->mSingleChannelSensors.size());
+    auto nChannels
+        = static_cast<int> (pImpl->mThreeChannelSensors.size())*3
+        + static_cast<int> (pImpl->mSingleChannelVerticalSensors.size());
     return nChannels;
 }
 
@@ -256,7 +257,7 @@ int Station<T>::getNumberOfVerticalChannels() const noexcept
 {
     auto nVerticalChannels
         = static_cast<int> (pImpl->mThreeChannelSensors.size())
-        + static_cast<int> (pImpl->mSingleChannelSensors.size());
+        + static_cast<int> (pImpl->mSingleChannelVerticalSensors.size());
     return nVerticalChannels;
 }
 
@@ -273,7 +274,7 @@ template<class T>
 const std::vector<SingleChannelSensor<T>>&
     Station<T>::getSingleChannelSensorsReference() const noexcept
 {
-    return pImpl->mSingleChannelSensors;
+    return pImpl->mSingleChannelVerticalSensors;
 }
 
 /// Channel exists?

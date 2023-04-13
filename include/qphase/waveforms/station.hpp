@@ -3,6 +3,7 @@
 #include <memory>
 namespace QPhase::Waveforms
 {
+template<class T> class SingleChannelVerticalSensor;
 template<class T> class SingleChannelSensor;
 template<class T> class ThreeChannelSensor;
 template<class T> class Channel;
@@ -51,6 +52,9 @@ public:
     /// @brief Adds a single-channel sensor.
     void add(const SingleChannelSensor<T> &sensor);
     void add(SingleChannelSensor<T> &&sensor);
+    /// @brief Adds a single-channel vertical sensor.
+    void add(const SingleChannelVerticalSensor<T> &sensor);
+    void add(SingleChannelVerticalSensor<T> &&sensor);
     /// @brief Adds a three-channel sensor.
     void add(const ThreeChannelSensor<T> &sensor); 
     void add(ThreeChannelSensor<T> &&sensor);
