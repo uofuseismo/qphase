@@ -2,6 +2,7 @@
 #include <vector>
 #include "qphase/waveforms/station.hpp"
 #include "qphase/waveforms/singleChannelSensor.hpp"
+#include "qphase/waveforms/singleChannelVerticalSensor.hpp"
 #include "qphase/waveforms/threeChannelSensor.hpp"
 #include "qphase/waveforms/channel.hpp"
 #include "private/removeBlanksAndCapitalize.hpp"
@@ -12,7 +13,7 @@ template<class T>
 class Station<T>::StationImpl
 {
 public:
-    void checkSensor(const SingleChannelSensor<T> &sensor) const
+    void checkSensor(const SingleChannelVerticalSensor<T> &sensor) const
     {
         if (!sensor.haveVerticalChannel())
         {
@@ -27,6 +28,22 @@ public:
             throw std::invalid_argument(zChannelCode + "." + locationCode
                                       + " already exists");
         }
+    }
+    void checkSensor(const SingleChannelSensor<T> &sensor) const
+    {
+        if (!sensor.haveChannel())
+        {
+            throw std::invalid_argument("Channel not set");
+        }
+        // Get channel codes and check for existence
+        auto locationCode = sensor.getLocationCode();
+        auto channelCode
+            = sensor.getChannelReference().getChannelCode();
+        if (channelExists(channelCode, locationCode))
+        {
+            throw std::invalid_argument(channelCode + "." + locationCode
+                                      + " already exists");
+        }   
     }
     void checkSensor(const ThreeChannelSensor<T> &sensor) const
     {
@@ -70,6 +87,19 @@ public:
     bool channelExists(const std::string &channel,
                        const std::string &locationCode) const
     {
+        for (const auto &sensor : mSingleChannelSensors)
+        {
+            auto sensorLocationCode = sensor.getLocationCode();
+            if (sensorLocationCode == locationCode)
+            {
+                auto channelCode
+                    = sensor.getChannelReference().getChannelCode();
+                if (channel == channelCode)
+                {
+                    return true;
+                }
+            }
+        }
         for (const auto &sensor : mSingleChannelVerticalSensors)
         {
             auto sensorLocationCode = sensor.getLocationCode();
@@ -111,8 +141,8 @@ public:
         return false;
     }
     std::vector<ThreeChannelSensor<T>> mThreeChannelSensors;
-    std::vector<SingleChannelSensor<T>> mSingleChannelVerticalSensors;
-    std::vector<Channel<T>> mSingleChannelSensors;
+    std::vector<SingleChannelVerticalSensor<T>> mSingleChannelVerticalSensors;
+    std::vector<SingleChannelSensor<T>> mSingleChannelSensors;
     std::string mName;
     std::string mNetworkCode;
 };
@@ -231,11 +261,62 @@ template<class T>
 void Station<T>::add(const SingleChannelSensor<T> &sensor)
 {
     pImpl->checkSensor(sensor);
-    pImpl->mSingleChannelVerticalSensors.push_back(sensor);
+    // Is this a vertical channel sensor?
+    bool isVertical = false;
+    auto channel = sensor.getChannelReference().getChannelCode();
+    if (channel.size() == 3)
+    {
+        if (channel[2] == 'Z')
+        {
+            isVertical = true;
+        }
+    }
+    if (isVertical)
+    {
+        SingleChannelVerticalSensor<T> verticalSensor(sensor);
+        pImpl->mSingleChannelVerticalSensors.push_back(std::move(sensor));
+    }
+    else
+    {
+        pImpl->mSingleChannelSensors.push_back(sensor);
+    }
 }
 
 template<class T>
 void Station<T>::add(SingleChannelSensor<T> &&sensor)
+{
+    pImpl->checkSensor(sensor);
+    // Is this a vertical channel sensor?
+    bool isVertical = false;
+    auto channel = sensor.getChannelReference().getChannelCode();
+    if (channel.size() == 3)
+    {   
+        if (channel[2] == 'Z')
+        {
+            isVertical = true;
+        }   
+    }
+    if (isVertical)
+    {
+        SingleChannelVerticalSensor<T> verticalSensor(sensor);
+        pImpl->mSingleChannelVerticalSensors.push_back(std::move(sensor));
+    }
+    else
+    {
+        pImpl->mSingleChannelSensors.push_back(std::move(sensor));
+    }
+}
+
+/// Adds a sensor
+template<class T>
+void Station<T>::add(const SingleChannelVerticalSensor<T> &sensor)
+{
+    pImpl->checkSensor(sensor);
+    pImpl->mSingleChannelVerticalSensors.push_back(sensor);
+}
+
+template<class T>
+void Station<T>::add(SingleChannelVerticalSensor<T> &&sensor)
 {
     pImpl->checkSensor(sensor);
     pImpl->mSingleChannelVerticalSensors.push_back(std::move(sensor));
@@ -247,7 +328,8 @@ int Station<T>::getNumberOfChannels() const noexcept
 {
     auto nChannels
         = static_cast<int> (pImpl->mThreeChannelSensors.size())*3
-        + static_cast<int> (pImpl->mSingleChannelVerticalSensors.size());
+        + static_cast<int> (pImpl->mSingleChannelVerticalSensors.size())
+        + static_cast<int> (pImpl->mSingleChannelSensors.size());
     return nChannels;
 }
 
@@ -269,12 +351,20 @@ const std::vector<ThreeChannelSensor<T>>&
     return pImpl->mThreeChannelSensors;
 }
 
-/// Gets the three channel sensors
+/// Gets the single channel vertical sensors
+template<class T>
+const std::vector<SingleChannelVerticalSensor<T>>&
+    Station<T>::getSingleChannelVerticalSensorsReference() const noexcept
+{
+    return pImpl->mSingleChannelVerticalSensors;
+}
+
+/// Gets the single channel sensors
 template<class T>
 const std::vector<SingleChannelSensor<T>>&
     Station<T>::getSingleChannelSensorsReference() const noexcept
 {
-    return pImpl->mSingleChannelVerticalSensors;
+    return pImpl->mSingleChannelSensors;
 }
 
 /// Channel exists?

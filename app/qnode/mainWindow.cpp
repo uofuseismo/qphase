@@ -204,7 +204,9 @@ void MainWindow::createSlots()
                     } // End check on database connection
                     // Start doing plotting
                     mStationView->setTimeLimits(std::pair(plotTime0, plotTime1));
+qDebug() << "set it";
                     mStationView->setEvent(selectedEvents.at(0));
+qDebug() << "set";
                 }
                 else // No events
                 {

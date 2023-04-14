@@ -59,8 +59,12 @@ public:
     void add(const ThreeChannelSensor<T> &sensor); 
     void add(ThreeChannelSensor<T> &&sensor);
 
-    [[nodiscard]] const std::vector<ThreeChannelSensor<T>>& getThreeChannelSensorsReference() const noexcept; 
-    [[nodiscard]] const std::vector<SingleChannelSensor<T>>& getSingleChannelSensorsReference() const noexcept;
+    [[nodiscard]] const std::vector<ThreeChannelSensor<T>>&
+         getThreeChannelSensorsReference() const noexcept; 
+    [[nodiscard]] const std::vector<SingleChannelSensor<T>>&
+         getSingleChannelSensorsReference() const noexcept;
+    [[nodiscard]] const std::vector<SingleChannelVerticalSensor<T>>&
+         getSingleChannelVerticalSensorsReference() const noexcept;
 
     /// @brief Gets the three-channel sensors.
 

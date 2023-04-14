@@ -10,12 +10,33 @@
 #include "qphase/database/internal/arrivalTable.hpp"
 #include "qphase/database/internal/magnitude.hpp"
 #include "qphase/database/connection/connection.hpp"
-#include "private/database/utilities.hpp"
 
 using namespace QPhase::Database::Internal;
 
 namespace
 {
+[[nodiscard]]
+std::string eventTypeToString(const Event::Type eventType)
+{
+    if (eventType == Event::Type::LocalEarthquake)
+    {
+        return "LE";
+    }
+    else if (eventType == Event::Type::QuarryBlast)
+    {
+        return "QB";
+    }
+    else
+    {
+        if (eventType != Event::Type::Unknown)
+        {
+            std::cerr << "Unhandled event type: "
+                      << static_cast<int> (eventType) << std::endl;
+        }
+    }
+    return "UK";
+}
+
 [[nodiscard]] Event::Type stringToEventType(const std::string &eventType)
 {
     auto temp = eventType;
@@ -33,6 +54,32 @@ namespace
         std::cerr << "Unknown event type: " << temp << std::endl;
     }
     return Event::Type::Unknown;
+}
+[[nodiscard]]
+std::string reviewStatusToString(const Event::ReviewStatus status)
+{
+    if (status == Event::ReviewStatus::Automatic)
+    {
+        return "A";
+    }
+    else if (status == Event::ReviewStatus::Incomplete)
+    {
+        return "I";
+    }
+    else if (status == Event::ReviewStatus::Finalized)
+    {
+        return "F";
+    }
+    else if (status == Event::ReviewStatus::Cancelled)
+    {
+        return "C";
+    }
+    else
+    {
+        std::cerr << "Unknown review status: "
+                  << static_cast<int> (status) << std::endl;
+    }
+    return "A";
 }
 [[nodiscard]] Event::ReviewStatus
     stringToEventReviewStatus(const std::string &status)
@@ -80,7 +127,7 @@ template<> struct soci::type_conversion<Event>
         origin.setLatitude(v.get<double> ("latitude"));
         origin.setLongitude(v.get<double> ("longitude"));
         origin.setDepth(v.get<double> ("depth"));
-        double originTime = v.get<double> ("origin_time");
+        auto originTime = v.get<double> ("origin_time");
         origin.setTime(originTime*1.e-6);
 
         Magnitude magnitude;
@@ -91,28 +138,51 @@ template<> struct soci::type_conversion<Event>
         data.setOrigin(origin);
         data.setMagnitude(magnitude);
     }
+    static void to_base(const Event &event, values &v, indicator &ind)
+    {
+        v.set("identifier", event.getIdentifier(), ind);
+        v.set("preferred_origin", event.getOrigin().getIdentifier(), ind);
+        if (event.haveMagnitude())
+        {
+            v.set("preferred_magnitude", event.getMagnitude().getIdentifier(), ind);
+        }
+        else
+        {
+            v.set("preferred_magnitude", 0, i_null);
+        }
+        v.set("event_type", eventTypeToString(event.getType()), ind);
+        v.set("event_review_status",
+              reviewStatusToString(event.getReviewStatus()), ind);
+    }
 };
 
 
-class EventTable::EventTableImpl
-{
+class EventTable::EventTableImpl {
 public:
     /// Get the station data
-    [[nodiscard]] std::vector<Event> getData() const
-    {
+    [[nodiscard]] std::vector<Event> getData() const {
         std::scoped_lock lock(mMutex);
         return mEvents;
     }
+
     /// Connected?
-    [[nodiscard]] bool isConnected() const noexcept
+    [[nodiscard]] bool isConnected() const noexcept {
+        std::scoped_lock lock(mMutex);
+        if (mConnection != nullptr) {
+            return mConnection->isConnected();
+        }
+        return false;
+    }
+
+    /// Add event
+    void add(const Event &event)
     {
         std::scoped_lock lock(mMutex);
-        if (mConnection != nullptr)
-        {
-            return mConnection->isConnected();
-        }   
-        return false;
-    }   
+        auto session = mConnection->getSession();
+        *session << "INSERT INTO event(identifier, preferred_origin, preferred_magnitude, event_type, event_review_status) "
+                    "VALUES(:identifier, :preferred_origin, :preferred_magnitude, :event_type, :event_review_status)",
+                    soci::use(event);
+    }
     /// Query
     void queryAll()
     {
@@ -205,4 +275,13 @@ void EventTable::setConnection(
 bool EventTable::isConnected() const noexcept
 {
     return pImpl->isConnected();
+}
+
+void EventTable::update(const Event &event)
+{
+    if (!isConnected())
+    {
+        throw std::runtime_error("Database connection not set");
+    }
+
 }

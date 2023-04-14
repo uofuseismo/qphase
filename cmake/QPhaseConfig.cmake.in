@@ -1,0 +1,52 @@
+# Qphase cmake module
+#
+# The following import targets are created
+#
+# ::
+#
+#   libqphase_widgets-static
+#   libqphase_widgets
+#
+# This module sets the following variables in your project::
+#
+#   QPhase_FOUND - true if QPhase was found on the system
+#   QPhase_INCLUDE_DIR - the directory containing QPhase headers
+#   QPhase_LIBRARY - 
+#   QPhase_STATIC_LIBRARY
+
+@PACKAGE_INIT@
+
+if(NOT TARGET qphase_core AND NOT TARGET qphase_core-static)
+  include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+  if (TARGET qphase_core)
+    get_target_property(@PROJECT_NAME@_INCLUDE_DIR qphase_core INTERFACE_INCLUDE_DIRECTORIES)
+  else ()
+    get_target_property(@PROJECT_NAME@_INCLUDE_DIR qphase_core-static INTERFACE_INCLUDE_DIRECTORIES)
+  endif()
+
+  if (TARGET qphase_core)
+    get_target_property(@PROJECT_NAME@_LIBRARY qphase_core LOCATION)
+  endif()
+  if (TARGET qphase_core-static)
+    get_target_property(@PROJECT_NAME@_STATIC_LIBRARY qphase_core-static LOCATION)
+  endif()
+
+endif()
+
+if(NOT TARGET qphase_widgets AND NOT TARGET qphase_widgets-static)
+  include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+
+  if (TARGET qphase_widgets)
+    get_target_property(@PROJECT_NAME@_INCLUDE_DIR qphase_widgets INTERFACE_INCLUDE_DIRECTORIES)
+  else ()
+    get_target_property(@PROJECT_NAME@_INCLUDE_DIR qphase_widgets-static INTERFACE_INCLUDE_DIRECTORIES)
+  endif()
+
+  if (TARGET qphase_widgets)
+    get_target_property(@PROJECT_NAME@_LIBRARY qphase_widgets LOCATION)
+  endif()
+  if (TARGET qphase_widgets-static)
+    get_target_property(@PROJECT_NAME@_STATIC_LIBRARY qphase_widgets-static LOCATION)
+  endif()
+endif()

@@ -11,6 +11,7 @@
 #include "qphase/waveforms/station.hpp"
 #include "qphase/waveforms/channel.hpp"
 #include "qphase/waveforms/threeChannelSensor.hpp"
+#include "qphase/waveforms/singleChannelVerticalSensor.hpp"
 #include "qphase/waveforms/singleChannelSensor.hpp"
 
 using namespace QPhase::Widgets::Waveforms;
@@ -71,8 +72,10 @@ void StationItem::setWaveforms(
     }
     auto threeComponentSensors
         = stationWaveforms.getThreeChannelSensorsReference();
+    auto singleComponentVerticalSensors
+        = stationWaveforms.getSingleChannelVerticalSensorsReference(); 
     auto singleComponentSensors
-        = stationWaveforms.getSingleChannelSensorsReference(); 
+        = stationWaveforms.getSingleChannelSensorsReference();
     auto nChannels = stationWaveforms.getNumberOfChannels();
     pImpl->mNumberOfChannels = nChannels;
     auto channelWidth  = boundingRect().width();
@@ -120,7 +123,7 @@ void StationItem::setWaveforms(
         eChannelItem->setName(name);
         iChannel = iChannel + 1;
     }
-    for (const auto &sensor : singleComponentSensors)
+    for (const auto &sensor : singleComponentVerticalSensors)
     {
         auto verticalChannel = sensor.getVerticalChannelReference();
         auto locationCode = QString::fromStdString(sensor.getLocationCode());
@@ -134,6 +137,21 @@ void StationItem::setWaveforms(
         zChannelItem->setPos(0, iChannel*channelHeight);
         zChannelItem->setName(name);
         iChannel = iChannel + 1; 
+    }
+    for (const auto &sensor : singleComponentSensors)
+    {
+        auto channel = sensor.getChannelReference();
+        auto locationCode = QString::fromStdString(sensor.getLocationCode());
+        auto name = pImpl->mName + "." 
+                  + QString::fromStdString(channel.getChannelCode());
+        if (!locationCode.isEmpty()){name = name + "." + locationCode;}
+        auto channelItem = new ChannelItem<U>(channelPlotArea, this);
+        channelItem->setAbsoluteTimeLimits(std::pair(pImpl->mPlotEarliestTime,
+                                                     pImpl->mPlotLatestTime));
+        channelItem->setWaveform(channel, WaveformType::Seismogram);
+        channelItem->setPos(0, iChannel*channelHeight);
+        channelItem->setName(name);
+        iChannel = iChannel + 1;
     }
 }
 

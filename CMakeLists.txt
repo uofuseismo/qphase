@@ -21,7 +21,8 @@ configure_file(${CMAKE_SOURCE_DIR}/include/private/organization.hpp.in
                ${CMAKE_SOURCE_DIR}/include/private/organization.hpp)
 
 # Qt
-find_package(Qt6 COMPONENTS Core Widgets Network REQUIRED)
+find_package(Qt6 COMPONENTS Core Widgets Quick Network REQUIRED)
+qt6_standard_project_setup()
 set(CMAKE_AUTOMOC ON) 
 set(CMAKE_AUTORCC ON) 
 set(CMAKE_AUTOUIC ON) 
@@ -39,7 +40,7 @@ find_package(FindSFF)
 include_directories(
     ${CMAKE_SOURCE_DIR}/include)
 set(PUBLIC_HEADER_DIRECTORIES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/urts)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/qphase)
 set(PRIVATE_HEADER_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/private)
 
@@ -67,6 +68,7 @@ set(CORE_SRC
     src/waveforms/segment.cpp
     src/waveforms/simpleResponse.cpp
     src/waveforms/singleChannelSensor.cpp
+    src/waveforms/singleChannelVerticalSensor.cpp
     src/waveforms/station.cpp
     src/waveforms/threeChannelSensor.cpp
     src/waveforms/waveform.cpp
@@ -119,6 +121,12 @@ if (${FindQGeoView_FOUND})
                                include/qphase/widgets/map/QGVMapBox.hpp)
     endif()
 endif()
+#qt6_add_qml_module(qphaseMap
+#                   URI qphaseMaps
+#                   QML_FILES src/widgets/map/map.qml
+#                   #RESOURCES
+#                   #    img/world.png
+#                   )
 
 set(BUILD_SHARED_LIBS YES)
 add_library(qphase_core ${CORE_SRC} ${DB_SRC} ${WS_SRC} src/version.cpp)
@@ -133,8 +141,8 @@ target_link_libraries(qphase_core
                       PRIVATE ${CURL_LIBRARIES})# SOCI::soci_postgresql)
 target_include_directories(qphase_core
                            PRIVATE SOCI::soci_sqlite3 ${CURL_INCLUDE_DIRS} ${SFF_INCLUDE_DIR}
-                           PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>
-                           PUBLIC $<INSTALL_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>)
+                           PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+                           PUBLIC  $<INSTALL_INTERFACE:include>)
 
 
 add_library(qphase_widgets ${UI_SRC} ${MAP_SRC})
@@ -144,11 +152,12 @@ set_target_properties(qphase_widgets PROPERTIES
                       CXX_EXTENSIONS NO)
 target_link_libraries(qphase_widgets
                       PUBLIC qphase_core
-                      PRIVATE ${QGEOVIEW_LIBRARY} Qt6::Core Qt6::Widgets Qt6::Network)
+                      PRIVATE ${QGEOVIEW_LIBRARY} Qt6::Core Qt6::Widgets 
+                                                  Qt6::Quick Qt6::Network)
 target_include_directories(qphase_widgets
-                           PUBLIC ${Qt6Widgets_INCLUDE_DIRS} ${QGEOVIEW_INCLUDE_DIR}
-                           PUBLIC $<BUILD_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>
-                           PUBLIC $<INSTALL_INTERFACE:${PUBLIC_HEADER_DIRECTORIES}>)
+                           PRIVATE ${Qt6Widgets_INCLUDE_DIRS} ${QGEOVIEW_INCLUDE_DIR}
+                           PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+                           PUBLIC  $<INSTALL_INTERFACE:include>)
 
 ##########################################################################################
 #                                      Applications                                      #
@@ -192,13 +201,36 @@ add_test(NAME unitTests
 #                                      Installation                                      #
 ##########################################################################################
 include(GNUInstallDirs)
-install(TARGETS qnode qphase_core
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/qphase
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    cmake/QPhaseConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION "${version}"
+    COMPATIBILITY AnyNewerVersion
+)
+
+install(TARGETS qphase_core qphase_widgets
+        EXPORT ${PROJECT_NAME}-targets
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-#install(DIRECTORY ${PUBLIC_HEADER_DIRECTORIES}/qphase
-#        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT Runtime)
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/qphase
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+export(EXPORT ${PROJECT_NAME}-targets
+       FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
+install(EXPORT ${PROJECT_NAME}-targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
 ##########################################################################################
 #                                     CPack Packaging                                    #

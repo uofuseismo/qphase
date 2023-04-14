@@ -13,6 +13,7 @@
 #include "qphase/database/internal/stationData.hpp"
 #include "private/haveMap.hpp"
 
+#include <QQuickWindow>
 
 using namespace QPhase::Widgets::Map;
 

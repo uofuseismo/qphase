@@ -1,36 +1,37 @@
-#ifndef QPHASE_WAVEFORMS_SINGLE_CHANNEL_SENSOR_HPP
-#define QPHASE_WAVEFORMS_SINGLE_CHANNEL_SENSOR_HPP
+#ifndef QPHASE_WAVEFORMS_SINGLE_CHANNEL_VERTICAL_SENSOR_HPP
+#define QPHASE_WAVEFORMS_SINGLE_CHANNEL_VERTICAL_SENSOR_HPP
 #include <memory>
 namespace QPhase::Waveforms
 {
+ template<class T> class SingleChannelSensor;
  template<class T> class Channel;
  class SimpleResponse;
  class InstrumentResponse;
 }
 namespace QPhase::Waveforms
 {
-/// @class SingleChannelSensor "singleChannelSensor.hpp" "qphase/waveforms/singleChannelSensor.hpp"
-/// @brief Defines a single-channel sensor.  For vertical sensors use 
-///        \c SingleChannelVerticalSensor.
+/// @class SingleChannelVerticalSensor "singleChannelVerticalSensor.hpp" "qphase/waveforms/singleChannelVerticalSensor.hpp"
+/// @brief Defines a single-channel vertical sensor.
 /// @copyright Ben Baker (University of Utah) distributed under the MIT license.
 template<class T>
-class SingleChannelSensor
+class SingleChannelVerticalSensor
 {
 public:
     /// @name Constructors
     /// @{
 
     /// @brief Constructor
-    SingleChannelSensor();
+    SingleChannelVerticalSensor();
     /// @brief Copy constructor.
     /// @param[in] sensor  The single-channel sensor from which to initialize
     ///                    this class.
-    SingleChannelSensor(const SingleChannelSensor &sensor);
+    SingleChannelVerticalSensor(const SingleChannelVerticalSensor &sensor);
     /// @brief Move constructor.
     /// @param[in,out] sensor   The single-channel sensor from which to
     ///                         initialize this class.  On exit, sensor's
     ///                         behavior is undefined.
-    SingleChannelSensor(SingleChannelSensor &&sensor) noexcept;
+    SingleChannelVerticalSensor(SingleChannelVerticalSensor &&sensor) noexcept;
+    SingleChannelVerticalSensor(const SingleChannelSensor<T> &sensor);
     /// @}
 
     /// @name Operators
@@ -39,33 +40,33 @@ public:
     /// @brief Copy assignment.
     /// @param[in] sensor  The single-channel sensor to copy to this.
     /// @result A deep copy of the input sensor.
-    SingleChannelSensor& operator=(const SingleChannelSensor &sensor);
+    SingleChannelVerticalSensor& operator=(const SingleChannelVerticalSensor &sensor);
     /// @brief Move assignment.
     /// @param[in,out] sensor  The single-channel sensor whose memory will be
     ///                        moved to this.  On exit, sensor's behavior is
     ///                        undefined.
     /// @result The memory from sensor moved to this.
-    SingleChannelSensor& operator=(SingleChannelSensor &&sensor) noexcept;
+    SingleChannelVerticalSensor& operator=(SingleChannelVerticalSensor &&sensor) noexcept;
     /// @}
 
-    /// @name Channel
+    /// @name Vertical Channel
     /// @{
 
-    /// @brief Sets the channel.
-    /// @param[in] channel   The channel.
-    void setChannel(const Channel<T> &channel);
+    /// @brief Sets the vertical channel.
+    /// @param[in] channel   The vertical channel.
+    void setVerticalChannel(const Channel<T> &channel);
     /// @brief Sets a vertical channel.
     /// @param[in,out] channel  The vertical channel to set.
     ///                         On exit, channel's behavior is undefined.
-    void setChannel(Channel<T> &&channel);
+    void setVerticalChannel(Channel<T> &&channel);
     /// @result A reference to the vertical channel.
-    /// @throws std::runtime_error if \c haveChannel() is false.
-    [[nodiscard]] const Channel<T>& getChannelReference() const;
+    /// @throws std::runtime_error if \c haveVerticalChannel() is false.
+    [[nodiscard]] const Channel<T>& getVerticalChannelReference() const;
     /// @result The vertical channel.
-    /// @throws std::runtime_error if \c haveChannel() is false.
-    [[nodiscard]] Channel<T> getChannel() const;
+    /// @throws std::runtime_error if \c haveVerticalChannel() is false.
+    [[nodiscard]] Channel<T> getVerticalChannel() const;
     /// @result True indicates the vertical channel was set.
-    [[nodiscard]] bool haveChannel() const noexcept;
+    [[nodiscard]] bool haveVerticalChannel() const noexcept;
     /// @}
 
     /// @name Location
@@ -119,11 +120,11 @@ public:
     /// @brief Resets class and releases memory.
     void clear() noexcept;
     /// @brief Destructor.
-    ~SingleChannelSensor();
+    ~SingleChannelVerticalSensor();
     /// @}
 private:
-    class SingleChannelSensorImpl;
-    std::unique_ptr<SingleChannelSensorImpl> pImpl;
+    class SingleChannelVerticalSensorImpl;
+    std::unique_ptr<SingleChannelVerticalSensorImpl> pImpl;
 };
 }
 #endif

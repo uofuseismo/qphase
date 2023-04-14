@@ -1,7 +1,8 @@
-#ifndef QPHASE_WIDGETS_MAP_MAINWINDOW_HPP
-#define QPHASE_WIDGETS_MAP_MAINWINDOW_HPP
+#ifndef QPHASE_WIDGETS_MAP_MAIN_WINDOW_HPP
+#define QPHASE_WIDGETS_MAP_MAIN_WINDOW_HPP
 #include <memory>
 #include <QMainWindow>
+#include <qphase/widgets/map/map.hpp>
 namespace QPhase::Widgets::Map
 {
 class Map;
@@ -20,6 +21,7 @@ public:
 
     /// @brief Constructor.
     explicit MainWindow(QWidget *parent = nullptr);
+    /// @}
 
     /// @result A pointer to the underlying map.
     [[nodiscard]] Map *getMapPointer();

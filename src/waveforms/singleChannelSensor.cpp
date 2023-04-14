@@ -24,14 +24,6 @@ void checkChannel(const Channel<T> &channel)
     {
         throw std::runtime_error("Channel code size must be 3");
     }
-    if (channelCode[2] == 'N' ||
-        channelCode[2] == 'E' ||
-        channelCode[2] == 'R' || 
-        channelCode[2] == 'T')
-    {
-        throw std::invalid_argument("Channel code = " + channelCode
-                                  + " appears to not be vertical");
-    }
 }
 
 }
@@ -40,12 +32,12 @@ template<class T>
 class SingleChannelSensor<T>::SingleChannelSensorImpl
 {
 public:
-    Channel<T> mVerticalChannel;
+    Channel<T> mChannel;
     std::string mLocationCode;
     double mLatitude{0};
     double mLongitude{0};
     double mElevation{0};
-    bool mHaveVerticalChannel{false};
+    bool mHaveChannel{false};
     bool mHaveLatitude{false};
     bool mHaveLongitude{false};
     bool mHaveElevation{false};
@@ -94,55 +86,47 @@ SingleChannelSensor<T>&
     return *this;
 }
 
-/// Vertical channel
+/// Channel
 template<class T>
-void SingleChannelSensor<T>::setVerticalChannel(Channel<T> &&channel)
+void SingleChannelSensor<T>::setChannel(Channel<T> &&channel)
 {
     checkChannel(channel);
-    pImpl->mVerticalChannel = std::move(channel);
-    if (!pImpl->mVerticalChannel.haveAzimuth())
-    {
-        pImpl->mVerticalChannel.setAzimuth(0);
-    }   
-    pImpl->mHaveVerticalChannel = true;
+    pImpl->mChannel = std::move(channel);
+    pImpl->mHaveChannel = true;
 }
 
 template<class T>
-void SingleChannelSensor<T>::setVerticalChannel(const Channel<T> &channel)
+void SingleChannelSensor<T>::setChannel(const Channel<T> &channel)
 {
     checkChannel(channel);
-    pImpl->mVerticalChannel = channel;
-    if (!pImpl->mVerticalChannel.haveAzimuth())
-    {
-        pImpl->mVerticalChannel.setAzimuth(0);
-    }
-    pImpl->mHaveVerticalChannel = true;
+    pImpl->mChannel = channel;
+    pImpl->mHaveChannel = true;
 }
 
 template<class T>
-const Channel<T>& SingleChannelSensor<T>::getVerticalChannelReference() const
+const Channel<T>& SingleChannelSensor<T>::getChannelReference() const
 {
-    if (!haveVerticalChannel())
+    if (!haveChannel())
     {
-        throw std::runtime_error("Vertical channel not set");
+        throw std::runtime_error("Channel not set");
     }
-    return pImpl->mVerticalChannel;
+    return pImpl->mChannel;
 }
 
 template<class T>
-Channel<T> SingleChannelSensor<T>::getVerticalChannel() const
+Channel<T> SingleChannelSensor<T>::getChannel() const
 {
-    if (!haveVerticalChannel())
+    if (!haveChannel())
     {
-        throw std::runtime_error("Vertical channel not set");
+        throw std::runtime_error("Channel not set");
     }
-    return pImpl->mVerticalChannel;
+    return pImpl->mChannel;
 }
 
 template<class T>
-bool SingleChannelSensor<T>::haveVerticalChannel() const noexcept
+bool SingleChannelSensor<T>::haveChannel() const noexcept
 {
-    return pImpl->mHaveVerticalChannel;
+    return pImpl->mHaveChannel;
 }
 
 /// Latitude

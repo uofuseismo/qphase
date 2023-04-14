@@ -10,7 +10,7 @@
 #include "load.hpp"
 #include "qphase/waveforms/station.hpp"
 #include "qphase/waveforms/threeChannelSensor.hpp"
-#include "qphase/waveforms/singleChannelSensor.hpp"
+#include "qphase/waveforms/singleChannelVerticalSensor.hpp"
 #include "qphase/waveforms/waveform.hpp"
 #include "qphase/waveforms/channel.hpp"
 #include "qphase/waveforms/segment.hpp"
@@ -285,7 +285,7 @@ std::vector<QPhase::Waveforms::Station<T>>
             // Station match
             if (thisStationName == stationName)
             {
-                QPhase::Waveforms::SingleChannelSensor<T> sensor;
+                QPhase::Waveforms::SingleChannelVerticalSensor<T> sensor;
                 sensor.setLocationCode(workSpace.at(i).locationCode);
                 if (workSpace[i].haveLatitude)
                 {

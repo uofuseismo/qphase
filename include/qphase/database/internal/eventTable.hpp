@@ -40,6 +40,9 @@ public:
     /// @result The queried events.
     [[nodiscard]] std::vector<Event> getEvents() const noexcept;
 
+    /// @brief Updates an event.
+    void update(const Event &event);
+
     /// @name Destructors
     /// @{
 

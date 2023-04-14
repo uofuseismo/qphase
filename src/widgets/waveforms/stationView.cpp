@@ -12,6 +12,8 @@
 #include "qphase/waveforms/waveform.hpp"
 #include "qphase/waveforms/threeChannelSensor.hpp"
 #include "qphase/waveforms/singleChannelSensor.hpp"
+#include "qphase/waveforms/singleChannelVerticalSensor.hpp"
+#include "qphase/waveforms/singleChannelSensor.hpp"
 #include "qphase/database/internal/event.hpp"
 #include "qphase/database/connection/sqlite3.hpp"
 
@@ -59,7 +61,7 @@ std::pair<std::chrono::microseconds, std::chrono::microseconds>
         {
         }
     }
-    auto sensors1C = station.getSingleChannelSensorsReference();
+    auto sensors1C = station.getSingleChannelVerticalSensorsReference();
     for (const auto &channel : sensors1C)
     {
         try
@@ -67,6 +69,20 @@ std::pair<std::chrono::microseconds, std::chrono::microseconds>
             tMin = std::min(tMin, channel.getVerticalChannelReference()
                                      .getWaveformReference().getEarliestTime());
             tMax = std::max(tMax, channel.getVerticalChannelReference()
+                                     .getWaveformReference().getLatestTime());
+        }
+        catch (...)
+        {
+        }
+    }
+    auto sensors1NVC = station.getSingleChannelSensorsReference();
+    for (const auto &channel : sensors1NVC)
+    {
+        try
+        {
+            tMin = std::min(tMin, channel.getChannelReference()
+                                     .getWaveformReference().getEarliestTime());
+            tMax = std::max(tMax, channel.getChannelReference()
                                      .getWaveformReference().getLatestTime());
         }
         catch (...)
@@ -200,7 +216,7 @@ void StationView::setStations(
 /// Sets the event that is being processed
 void StationView::setEvent(const QPhase::Database::Internal::Event &event)
 {
-    if (event.haveIdentifier())
+    if (!event.haveIdentifier())
     {
         throw std::invalid_argument("Event identifier not set");
     }
