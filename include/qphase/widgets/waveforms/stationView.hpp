@@ -48,8 +48,11 @@ public:
     ///                        while plotLimits.second is the end time of the
     ///                        plot.  
     void setTimeLimits(const std::pair<std::chrono::microseconds, std::chrono::microseconds> &plotLimits);
+    /// @result The plot's temporal limits.  Note, this is the minimum and maximum.
+    [[nodiscard]] std::pair<std::chrono::microseconds, std::chrono::microseconds> getTimeLimits() const;
     /// @brief Sets the stations to plot.
     void setStations(std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations);
+    void redrawWaveforms();
 
     /// @brief Sets the event information.
     /// @param[in] event  The event information that is currently being processed.

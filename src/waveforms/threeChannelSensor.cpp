@@ -173,6 +173,16 @@ const Channel<T>& ThreeChannelSensor<T>::getVerticalChannelReference() const
 }
 
 template<class T>
+Channel<T> *ThreeChannelSensor<T>::getVerticalChannelPointer()
+{
+    if (!haveVerticalChannel())
+    {
+        throw std::runtime_error("Vertical channel not set");
+    }
+    return &pImpl->mVerticalChannel;
+}
+
+template<class T>
 Channel<T> ThreeChannelSensor<T>::getVerticalChannel() const
 {
     if (!haveVerticalChannel())
@@ -221,6 +231,16 @@ const Channel<T>& ThreeChannelSensor<T>::getNorthChannelReference() const
         throw std::runtime_error("North channel not set");
     }
     return pImpl->mNorthChannel;
+}
+
+template<class T>
+Channel<T> *ThreeChannelSensor<T>::getNorthChannelPointer()
+{
+    if (!haveNorthChannel())
+    {   
+        throw std::runtime_error("North channel not set");
+    }   
+    return &pImpl->mNorthChannel;
 }
 
 template<class T>
@@ -282,6 +302,16 @@ Channel<T> ThreeChannelSensor<T>::getEastChannel() const
         throw std::runtime_error("East channel not set");
     }
     return pImpl->mEastChannel;
+}
+
+template<class T>
+Channel<T> *ThreeChannelSensor<T>::getEastChannelPointer()
+{
+    if (!haveEastChannel())
+    {   
+        throw std::runtime_error("East channel not set");
+    }   
+    return &pImpl->mEastChannel;
 }
 
 template<class T>

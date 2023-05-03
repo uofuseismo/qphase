@@ -330,13 +330,19 @@ void StationScene::wheelEvent(QGraphicsSceneWheelEvent *event)
         pImpl->mPlotLatestTime = plotT1;
         for (auto &stationItem : pImpl->mStationItems)
         {
-            stationItem.second->setAbsoluteTimeLimits(std::pair{plotT0, plotT1});
+            stationItem.second->setAbsoluteTimeLimits(
+               std::pair{pImpl->mPlotEarliestTime, pImpl->mPlotLatestTime});
         }
         update();
     }
     // Was the event handled?
     event->ignore();
     if (handled){event->accept();}
+}
+
+void StationScene::redrawWaveforms()
+{
+    populateScene();
 }
 
 /// Sets the stations

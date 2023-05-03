@@ -92,8 +92,8 @@ void StationItem::setWaveforms(
                   + QString::fromStdString(verticalChannel.getChannelCode());
         if (!locationCode.isEmpty()){name = name + "." + locationCode;}
         auto zChannelItem = new ChannelItem<U>(channelPlotArea, this);
-        zChannelItem->setAbsoluteTimeLimits(std::pair(pImpl->mPlotEarliestTime,
-                                                      pImpl->mPlotLatestTime));
+        zChannelItem->setAbsoluteTimeLimits(std::pair{pImpl->mPlotEarliestTime,
+                                                      pImpl->mPlotLatestTime});
         zChannelItem->setWaveform(verticalChannel, WaveformType::Seismogram);
         zChannelItem->setPos(0, iChannel*channelHeight);
         zChannelItem->setName(name);
@@ -104,8 +104,8 @@ void StationItem::setWaveforms(
              + QString::fromStdString(northChannel.getChannelCode());
         if (!locationCode.isEmpty()){name = name + "." + locationCode;}
         auto nChannelItem = new ChannelItem<U>(channelPlotArea, this);
-        nChannelItem->setAbsoluteTimeLimits(std::pair(pImpl->mPlotEarliestTime,
-                                                      pImpl->mPlotLatestTime));
+        nChannelItem->setAbsoluteTimeLimits(std::pair{pImpl->mPlotEarliestTime,
+                                                      pImpl->mPlotLatestTime});
         nChannelItem->setWaveform(northChannel, WaveformType::Seismogram);
         nChannelItem->setPos(0, iChannel*channelHeight);
         nChannelItem->setName(name);
@@ -116,8 +116,8 @@ void StationItem::setWaveforms(
              + QString::fromStdString(eastChannel.getChannelCode());
         if (!locationCode.isEmpty()){name = name + "." + locationCode;}
         auto eChannelItem = new ChannelItem<U>(channelPlotArea, this);
-        eChannelItem->setAbsoluteTimeLimits(std::pair(pImpl->mPlotEarliestTime,
-                                                      pImpl->mPlotLatestTime));
+        eChannelItem->setAbsoluteTimeLimits(std::pair{pImpl->mPlotEarliestTime,
+                                                      pImpl->mPlotLatestTime});
         eChannelItem->setWaveform(eastChannel, WaveformType::Seismogram);
         eChannelItem->setPos(0, iChannel*channelHeight);
         eChannelItem->setName(name);
@@ -131,8 +131,8 @@ void StationItem::setWaveforms(
                   + QString::fromStdString(verticalChannel.getChannelCode());
         if (!locationCode.isEmpty()){name = name + "." + locationCode;}
         auto zChannelItem = new ChannelItem<U>(channelPlotArea, this);
-        zChannelItem->setAbsoluteTimeLimits(std::pair(pImpl->mPlotEarliestTime,
-                                                      pImpl->mPlotLatestTime));
+        zChannelItem->setAbsoluteTimeLimits(std::pair{pImpl->mPlotEarliestTime,
+                                                      pImpl->mPlotLatestTime});
         zChannelItem->setWaveform(verticalChannel, WaveformType::Seismogram);
         zChannelItem->setPos(0, iChannel*channelHeight);
         zChannelItem->setName(name);
@@ -146,8 +146,8 @@ void StationItem::setWaveforms(
                   + QString::fromStdString(channel.getChannelCode());
         if (!locationCode.isEmpty()){name = name + "." + locationCode;}
         auto channelItem = new ChannelItem<U>(channelPlotArea, this);
-        channelItem->setAbsoluteTimeLimits(std::pair(pImpl->mPlotEarliestTime,
-                                                     pImpl->mPlotLatestTime));
+        channelItem->setAbsoluteTimeLimits(std::pair{pImpl->mPlotEarliestTime,
+                                                     pImpl->mPlotLatestTime});
         channelItem->setWaveform(channel, WaveformType::Seismogram);
         channelItem->setPos(0, iChannel*channelHeight);
         channelItem->setName(name);

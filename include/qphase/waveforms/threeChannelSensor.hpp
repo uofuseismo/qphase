@@ -63,6 +63,10 @@ public:
     /// @result The vertical channel.
     /// @throws std::runtime_error if \c haveVerticalChannel() is false.
     [[nodiscard]] Channel<T> getVerticalChannel() const;
+    /// @result A pointer to the vertical channel.
+    /// @throws std::runtime_error if \c haveVerticalChannel() is false.
+    /// @note This exists for performance reasons only.
+    [[nodiscard]] Channel<T> *getVerticalChannelPointer();
     /// @result True indicates the vertical channel was set.
     [[nodiscard]] bool haveVerticalChannel() const noexcept;
 
@@ -78,6 +82,10 @@ public:
     /// @result A reference to the north channel.
     /// @throws std::runtime_error if \c haveNorthChannel() is false.
     [[nodiscard]] const Channel<T>& getNorthChannelReference() const;
+    /// @result A pointer to the north channel.
+    /// @throws std::runtime_error if \c haveNorthChannel() is false.
+    /// @note This exists for performance reasons only.
+    [[nodiscard]] Channel<T> *getNorthChannelPointer();
     /// @result The north channel.
     /// @throws std::runtime_error if \c haveNorthChannel() is false.
     [[nodiscard]] Channel<T> getNorthChannel() const;
@@ -96,6 +104,10 @@ public:
     /// @result A reference to the east channel.
     /// @throws std::runtime_error if \c haveEastChannel() is false.
     [[nodiscard]] const Channel<T>& getEastChannelReference() const;
+    /// @result A pointer to the east channel.
+    /// @throws std::runtime_error if \c haveEastChannel() is false.
+    /// @note This exists for performance reasons only.
+    [[nodiscard]] Channel<T> *getEastChannelPointer();
     /// @result The east channel.
     /// @throws std::runtime_error if \c haveEastChannel() is false.
     [[nodiscard]] Channel<T> getEastChannel() const;

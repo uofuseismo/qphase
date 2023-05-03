@@ -172,7 +172,7 @@ set_target_properties(qnode PROPERTIES
                       CXX_STANDARD 17
                       CXX_STANDARD_REQUIRED YES
                       CXX_EXTENSIONS NO)
-target_include_directories(qnode PRIVATE ${SFF_INCLUDE_DIR})
+target_include_directories(qnode PRIVATE ${SFF_INCLUDE_DIR} PUBLIC ${QGEOVIEW_INCLUDE_DIR})
 target_link_libraries(qnode
                       PRIVATE qphase_core qphase_widgets Qt6::Core Qt6::Widgets Qt6::Network ${SFF_LIBRARY} SOCI::soci_core)
 ##########################################################################################

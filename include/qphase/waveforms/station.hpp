@@ -71,8 +71,10 @@ public:
     /// @param[in] channel       The channel code.
     /// @param[in] locationCode  The location code.
     /// @throws std::invalid_argument if \c channelExists() is false.
-    [[nodiscard]] Channel<T> getChannelReference(const std::string &channel,
-                                                 const std::string &locationCode);
+    [[nodiscard]] Channel<T> *getChannelPointer(const std::string &channel,
+                                                const std::string &locationCode);
+    [[nodiscard]] const Channel<T> &getChannelReference(const std::string &channel,
+                                                        const std::string &locationCode) const;
     /// @param[in] channel       The channel code.
     /// @param[in] locationCode  The location code.
     /// @result True indicates the channel exists.

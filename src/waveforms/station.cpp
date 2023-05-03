@@ -83,6 +83,118 @@ public:
                                       + " already exists");
         }
     }
+    const Channel<T> &getChannelReference(const std::string &channel,
+                                          const std::string &locationCode) const
+    {
+        for (const auto &sensor : mSingleChannelSensors)
+        {
+            auto sensorLocationCode = sensor.getLocationCode();
+            if (sensorLocationCode == locationCode)
+            {
+                auto channelCode
+                    = sensor.getChannelReference().getChannelCode();
+                if (channel == channelCode)
+                {   
+                    return sensor.getChannelReference();
+                }
+            }
+        }
+        for (const auto &sensor : mSingleChannelVerticalSensors)
+        {
+            auto sensorLocationCode = sensor.getLocationCode();
+            if (sensorLocationCode == locationCode)
+            {
+                auto zChannelCode
+                    = sensor.getVerticalChannelReference().getChannelCode();
+                if (channel == zChannelCode)
+                {
+                    return sensor.getVerticalChannelReference();
+                }
+            }
+        }
+        for (const auto &sensor : mThreeChannelSensors)
+        {
+            auto sensorLocationCode = sensor.getLocationCode();
+            if (sensorLocationCode == locationCode)
+            {
+                auto zChannelCode
+                    = sensor.getVerticalChannelReference().getChannelCode();
+                if (channel == zChannelCode)
+                {
+                    return sensor.getVerticalChannelReference();
+                }
+                auto nChannelCode
+                    = sensor.getNorthChannelReference().getChannelCode();
+                if (channel == nChannelCode)
+                {
+                    return sensor.getNorthChannelReference();
+                }
+                auto eChannelCode
+                    = sensor.getEastChannelReference().getChannelCode();
+                if (channel == eChannelCode)
+                {
+                    return sensor.getEastChannelReference();
+                }
+            }
+        }
+        throw std::runtime_error("Channel does not exist");
+    }
+    Channel<T> *getChannelPointer(const std::string &channel,
+                                  const std::string &locationCode)
+    {
+        for (auto &sensor : mSingleChannelSensors)
+        {
+            auto sensorLocationCode = sensor.getLocationCode();
+            if (sensorLocationCode == locationCode)
+            {
+                auto channelCode
+                    = sensor.getChannelReference().getChannelCode();
+                if (channel == channelCode)
+                {
+                    return sensor.getChannelPointer();
+                }
+            }
+        }
+        for (auto &sensor : mSingleChannelVerticalSensors)
+        {
+            auto sensorLocationCode = sensor.getLocationCode();
+            if (sensorLocationCode == locationCode)
+            {
+                auto zChannelCode
+                    = sensor.getVerticalChannelReference().getChannelCode();
+                if (channel == zChannelCode)
+                {
+                    return sensor.getVerticalChannelPointer();
+                }
+            }
+        }
+        for (auto &sensor : mThreeChannelSensors)
+        {
+            auto sensorLocationCode = sensor.getLocationCode();
+            if (sensorLocationCode == locationCode)
+            {
+                auto zChannelCode
+                    = sensor.getVerticalChannelReference().getChannelCode();
+                if (channel == zChannelCode)
+                {
+                    return sensor.getVerticalChannelPointer();
+                }
+                auto nChannelCode
+                    = sensor.getNorthChannelReference().getChannelCode();
+                if (channel == nChannelCode)
+                {
+                    return sensor.getNorthChannelPointer();
+                }
+                auto eChannelCode
+                    = sensor.getEastChannelReference().getChannelCode();
+                if (channel == eChannelCode)
+                {
+                    return sensor.getEastChannelPointer();
+                }
+            }
+        }
+        throw std::runtime_error("Channel does not exist");
+    }
     // Check if channel exists
     bool channelExists(const std::string &channel,
                        const std::string &locationCode) const
@@ -366,6 +478,32 @@ const std::vector<SingleChannelSensor<T>>&
 {
     return pImpl->mSingleChannelSensors;
 }
+
+/// Get channel
+template<class T>
+const Channel<T>&
+Station<T>::getChannelReference(const std::string &channel,
+                                const std::string &locationCode) const
+{
+    if (!channelExists(channel, locationCode))
+    {
+        throw std::runtime_error("Channel does not exist");
+    }
+    return pImpl->getChannelReference(channel, locationCode);
+}
+
+template<class T>
+Channel<T>*
+Station<T>::getChannelPointer(const std::string &channel,
+                                const std::string &locationCode)
+{
+    if (!channelExists(channel, locationCode))
+    {
+        throw std::runtime_error("Channel does not exist");
+    }   
+    return pImpl->getChannelPointer(channel, locationCode);
+}
+
 
 /// Channel exists?
 template<class T>

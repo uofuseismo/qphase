@@ -178,6 +178,12 @@ void StationView::setTimeLimits(const std::pair<std::chrono::microseconds,
     redrawScene();
 }
 
+std::pair<std::chrono::microseconds, std::chrono::microseconds>
+    StationView::getTimeLimits() const
+{
+    return std::pair {pImpl->mPlotEarliestTime, pImpl->mPlotLatestTime};
+}
+
 /// Force a redraw
 void StationView::redrawScene()
 {
@@ -211,6 +217,11 @@ void StationView::setStations(
     pImpl->mStations = stations;
     pImpl->mScene->setStations(stations);
     redrawScene();
+}
+
+void StationView::redrawWaveforms()
+{
+    if (pImpl->mScene != nullptr){pImpl->mScene->populateScene();}
 }
 
 /// Sets the event that is being processed

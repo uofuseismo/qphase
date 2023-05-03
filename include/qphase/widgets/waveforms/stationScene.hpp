@@ -43,6 +43,7 @@ public:
     void setRelativeTimeLimits(const std::chrono::microseconds &time);
     /// @brief Sets the stations to plot.
     void setStations(std::shared_ptr<std::vector<QPhase::Waveforms::Station<double>>> &stations);
+    void redrawWaveforms();
 
     StationScene(const StationScene &) = delete;
     StationScene(StationScene &&) noexcept = delete;

@@ -171,6 +171,16 @@ Channel<T> SingleChannelVerticalSensor<T>::getVerticalChannel() const
 }
 
 template<class T>
+Channel<T> *SingleChannelVerticalSensor<T>::getVerticalChannelPointer()
+{
+    if (!haveVerticalChannel())
+    {
+        throw std::runtime_error("Vertical channel not set");
+    }
+    return &pImpl->mVerticalChannel;
+}
+
+template<class T>
 bool SingleChannelVerticalSensor<T>::haveVerticalChannel() const noexcept
 {
     return pImpl->mHaveVerticalChannel;

@@ -62,6 +62,10 @@ public:
     /// @result A reference to the vertical channel.
     /// @throws std::runtime_error if \c haveVerticalChannel() is false.
     [[nodiscard]] const Channel<T>& getVerticalChannelReference() const;
+    /// @result A pointer to the vertical channel.
+    /// @throws std::runtime_error if \c haveVerticalChannel() is false.
+    /// @note This exists for performance reasons only.
+    [[nodiscard]] Channel<T> *getVerticalChannelPointer();
     /// @result The vertical channel.
     /// @throws std::runtime_error if \c haveVerticalChannel() is false.
     [[nodiscard]] Channel<T> getVerticalChannel() const;

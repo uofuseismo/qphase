@@ -114,6 +114,16 @@ const Channel<T>& SingleChannelSensor<T>::getChannelReference() const
 }
 
 template<class T>
+Channel<T> *SingleChannelSensor<T>::getChannelPointer()
+{
+    if (!haveChannel())
+    {   
+        throw std::runtime_error("Channel not set");
+    }   
+    return &pImpl->mChannel;
+}
+
+template<class T>
 Channel<T> SingleChannelSensor<T>::getChannel() const
 {
     if (!haveChannel())

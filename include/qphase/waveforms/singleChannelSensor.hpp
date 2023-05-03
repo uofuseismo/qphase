@@ -54,17 +54,21 @@ public:
     /// @brief Sets the channel.
     /// @param[in] channel   The channel.
     void setChannel(const Channel<T> &channel);
-    /// @brief Sets a vertical channel.
-    /// @param[in,out] channel  The vertical channel to set.
+    /// @brief Sets a channel.
+    /// @param[in,out] channel  The channel to set.
     ///                         On exit, channel's behavior is undefined.
     void setChannel(Channel<T> &&channel);
-    /// @result A reference to the vertical channel.
+    /// @result A reference to the channel.
     /// @throws std::runtime_error if \c haveChannel() is false.
     [[nodiscard]] const Channel<T>& getChannelReference() const;
-    /// @result The vertical channel.
+    /// @result A pointer to the channel.
+    /// @throws std::runtime_error if \c haveChannel() is false.
+    /// @note This exists for performance reasons only.
+    [[nodiscard]] Channel<T> *getChannelPointer();
+    /// @result The channel.
     /// @throws std::runtime_error if \c haveChannel() is false.
     [[nodiscard]] Channel<T> getChannel() const;
-    /// @result True indicates the vertical channel was set.
+    /// @result True indicates the channel was set.
     [[nodiscard]] bool haveChannel() const noexcept;
     /// @}
 
