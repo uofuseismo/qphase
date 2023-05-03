@@ -45,6 +45,8 @@ public:
     /// @brief Sets the channel's waveform.
     /// @param[in] waveform  The channel's waveform.
     void setWaveform(const Waveform<T> &waveform);
+    /// @param[in,out] waveform  The channel's waveform.  On exit, waveform's
+    ///                          behavior is undefined.
     void setWaveform(Waveform<T> &&waveform);
     /// @result a reference to the channel waveform. 
     [[nodiscard]] const Waveform<T> &getWaveformReference() const;

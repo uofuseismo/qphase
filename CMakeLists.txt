@@ -21,7 +21,7 @@ configure_file(${CMAKE_SOURCE_DIR}/include/private/organization.hpp.in
                ${CMAKE_SOURCE_DIR}/include/private/organization.hpp)
 
 # Qt
-find_package(Qt6 COMPONENTS Core Widgets Quick Network REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Widgets Quick Network REQUIRED)
 qt6_standard_project_setup()
 set(CMAKE_AUTOMOC ON) 
 set(CMAKE_AUTORCC ON) 
@@ -93,6 +93,7 @@ if (${CURL_FOUND})
 endif()
 
 set(UI_SRC
+    src/widgets/colorMaps/parula.cpp
     src/widgets/tableViews/eventTableModel.cpp
     src/widgets/tableViews/eventTableView.cpp
     src/widgets/waveforms/channelItem.cpp
@@ -182,14 +183,15 @@ set(TEST_SRC
     testing/main.cpp
     testing/database/internal.cpp
     testing/waveforms/waveform.cpp
-    testing/webServices/comcat.cpp)
+    testing/webServices/comcat.cpp
+    testing/widgets/colorMaps.cpp)
 add_executable(unitTests ${TEST_SRC})
 set_target_properties(unitTests PROPERTIES
                       CXX_STANDARD 20
                       CXX_STANDARD_REQUIRED YES
                       CXX_EXTENSIONS NO)
 target_link_libraries(unitTests
-                      PRIVATE qphase_core ${GTEST_BOTH_LIBRARIES})
+                      PRIVATE qphase_core qphase_widgets ${GTEST_BOTH_LIBRARIES} Qt6::Gui)
 target_include_directories(unitTests
                            PRIVATE ${GTEST_INCLUDE_DIRS}
                                    ${PRIVATE_HEADER_DIRECTORIES}

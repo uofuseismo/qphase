@@ -1,5 +1,5 @@
-#ifndef QURTS_COLORMAPS_PARULA_HPP
-#define QURTS_COLORMAPS_PARULA_HPP
+#ifndef QPHASE_WIDGETS_COLOR_MAPS_PARULA_HPP
+#define QPHASE_WIDGETS_COLOR_MAPS_PARULA_HPP
 #include <memory>
 #include "qphase/widgets/colorMaps/colorMap.hpp"
 namespace QPhase::Widgets::ColorMaps
@@ -41,7 +41,8 @@ public:
 
     /// @brief Initializes the interpolator to work on the range.
     /// @throws std::invalid_argument if range.first >= range.second.
-    void initialize(const std::pair<double, double> &range);
+    void initialize(const std::pair<double, double> &range,
+                    InterpolationMethod method = InterpolationMethod::Linear);
     /// @result The interpolated color on the interval.
     [[nodiscard]] QColor evaluate(double x) const override;
     /// @result True indicates that class is initialized.
